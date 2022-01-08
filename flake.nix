@@ -1,5 +1,5 @@
 {
-  description = "Foo Bar Rust Project";
+  description = "Auth MVC demo";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -11,13 +11,9 @@
 
   outputs = { self, nixpkgs, flake-utils, naersk }:
     let
-      name = "foo-bar";
-      overlay = nixpkgs.lib.composeExtensions naersk.overlay (final: prev: {
-        ${name} = final.naersk.buildPackage {
-          pname = name;
-          root = ./.;
-        };
-      });
+      overlay = final: prev: {
+        auth-demo = final.callPackage ./default.nix { };
+      };
       overlays = [ overlay ];
     in
     {
@@ -25,22 +21,29 @@
     } //
     (flake-utils.lib.eachDefaultSystem (system:
       let
-        name = "foo-bar";
         pkgs = import nixpkgs { inherit system overlays; };
       in
       rec {
         # nix build
-        packages.${name} = pkgs.${name};
-        defaultPackage = packages.${name};
+        packages.auth-demo = pkgs.auth-demo;
+        defaultPackage = packages.auth-demo;
 
         # nix run
-        apps.${name} = flake-utils.lib.mkApp { drv = packages.${name}; };
-        defaultApp = apps.${name};
+        apps.auth-demo = flake-utils.lib.mkApp { drv = packages.auth-demo; };
+        defaultApp = apps.auth-demo;
 
         # nix develop
         devShell = pkgs.mkShell {
           inputsFrom = [ defaultPackage ];
-          buildInputs = with pkgs; [ rustc rust-analyzer rustfmt clippy ];
+          buildInputs = with pkgs; [
+            # Rust tooling
+            rustc rust-analyzer rustfmt clippy
+            # Postgres tooling
+            postgresql pgformatter sqls
+            # HTML/CSS tooling
+            nodePackages.prettier
+            sass
+          ];
         };
       }));
 }

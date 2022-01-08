@@ -79,6 +79,8 @@ dependencies = [
  "normpath",
  "postgres-types",
  "rocket",
+ "rocket-assets-fairing",
+ "rocket-post-as-delete",
  "rocket_db_pools",
  "rocket_dyn_templates",
  "serde",
@@ -1424,6 +1426,25 @@ dependencies = [
  "ubyte",
  "version_check",
  "yansi",
+]
+
+[[package]]
+name = "rocket-assets-fairing"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d664a6017fdc3d5dc6e8430bb4ac6910c1cb79361fece566e2536bf9bfe21690"
+dependencies = [
+ "normpath",
+ "rocket",
+]
+
+[[package]]
+name = "rocket-post-as-delete"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8e2e0fa05ea6bc1996ab8d64304b2fece4cf3cdbdee9d042773bfa053ed28f38"
+dependencies = [
+ "rocket",
 ]
 
 [[package]]

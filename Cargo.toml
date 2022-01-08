@@ -18,6 +18,10 @@ features = [ "tera" ]
 [dependencies.rocket_db_pools]
 version = "0.1.0-rc"
 features = [ "deadpool_postgres" ]
+[dependencies.rocket-post-as-delete]
+version = "0.1"
+[dependencies.rocket-assets-fairing]
+version = "0.1"
 
 [dependencies.time]
 version = "0.3"
