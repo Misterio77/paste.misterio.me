@@ -40,9 +40,6 @@
             rustc rust-analyzer rustfmt clippy
             # Postgres tooling
             postgresql pgformatter sqls
-            # HTML/CSS tooling
-            nodePackages.prettier
-            sass
           ];
         };
       }));

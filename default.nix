@@ -1,4 +1,4 @@
-{ lib, rustPlatform }:
+{ lib, rustPlatform, nodePackages }:
 
 rustPlatform.buildRustPackage rec {
   pname = "auth-demo";
@@ -13,9 +13,13 @@ rustPlatform.buildRustPackage rec {
     };
   };
 
+  nativeBuildInputs = [ nodePackages.sass ];
   postInstall = ''
-    install -d $out/etc
-    cp -r templates assets db $out/etc
+    sass assets/style.{s,}css --style compressed
+
+    mkdir -p $out/etc/assets
+    cp assets/style.css{.map,} $out/etc/assets
+    cp -r templates db $out/etc
   '';
 
   meta = with lib; {

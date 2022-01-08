@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Home{% endblock %} | Auth Demo</title>
+    <link rel="icon" href="data:,"> <!-- Disable favicon -->
+    <link rel="stylesheet" href="/assets/style.css" />
+  </head>
+  <body>
+    <nav>
+      <ul>
+        <li>
+          <a href="/">Foo Bar</a>
+        </li>
+      </ul>
+    </nav>
+    <main class="container">
+      {% include "flash" %}
+      {% block content %}
+      {% endblock content %}
+    </main>
+
+    <footer class="container">
+      <p>
+        Authentication Demo -
+        <a href="https://github.com/misterio77/auth-demo">Sourcecode</a>
+      </p>
+      <p>Served from: <em>{{ exec_path() }}</em></p>
+    </footer>
+  </body>
+</html>
