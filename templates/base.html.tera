@@ -9,15 +9,28 @@
     <link rel="stylesheet" href="/assets/style.css" />
   </head>
   <body>
-    <nav>
+    <nav class="container-fluid">
       <ul>
-        <li>
-          <a href="/">paste.misterio.me</a>
-        </li>
+        <li><a href="/">paste.misterio.me</a></li>
+      </ul>
+      <ul>
+        {% block auth %}
+        {% if session.creator %}
+          <li><a href="/~{{ session.creator }}">~{{ session.creator }}</a></li> |
+          <li><a href="/logout">Log out</a></li>
+        {% else %}
+          <li><a href="/login">Log in</a></li> |
+          <li><a href="/register">Register</a></li>
+        {% endif %}
+        {% endblock auth %}
       </ul>
     </nav>
+
     <main class="container">
       {% block content %}
+        {% if flash %}
+          {{ flash.message }}
+        {% endif %}
       {% endblock content %}
     </main>
 

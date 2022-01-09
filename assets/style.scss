@@ -21,16 +21,8 @@ $primary-700: #c2185b;
 
 // Style navbar
 body>nav {
-  display: flex;
-  flex-wrap: wrap;
-  padding-right: var(--spacing);
-  padding-left: var(--spacing);
-  background-color: var(--code-background-color);
-  border-bottom: 1px solid var(--primary);
-  &>ul {
-    display: flex;
-    flex-wrap: wrap;
-  }
+  box-shadow: var(--card-box-shadow);
+  background-color: var(--card-sectionning-background-color);
 }
 
 // Style footer
@@ -49,6 +41,15 @@ article {
   &.slim {
     @media (min-width: 30em) {
       max-width: 30em;
+    }
+  }
+  // Remove bottom margin from headers
+  header {
+    h1, h2, h3, h4, h5, h6 {
+      margin-bottom: 0;
+    }
+    hgroup, .headings {
+      margin-bottom: 0;
     }
   }
 }

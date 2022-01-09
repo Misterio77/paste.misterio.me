@@ -5,26 +5,31 @@
 {% block content%}
 
 <article class="slim">
-  <header class="headings">
-    <h1>Register</h1>
-    <h2>Already have an account? <a href="/login">Login</a></h2>
+  <header>
+    <hgroup>
+      <h1>Register</h1>
+      <h2>Already have an account? <a href="/login">Login</a></h2>
+    </hgroup>
   </header>
   <form method="post">
     <label>
       Username
-      <input type="text" name="login" autocomplete="username" autofocus />
+      <input type="text" name="username" autocomplete="username" required autofocus />
     </label>
     <label>
       Email address
-      <input type="email" name="password" autocomplete="email" />
+      <input type="email" name="email" autocomplete="email" required />
     </label>
     <label>
       Password
-      <input type="password" name="password" autocomplete="new-password" />
+      <input type="password" name="password" autocomplete="new-password" required />
     </label>
     <button>
       Login
     </button>
+    {% if flash %}
+      {{ flash.message }}
+    {% endif %}
   </form>
 </article>
 

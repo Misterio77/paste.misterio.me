@@ -1,10 +1,12 @@
+pub use rocket::{
+    http::Status,
+    outcome::{IntoOutcome, Outcome},
+};
+
 use std::error::Error as StdError;
 use std::fmt;
 
-use rocket::{
-    http::Status,
-    response::{Flash, Redirect},
-};
+use rocket::response::{Flash, Redirect};
 use rocket_dyn_templates::Template;
 use serde::{
     ser::{SerializeStruct, Serializer},
@@ -60,19 +62,68 @@ impl fmt::Display for ServerError {
 }
 
 impl StdError for ServerError {
-    /// Obter o erro originário
     fn source(&self) -> Option<&(dyn StdError + 'static)> {
         self.source.as_ref().map(|s| &**s as _)
     }
 }
 
-/// Converte erro do rocket
+impl From<ServerErrorBuilder> for ServerError {
+    fn from(e: ServerErrorBuilder) -> Self {
+        e.build()
+    }
+}
+
+impl<T: Into<ServerError>> From<Option<T>> for ServerError {
+    fn from(e: Option<T>) -> Self {
+        match e {
+            Some(error) => ServerError::builder_from(error),
+            None => ServerError::builder(),
+        }
+        .build()
+    }
+}
+
+impl<T: Into<ServerError>> From<(Status, T)> for ServerError {
+    fn from(e: (Status, T)) -> Self {
+        ServerError::builder_from(e.1).code(e.0).build()
+    }
+}
+
+impl From<ServerError> for (Status, ServerError) {
+    fn from(e: ServerError) -> Self {
+        (e.code, e)
+    }
+}
+
+impl<
+        T: Send + Sync + fmt::Display + fmt::Debug + 'static,
+        U: Send + Sync + fmt::Display + fmt::Debug + 'static,
+    > From<rocket_db_pools::Error<T, U>> for ServerError
+{
+    fn from(e: rocket_db_pools::Error<T, U>) -> Self {
+        ServerError::builder()
+            .code(Status::ServiceUnavailable)
+            .source(Box::new(e))
+            .message("Couldn't start database connection pool")
+            .build()
+    }
+}
+
 impl From<rocket::error::Error> for ServerError {
     fn from(e: rocket::error::Error) -> Self {
         ServerError::builder()
             .code(Status::ServiceUnavailable)
             .source(Box::new(e))
             .message("Couldn't start up server")
+            .build()
+    }
+}
+impl From<argon2::Error> for ServerError {
+    fn from(e: argon2::Error) -> Self {
+        ServerError::builder()
+            .code(Status::InternalServerError)
+            .source(Box::new(e))
+            .message("Hashing error")
             .build()
     }
 }
@@ -97,20 +148,10 @@ impl<'r> rocket::response::Responder<'r, 'static> for ServerError {
         self,
         req: &'r rocket::request::Request<'_>,
     ) -> rocket::response::Result<'static> {
-        let media_type = req.accept().map(|a| a.preferred().media_type());
-
-        let mut response = rocket::response::Response::build();
-        response.status(self.code);
-
-        if media_type == Some(&rocket::http::MediaType::JSON) {
-            let json = rocket::serde::json::Json(self);
-            response.join(json.respond_to(req)?)
-        } else {
-            let template = Template::render("error", self);
-            response.join(template.respond_to(req)?)
-        };
-
-        response.ok()
+        rocket::response::Response::build()
+            .status(self.code)
+            .join(Template::render("error", self).respond_to(req)?)
+            .ok()
     }
 }
 

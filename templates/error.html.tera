@@ -2,11 +2,16 @@
 
 {% block title %}Error{% endblock title %}
 
-{% block content%}
+{% block auth %}
+{% endblock auth %}
+
+{% block content %}
 <article>
   <header>
-    <h1>{{ code | as_str }}</h1>
-    <p><strong>{{ description }}</strong></p>
+    <hgroup>
+      <h1>{{ code | as_str }}</h1>
+      <h2>{{ description }}</h2>
+    </hgroup>
   </header>
 
   {% if reason %}

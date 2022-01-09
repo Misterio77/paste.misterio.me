@@ -1,0 +1,27 @@
+{% extends "base" %}
+
+{% block title %}Log out{% endblock title %}
+
+{% block content%}
+
+<article class="slim">
+  <header>
+    <h1>Log out</h1>
+  </header>
+  <form method="post">
+    <fieldset>
+      <label>
+        <input role="switch" type="checkbox" name="all" autofocus />
+        Log out from all sessions
+      </label>
+    </fieldset>
+    <button>
+      Log out
+    </button>
+    {% if flash %}
+      {{ flash.message }}
+    {% endif %}
+  </form>
+</article>
+
+{% endblock content %}

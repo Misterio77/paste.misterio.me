@@ -9,36 +9,35 @@ license = "Unlicense"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[dependencies]
+rocket_async_compression = "0.1"
+rocket-post-as-delete = "0.1"
+rocket-sass-fairing = "0.1"
+normpath = "0.3"
+rand = "0.8"
+rust-argon2 = "1.0"
+
 [dependencies.rocket]
 version = "0.5.0-rc.1"
-features = [ "json" ]
+features = [ "json", "secrets" ]
 [dependencies.rocket_dyn_templates]
 version = "0.1.0-rc.1"
 features = [ "tera" ]
 [dependencies.rocket_db_pools]
 version = "0.1.0-rc"
 features = [ "deadpool_postgres" ]
-[dependencies.rocket_async_compression]
-version = "0.1"
-[dependencies.rocket-post-as-delete]
-version = "0.1"
-[dependencies.rocket-sass-fairing]
-version = "0.1"
-
-[dependencies.time]
-version = "0.3"
-features = [ "serde-human-readable" ]
 
 [dependencies.serde]
 version = "1.0"
 features = [ "derive" ]
 
+[dependencies.chrono]
+version = "0.4"
+features = [ "serde" ]
+
 [dependencies.postgres-types]
 version = "0.2"
-features = [ "with-time-0_3" ]
-
-[dependencies.normpath]
-version = "0.3"
+features = [ "with-chrono-0_4" ]
 
 [patch.crates-io]
 rocket = { git = "https://github.com/SergioBenitez/Rocket" }

@@ -1,5 +1,21 @@
 pub mod login;
+pub mod logout;
 pub mod register;
+
+pub mod home {
+    use crate::schema::Session;
+    use rocket::{get, request::FlashMessage, routes, Route};
+    use rocket_dyn_templates::{context, Template};
+
+    #[get("/")]
+    async fn home(flash: Option<FlashMessage<'_>>, session: Option<Session>) -> Template {
+        Template::render("base", context! {flash, session})
+    }
+
+    pub fn routes() -> Vec<Route> {
+        routes![home]
+    }
+}
 
 pub mod assets {
     use rocket::{get, routes, Route};
