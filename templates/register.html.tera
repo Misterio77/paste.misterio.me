@@ -1,0 +1,31 @@
+{% extends "base" %}
+
+{% block title %}Register{% endblock title %}
+
+{% block content%}
+
+<article class="slim">
+  <header class="headings">
+    <h1>Register</h1>
+    <h2>Already have an account? <a href="/login">Login</a></h2>
+  </header>
+  <form method="post">
+    <label>
+      Username
+      <input type="text" name="login" autocomplete="username" autofocus />
+    </label>
+    <label>
+      Email address
+      <input type="email" name="password" autocomplete="email" />
+    </label>
+    <label>
+      Password
+      <input type="password" name="password" autocomplete="new-password" />
+    </label>
+    <button>
+      Login
+    </button>
+  </form>
+</article>
+
+{% endblock content %}

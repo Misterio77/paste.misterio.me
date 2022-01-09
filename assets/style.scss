@@ -18,3 +18,37 @@ $primary-700: #c2185b;
 ::selection {
   background: var(--primary-hover);
 }
+
+// Style navbar
+body>nav {
+  display: flex;
+  flex-wrap: wrap;
+  padding-right: var(--spacing);
+  padding-left: var(--spacing);
+  background-color: var(--code-background-color);
+  border-bottom: 1px solid var(--primary);
+  &>ul {
+    display: flex;
+    flex-wrap: wrap;
+  }
+}
+
+// Style footer
+body>footer {
+  border-top: 1px solid var(--primary);
+  padding-top: 2rem;
+  p {
+    font-size: 80%;
+  }
+}
+
+article {
+  // Center cards
+  margin: auto;
+  // Slimmer card
+  &.slim {
+    @media (min-width: 30em) {
+      max-width: 30em;
+    }
+  }
+}

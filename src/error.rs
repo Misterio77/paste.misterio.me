@@ -79,9 +79,7 @@ impl From<rocket::error::Error> for ServerError {
 impl From<rocket_db_pools::deadpool_postgres::tokio_postgres::Error> for ServerError {
     fn from(e: rocket_db_pools::deadpool_postgres::tokio_postgres::Error) -> Self {
         let message = match e.as_db_error() {
-            Some(db_e) => {
-                db_e.message().into()
-            }
+            Some(db_e) => db_e.message().into(),
             None => {
                 format!("{}", e)
             }

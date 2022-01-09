@@ -1,10 +1,17 @@
+pub mod login;
+pub mod register;
+
 pub mod assets {
-    use rocket::get;
+    use rocket::{get, routes, Route};
     use rocket_sass_fairing::SassSheet;
 
     #[get("/style.css")]
-    pub async fn style(sheet: &SassSheet) -> &SassSheet {
+    async fn style(sheet: &SassSheet) -> &SassSheet {
         sheet
+    }
+
+    pub fn routes() -> Vec<Route> {
+        routes![style]
     }
 }
 

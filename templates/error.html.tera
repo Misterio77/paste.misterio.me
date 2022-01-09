@@ -3,24 +3,23 @@
 {% block title %}Error{% endblock title %}
 
 {% block content%}
+<article>
+  <header>
+    <h1>{{ code | as_str }}</h1>
+    <p><strong>{{ description }}</strong></p>
+  </header>
 
-<h1>Erro - {{ code | as_str }}</h1>
+  {% if reason %}
+  <details open>
+    <summary><small>Detailed error:</small></summary>
+    <small><code>{{ reason }}</code></small>
+  </details>
+  {% endif %}
 
-<p><strong>{{ description }}</strong></p>
-
-{% if reason %}
-<details open>
-  <summary><small>Detailed error:</small></summary>
-  <small><code>{{ reason }}</code></small>
-</details>
-{% endif %}
-
-<p>
-  <small>
+  <p><small>
     Maybe you want to
     <a href="#" onclick="history.go(-1)">go back</a>
     or return <a href="/">home</a>.
-  </small>
-</p>
-
+  </small></p>
+</article>
 {% endblock content %}

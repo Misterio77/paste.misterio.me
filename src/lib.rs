@@ -1,4 +1,4 @@
-pub mod error;
 pub mod database;
-pub mod tera;
+pub mod error;
 pub mod routes;
+pub mod tera;
