@@ -1,0 +1,26 @@
+{% extends "base" %}
+
+{% block title %}Error{% endblock title %}
+
+{% block content%}
+
+<h1>Erro - {{ code | as_str }}</h1>
+
+<p><strong>{{ description }}</strong></p>
+
+{% if reason %}
+<details open>
+  <summary><small>Detailed error:</small></summary>
+  <small><code>{{ reason }}</code></small>
+</details>
+{% endif %}
+
+<p>
+  <small>
+    Maybe you want to
+    <a href="#" onclick="history.go(-1)">go back</a>
+    or return <a href="/">home</a>.
+  </small>
+</p>
+
+{% endblock content %}

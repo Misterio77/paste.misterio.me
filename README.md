@@ -1,3 +1,3 @@
-# Rocket Auth Demo
+# paste.misterio.me
 
-A rust [rocket](https://rocket.rs) MVC demo. Featuring user authentication with short-lived session cookies (JWTs) and opaque refresh tokens.
+Paste service. Built with Rocket.

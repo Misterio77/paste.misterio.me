@@ -1,5 +1,5 @@
 {
-  description = "Auth MVC demo";
+  description = "Paste service";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -11,8 +11,9 @@
 
   outputs = { self, nixpkgs, flake-utils, naersk }:
     let
+      name = "paste.misterio.me";
       overlay = final: prev: {
-        auth-demo = final.callPackage ./default.nix { };
+        ${name} = final.callPackage ./default.nix { };
       };
       overlays = [ overlay ];
     in
@@ -25,12 +26,12 @@
       in
       rec {
         # nix build
-        packages.auth-demo = pkgs.auth-demo;
-        defaultPackage = packages.auth-demo;
+        packages.${name} = pkgs.${name};
+        defaultPackage = packages.${name};
 
         # nix run
-        apps.auth-demo = flake-utils.lib.mkApp { drv = packages.auth-demo; };
-        defaultApp = apps.auth-demo;
+        apps.${name} = flake-utils.lib.mkApp { drv = packages.${name}; };
+        defaultApp = apps.${name};
 
         # nix develop
         devShell = pkgs.mkShell {
@@ -40,6 +41,10 @@
             rustc rust-analyzer rustfmt clippy
             # Postgres tooling
             postgresql pgformatter sqls
+            # Sass tooling
+            nodePackages.sass
+            # Httpie for testing
+            httpie
           ];
         };
       }));

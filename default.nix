@@ -13,12 +13,9 @@ rustPlatform.buildRustPackage rec {
     };
   };
 
-  nativeBuildInputs = [ nodePackages.sass ];
   postInstall = ''
-    sass assets/style.{s,}css --style compressed
-
     mkdir -p $out/etc/assets
-    cp assets/style.css{.map,} $out/etc/assets
+    cp assets/style.css $out/etc/assets
     cp -r templates db $out/etc
   '';
 

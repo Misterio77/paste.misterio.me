@@ -1,6 +1,6 @@
 [package]
-name = "auth-demo"
-description = "Exemplo de autenticação JWT + Refresh Tokens"
+name = "paste-misterio-me"
+description = "Paste service"
 version = "0.1.0"
 authors = [ "Gabriel Fontes <eu@misterio.me>" ]
 readme = "README.md"
@@ -18,9 +18,11 @@ features = [ "tera" ]
 [dependencies.rocket_db_pools]
 version = "0.1.0-rc"
 features = [ "deadpool_postgres" ]
+[dependencies.rocket_async_compression]
+version = "0.1"
 [dependencies.rocket-post-as-delete]
 version = "0.1"
-[dependencies.rocket-assets-fairing]
+[dependencies.rocket-sass-fairing]
 version = "0.1"
 
 [dependencies.time]
