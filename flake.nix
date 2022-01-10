@@ -3,13 +3,10 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    flake-utils.url = "github:numtide/flake-utils";
-
-    naersk.url = "github:nmattia/naersk";
-    naersk.inputs.nixpkgs.follows = "nixpkgs";
+    utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, flake-utils, naersk }:
+  outputs = { self, nixpkgs, flake-utils }:
     let
       name = "paste-misterio-me";
       overlay = final: prev: {
