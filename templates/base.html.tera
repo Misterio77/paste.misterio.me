@@ -16,10 +16,10 @@
       <ul>
         {% block auth %}
         {% if session.creator %}
-          <li><a href="/~{{ session.creator }}">~{{ session.creator }}</a></li> |
+          <li><a href="/~{{ session.creator }}">~{{ session.creator }}</a></li>
           <li><a href="/logout">Log out</a></li>
         {% else %}
-          <li><a href="/login">Log in</a></li> |
+          <li><a href="/login">Log in</a></li>
           <li><a href="/register">Register</a></li>
         {% endif %}
         {% endblock auth %}
@@ -45,13 +45,12 @@
       <p>
         <a href="/">paste.misterio.me</a>
         -
-        <a href="//github.com/misterio77/paste.misterio.me">Source code</a>
+        <a href="//sr.ht/~misterio/paste.misterio.me/">Source code</a>
       </p>
       <p>Served from: <em>{{ exec_path() }}</em></p>
     </footer>
 
     {% block scripts %}
-    <!-- TODO: colocar scripts de cada linguagem no template das pastes -->
     {% endblock scripts %}
   </body>
 </html>

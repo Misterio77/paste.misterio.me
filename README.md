@@ -1,3 +1,3 @@
-# paste.misterio.me
+# [paste.misterio.me](https://paste.misterio.me)
 
-Paste service. Built with Rocket.
+Simple pasting service, without any tracking nor ads.
