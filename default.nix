@@ -1,8 +1,9 @@
 { lib, rustPlatform }:
 
-rustPlatform.buildRustPackage rec {
-  pname = "paste-misterio-me";
-  version = "0.1.5";
+let manifest = (lib.importTOML ./Cargo.toml).package;
+in rustPlatform.buildRustPackage rec {
+  pname = manifest.name;
+  version = manifest.version;
 
   src = lib.cleanSource ./.;
 
@@ -19,9 +20,9 @@ rustPlatform.buildRustPackage rec {
   '';
 
   meta = with lib; {
-    description = "Pasting service";
-    homepage = "https://github.com/Misterio77/paste.misterio.me";
-    license = licenses.unlicense;
+    description = manifest.desciption;
+    homepage = manifest.homepage;
+    license = licenses.agpl3Plus;
     platforms = platforms.all;
   };
 }

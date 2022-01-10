@@ -1,11 +1,13 @@
 [package]
 name = "paste-misterio-me"
 description = "Paste service"
-version = "0.1.5"
+version = "0.2.0"
 authors = [ "Gabriel Fontes <eu@misterio.me>" ]
 readme = "README.md"
+repository = "https://sr.ht/~misterio/paste.misterio.me"
+homepage = "https://paste.misterio.me"
 edition = "2018"
-license = "AGPLv3"
+license = "AGPL-3.0-or-later"
 build = "build.rs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
