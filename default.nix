@@ -2,7 +2,7 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "paste-misterio-me";
-  version = "0.1.2";
+  version = "0.1.4";
 
   src = lib.cleanSource ./.;
 
@@ -15,7 +15,7 @@ rustPlatform.buildRustPackage rec {
 
   postInstall = ''
     mkdir -p $out/etc
-    cp -r templates db $out/etc
+    cp -r assets templates db $out/etc
   '';
 
   meta = with lib; {

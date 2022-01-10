@@ -1369,15 +1369,16 @@ dependencies = [
 
 [[package]]
 name = "paste-misterio-me"
-version = "0.1.2"
+version = "0.1.4"
 dependencies = [
  "chrono",
+ "grass",
  "normpath",
  "postgres-types",
  "rand",
  "rocket",
+ "rocket-assets-fairing",
  "rocket-post-as-delete",
- "rocket-sass-fairing",
  "rocket_async_compression",
  "rocket_db_pools",
  "rocket_dyn_templates",
@@ -1780,22 +1781,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "rocket-assets-fairing"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d664a6017fdc3d5dc6e8430bb4ac6910c1cb79361fece566e2536bf9bfe21690"
+dependencies = [
+ "normpath",
+ "rocket",
+]
+
+[[package]]
 name = "rocket-post-as-delete"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "673ff257326d9e2a9d8f7d14fadbd20d808fdddab7f7b68baa6e2c67a7ce9771"
 dependencies = [
- "rocket",
-]
-
-[[package]]
-name = "rocket-sass-fairing"
-version = "0.1.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1a0f9f5fb563c21745d6ee771e92c4c1c3b192fd601cc367f8ab834a00f51344"
-dependencies = [
- "grass",
- "normpath",
  "rocket",
 ]
 

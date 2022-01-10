@@ -20,11 +20,11 @@ pub mod home {
 
 pub mod assets {
     use rocket::{get, routes, Route};
-    use rocket_sass_fairing::SassSheet;
+    use rocket_assets_fairing::{Asset, Assets};
 
     #[get("/style.css")]
-    async fn style(sheet: &SassSheet) -> &SassSheet {
-        sheet
+    async fn style(assets: &Assets) -> Option<Asset> {
+        assets.open("style.css").await.ok()
     }
 
     pub fn routes() -> Vec<Route> {

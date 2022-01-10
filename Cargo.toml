@@ -1,18 +1,19 @@
 [package]
 name = "paste-misterio-me"
 description = "Paste service"
-version = "0.1.2"
+version = "0.1.4"
 authors = [ "Gabriel Fontes <eu@misterio.me>" ]
 readme = "README.md"
 edition = "2018"
 license = "Unlicense"
+build = "build.rs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 rocket_async_compression = "0.1"
 rocket-post-as-delete = "0.1"
-rocket-sass-fairing = "0.1"
+rocket-assets-fairing = "0.1"
 normpath = "0.3"
 rand = "0.8"
 rust-argon2 = "1.0"
@@ -38,6 +39,10 @@ features = [ "serde" ]
 [dependencies.postgres-types]
 version = "0.2"
 features = [ "with-chrono-0_4" ]
+
+[build-dependencies.grass]
+version = "0.10"
+default-features = false
 
 [patch.crates-io]
 rocket = { git = "https://github.com/SergioBenitez/Rocket" }

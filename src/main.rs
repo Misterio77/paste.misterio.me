@@ -9,7 +9,7 @@ use rocket_async_compression::Compression;
 use rocket_db_pools::Database as DatabaseTrait;
 use rocket_dyn_templates::Template;
 use rocket_post_as_delete::PostAsDelete;
-use rocket_sass_fairing::SassSheet;
+use rocket_assets_fairing::Assets;
 
 #[rocket::main]
 async fn main() -> Result<(), ServerError> {
@@ -17,7 +17,7 @@ async fn main() -> Result<(), ServerError> {
         // Fairings
         .attach(Database::init())
         .attach(Template::custom(customize))
-        .attach(SassSheet::fairing())
+        .attach(Assets::fairing())
         .attach(Compression::fairing())
         .attach(PostAsDelete)
         // Error catchers
