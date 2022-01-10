@@ -31,9 +31,19 @@ pub mod assets {
 
 pub mod errors {
     use crate::error::ServerError;
-    use rocket::{catch, catchers, http::Status, Catcher, Request, response::{Flash, Redirect}};
+    use rocket::{
+        catch, catchers,
+        http::Cookie,
+        http::Status,
+        response::{Flash, Redirect},
+        Catcher, Request,
+    };
     #[catch(401)]
-    fn unauthorized() -> Flash<Redirect> {
+    fn unauthorized(req: &Request) -> Flash<Redirect> {
+        // Uri to redirect to after logging in
+        req.cookies()
+            .add(Cookie::new("after_login", req.uri().to_string()));
+
         ServerError::builder()
             .code(Status::Unauthorized)
             .message("Please login first")

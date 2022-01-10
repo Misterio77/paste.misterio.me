@@ -61,7 +61,16 @@ async fn post(
 
     cookies.add_private(new_session.into());
 
-    Ok(Redirect::to("/"))
+    // Redirection cookie
+    let redir: String = if let Some(after_login) = cookies.get("after_login") {
+        cookies.remove(after_login.to_owned());
+        after_login.value()
+    } else {
+        "/"
+    }
+    .into();
+
+    Ok(Redirect::to(redir))
 }
 
 pub fn routes() -> Vec<Route> {
