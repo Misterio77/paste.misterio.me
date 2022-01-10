@@ -51,7 +51,7 @@ async fn post(
         .await
         .map_err(|e| e.flash_redirect("/register"))?;
 
-    Ok(Flash::success(Redirect::to(format!("/login")), "Registration complete. Please login"))
+    Ok(Flash::success(Redirect::to("/login"), "Registration complete. Please login"))
 }
 
 pub fn routes() -> Vec<Route> {

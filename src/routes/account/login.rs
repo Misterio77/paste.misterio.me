@@ -61,7 +61,7 @@ async fn post(
 
     cookies.add_private(session.into());
 
-    Ok(Redirect::to(format!("/")))
+    Ok(Redirect::to("/"))
 }
 
 pub fn routes() -> Vec<Route> {

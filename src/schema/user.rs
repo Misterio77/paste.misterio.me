@@ -24,18 +24,16 @@ impl User {
             WHERE username = $1",
             &[&username],
         )
-        .await
-        .map_err(|e| ServerError::builder_from(e).message("User not found"))?
+        .await?
         .try_into()
     }
-    async fn delete(db: &Client, username: &str) -> Result<(), ServerError> {
+    async fn _delete(db: &Client, username: &str) -> Result<(), ServerError> {
         db.execute(
             "DELETE FROM users
             WHERE username = $1",
             &[&username],
         )
-        .await
-        .map_err(|e| ServerError::builder_from(e).message("User not found"))?;
+        .await?;
         Ok(())
     }
     async fn insert(&self, db: &Client) -> Result<(), ServerError> {
@@ -48,7 +46,7 @@ impl User {
         .await?;
         Ok(())
     }
-    async fn update(&self, db: &Client) -> Result<(), ServerError> {
+    async fn _update(&self, db: &Client) -> Result<(), ServerError> {
         db.execute(
             "UPDATE users SET
             username = $1, email = $2, password = $3",
@@ -70,11 +68,7 @@ impl User {
             email,
             password,
         };
-        user.insert(db).await.map_err(|e| {
-            e.edit()
-                .code(Status::Conflict)
-                .message("This username is taken")
-        })?;
+        user.insert(db).await?;
         Ok(user)
     }
     pub async fn login(
@@ -118,5 +112,5 @@ fn hash_password(password: &str) -> Result<String, argon2::Error> {
 }
 
 fn verify_password(password: &str, hash: &str) -> Result<bool, argon2::Error> {
-    argon2::verify_encoded(&hash, password.as_bytes())
+    argon2::verify_encoded(hash, password.as_bytes())
 }

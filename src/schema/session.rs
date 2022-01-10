@@ -92,7 +92,7 @@ impl Session {
         Ok(session)
     }
     pub async fn authenticate(db: &Client, token: &str) -> Result<Session, ServerError> {
-        Session::get(db, &token).await.map_err(|e| {
+        Session::get(db, token).await.map_err(|e| {
             ServerError::builder_from(e)
                 .code(Status::Unauthorized)
                 .message("Session expired, please login again")
@@ -107,7 +107,7 @@ impl Session {
         Ok(())
     }
     pub async fn revoke_self(self, db: &Client) -> Result<(), ServerError> {
-        let creation = self.creation.clone();
+        let creation = self.creation;
         self.revoke(db, &creation).await?;
         Ok(())
     }
@@ -161,7 +161,7 @@ impl<'r> FromRequest<'r> for Session {
         let db = try_outcome!(request
             .guard::<Connection<Database>>()
             .await
-            .map_failure(|e| ServerError::from(e)));
+            .map_failure(ServerError::from));
 
         let token = try_outcome!(cookies
             .get_private("session")

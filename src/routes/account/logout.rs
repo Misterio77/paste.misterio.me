@@ -44,7 +44,7 @@ async fn post(
     }
     .map_err(|e| e.flash_redirect("/logout"))?;
 
-    Ok(Redirect::to(format!("/")))
+    Ok(Redirect::to("/"))
 }
 
 pub fn routes() -> Vec<Route> {
