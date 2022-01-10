@@ -6,7 +6,7 @@
     utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, flake-utils }:
+  outputs = { self, nixpkgs, utils }:
     let
       name = "paste-misterio-me";
       overlay = final: prev: {
@@ -17,7 +17,7 @@
     {
       inherit overlay overlays;
     } //
-    (flake-utils.lib.eachDefaultSystem (system:
+    (utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs { inherit system overlays; };
       in
@@ -27,7 +27,7 @@
         defaultPackage = packages.${name};
 
         # nix run
-        apps.${name} = flake-utils.lib.mkApp { drv = packages.${name}; };
+        apps.${name} = utils.lib.mkApp { drv = packages.${name}; };
         defaultApp = apps.${name};
 
         # nix develop
