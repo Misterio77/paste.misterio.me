@@ -1,15 +1,18 @@
 use paste_misterio_me::{
     database::Database,
     error::ServerError,
-    routes::{assets, errors, home, login, logout, register, sessions},
+    routes::{
+        account::{login, logout, register, sessions},
+        assets, errors, home,
+    },
     tera::customize,
 };
 
+use rocket_assets_fairing::Assets;
 use rocket_async_compression::Compression;
 use rocket_db_pools::Database as DatabaseTrait;
 use rocket_dyn_templates::Template;
 use rocket_post_as_delete::PostAsDelete;
-use rocket_assets_fairing::Assets;
 
 #[rocket::main]
 async fn main() -> Result<(), ServerError> {
@@ -24,8 +27,9 @@ async fn main() -> Result<(), ServerError> {
         .register("/", errors::catchers())
         // Assets
         .mount("/assets", assets::routes())
-        // Routes
+        // Home routes
         .mount("/", home::routes())
+        // Account related
         .mount("/login", login::routes())
         .mount("/logout", logout::routes())
         .mount("/register", register::routes())
