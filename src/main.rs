@@ -1,7 +1,7 @@
 use paste_misterio_me::{
     database::Database,
     error::ServerError,
-    routes::{assets, errors, home, login, logout, register},
+    routes::{assets, errors, home, login, logout, register, sessions},
     tera::customize,
 };
 
@@ -29,6 +29,7 @@ async fn main() -> Result<(), ServerError> {
         .mount("/login", login::routes())
         .mount("/logout", logout::routes())
         .mount("/register", register::routes())
+        .mount("/sessions", sessions::routes())
         .launch()
         .await?;
     Ok(())

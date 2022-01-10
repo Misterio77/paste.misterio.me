@@ -19,7 +19,6 @@ fn get(
     flash: Option<FlashMessage<'_>>,
     session: Result<Session, ServerError>,
 ) -> Result<Template, Flash<Redirect>> {
-    // If already logged in, redirect to home
     if session.is_ok() {
         return Err(ServerError::builder()
             .message("You're already logged in")
@@ -48,7 +47,7 @@ async fn post(
         password,
     } = form.into_inner();
 
-    let user = User::register(&db, username, email, password)
+    let _user = User::register(&db, username, email, password)
         .await
         .map_err(|e| e.flash_redirect("/register"))?;
 

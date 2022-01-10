@@ -1,10 +1,13 @@
 // Override default variables
-$primary-500: #e91e63;
-$primary-600: #d81b60;
-$primary-700: #c2185b;
+$primary-500: #9E61CF;
+$primary-600: #8D4EBF;
+$primary-700: #7323B3;
 
 // Import full Pico source code
 @import "pico/scss/pico";
+
+// Import code highlighting
+@import "highlight";
 
 // Disable link on current page
 [aria-current=page] {
@@ -34,15 +37,17 @@ body>footer {
   }
 }
 
+// Cards
 article {
-  // Center cards
-  margin: auto;
   // Slimmer card
   &.slim {
+  margin: auto;
     @media (min-width: 30em) {
       max-width: 30em;
     }
   }
+  margin-bottom: var(--typography-spacing-vertical);
+
   // Remove bottom margin from headers
   header {
     h1, h2, h3, h4, h5, h6 {
@@ -51,5 +56,24 @@ article {
     hgroup, .headings {
       margin-bottom: 0;
     }
+  }
+}
+
+#flash {
+  text-align: center;
+  padding-bottom: 3rem;
+  sup {
+    background-color: var(--primary);
+    color: var(--primary-inverse);
+    font-weight: bold;
+    border-radius: 0.2rem;
+    margin: 0.2rem;
+    padding: 0.4rem 0.5rem;
+  }
+  &.success sup {
+    background-color: var(--ins-color);
+  }
+  &.error sup {
+    background-color: var(--del-color);
   }
 }

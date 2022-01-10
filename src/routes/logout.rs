@@ -17,10 +17,8 @@ fn get(
     flash: Option<FlashMessage<'_>>,
     session: Result<Session, ServerError>,
 ) -> Result<Template, Flash<Redirect>> {
-    // If not logged in, redirect to login with error msg
     let session = session.map_err(|e| e.flash_redirect("/login"))?;
 
-    // If is, show logout form
     Ok(Template::render("logout", context! {flash, session}))
 }
 
@@ -36,7 +34,6 @@ async fn post(
     cookies: &CookieJar<'_>,
     session: Result<Session, ServerError>,
 ) -> Result<Redirect, Flash<Redirect>> {
-    // If not logged in, redirect to login with error msg
     let session = session.map_err(|e| e.flash_redirect("/login"))?;
 
     cookies.remove_private(Cookie::named("session"));

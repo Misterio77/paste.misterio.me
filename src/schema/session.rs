@@ -10,15 +10,15 @@ use std::net::IpAddr;
 
 #[derive(Debug, Serialize)]
 pub struct Session {
-    #[serde(skip_serializing)]
-    token: String,
     pub creator: String,
     pub source: IpAddr,
     pub creation: DateTime<Utc>,
+    #[serde(skip_serializing)]
+    token: String,
 }
 
 impl Session {
-    async fn fetch(db: &Client, token: &str) -> Result<Session, ServerError> {
+    async fn get(db: &Client, token: &str) -> Result<Session, ServerError> {
         db.query_one(
             "SELECT token, creator, source, creation
             FROM sessions
@@ -27,6 +27,18 @@ impl Session {
         )
         .await?
         .try_into()
+    }
+    async fn list(db: &Client, creator: &str) -> Result<Vec<Session>, ServerError> {
+        db.query(
+            "SELECT token, creator, source, creation
+            FROM sessions
+            WHERE creator = $1",
+            &[&creator],
+        )
+        .await?
+        .into_iter()
+        .map(TryInto::try_into)
+        .collect()
     }
     async fn delete(
         db: &Client,
@@ -80,23 +92,23 @@ impl Session {
         Ok(session)
     }
     pub async fn authenticate(db: &Client, token: &str) -> Result<Session, ServerError> {
-        Session::fetch(db, &token).await.map_err(|e| {
+        Session::get(db, &token).await.map_err(|e| {
             ServerError::builder_from(e)
                 .code(Status::Unauthorized)
-                .message("Invalid session token")
+                .message("Session expired, please login again")
                 .into()
         })
     }
-    pub async fn revoke_other(
-        self,
-        db: &Client,
-        creation: &DateTime<Utc>,
-    ) -> Result<(), ServerError> {
+    pub async fn show_all(&self, db: &Client) -> Result<Vec<Session>, ServerError> {
+        Session::list(db, &self.creator).await
+    }
+    pub async fn revoke(self, db: &Client, creation: &DateTime<Utc>) -> Result<(), ServerError> {
         Session::delete(db, &self.creator, creation).await?;
         Ok(())
     }
     pub async fn revoke_self(self, db: &Client) -> Result<(), ServerError> {
-        Session::delete(db, &self.creator, &self.creation).await?;
+        let creation = self.creation.clone();
+        self.revoke(db, &creation).await?;
         Ok(())
     }
     pub async fn revoke_all(self, db: &Client) -> Result<(), ServerError> {
@@ -110,7 +122,7 @@ fn generate_token() -> String {
 
     rand::thread_rng()
         .sample_iter(Alphanumeric)
-        .take(16)
+        .take(32)
         .map(char::from)
         .collect()
 }

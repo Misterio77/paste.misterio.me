@@ -23,9 +23,6 @@
     <button>
       Log in
     </button>
-    {% if flash %}
-      {{ flash.message }}
-    {% endif %}
   </form>
 </article>
 

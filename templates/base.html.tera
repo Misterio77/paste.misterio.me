@@ -27,19 +27,31 @@
     </nav>
 
     <main class="container">
+      {% block flash %}
+      {% if flash %}
+        <div id="flash" class="{{ flash.kind }}">
+          <sup onclick="document.getElementById('flash').remove()">
+            {{ flash.message }}
+          </sub>
+        </div>
+      {% endif %}
+      {% endblock flash %}
+
       {% block content %}
-        {% if flash %}
-          {{ flash.message }}
-        {% endif %}
       {% endblock content %}
     </main>
 
     <footer class="container">
       <p>
-        paste.misterio.me -
-        <a href="https://github.com/misterio77/paste.misterio.me">Source code</a>
+        <a href="/">paste.misterio.me</a>
+        -
+        <a href="//github.com/misterio77/paste.misterio.me">Source code</a>
       </p>
       <p>Served from: <em>{{ exec_path() }}</em></p>
     </footer>
+
+    {% block scripts %}
+    <!-- TODO: colocar scripts de cada linguagem no template das pastes -->
+    {% endblock scripts %}
   </body>
 </html>

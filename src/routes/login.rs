@@ -22,7 +22,6 @@ fn login(
     flash: Option<FlashMessage<'_>>,
     session: Option<Session>,
 ) -> Result<Template, Flash<Redirect>> {
-    // If already logged in, redirect to home
     if session.is_some() {
         return Err(ServerError::builder()
             .message("You're already logged in")
@@ -47,7 +46,6 @@ async fn post(
     cookies: &CookieJar<'_>,
     session: Option<Session>,
 ) -> Result<Redirect, Flash<Redirect>> {
-    // If already logged in, redirect to home
     if session.is_some() {
         return Err(ServerError::builder()
             .message("You're already logged in")

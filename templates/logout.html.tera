@@ -18,10 +18,12 @@
     <button>
       Log out
     </button>
-    {% if flash %}
-      {{ flash.message }}
-    {% endif %}
   </form>
+  <footer>
+    <a href="/sessions">
+      Manage active sessions
+    </a>
+  <footer>
 </article>
 
 {% endblock content %}

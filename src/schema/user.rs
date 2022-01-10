@@ -17,7 +17,7 @@ pub struct User {
 }
 
 impl User {
-    async fn fetch(db: &Client, username: &str) -> Result<User, ServerError> {
+    async fn get(db: &Client, username: &str) -> Result<User, ServerError> {
         db.query_one(
             "SELECT username, email, password
             FROM users
@@ -83,7 +83,7 @@ impl User {
         password: String,
         source: IpAddr,
     ) -> Result<(User, Session), ServerError> {
-        let user = User::fetch(db, &username).await?;
+        let user = User::get(db, &username).await?;
 
         if verify_password(&password, &user.password)? {
             Ok((user, Session::create(db, &username, source).await?))
