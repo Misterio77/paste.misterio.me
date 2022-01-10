@@ -40,7 +40,7 @@ struct RegisterForm {
 async fn post(
     db: Connection<Database>,
     form: Form<RegisterForm>,
-) -> Result<Redirect, Flash<Redirect>> {
+) -> Result<Flash<Redirect>, Flash<Redirect>> {
     let RegisterForm {
         username,
         email,
@@ -51,7 +51,7 @@ async fn post(
         .await
         .map_err(|e| e.flash_redirect("/register"))?;
 
-    Ok(Redirect::to(format!("/")))
+    Ok(Flash::success(Redirect::to(format!("/login")), "Registration complete. Please login"))
 }
 
 pub fn routes() -> Vec<Route> {
