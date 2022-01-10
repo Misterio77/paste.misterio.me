@@ -1,7 +1,7 @@
-{ lib, rustPlatform, nodePackages }:
+{ lib, rustPlatform }:
 
 rustPlatform.buildRustPackage rec {
-  pname = "auth-demo";
+  pname = "paste-misterio-.me";
   version = "0.1.0";
 
   src = lib.cleanSource ./.;
@@ -14,14 +14,13 @@ rustPlatform.buildRustPackage rec {
   };
 
   postInstall = ''
-    mkdir -p $out/etc/assets
-    cp assets/style.css $out/etc/assets
+    mkdir -p $out/etc
     cp -r templates db $out/etc
   '';
 
   meta = with lib; {
-    description = "Auth MVC example";
-    homepage = "https://github.com/Misterio77/auth-demo";
+    description = "Pasting service";
+    homepage = "https://github.com/Misterio77/paste.misterio.me";
     license = licenses.unlicense;
     platforms = platforms.all;
   };

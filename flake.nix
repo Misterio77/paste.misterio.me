@@ -11,7 +11,7 @@
 
   outputs = { self, nixpkgs, flake-utils, naersk }:
     let
-      name = "paste.misterio.me";
+      name = "paste-misterio-me";
       overlay = final: prev: {
         ${name} = final.callPackage ./default.nix { };
       };
