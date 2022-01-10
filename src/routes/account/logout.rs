@@ -1,4 +1,4 @@
-use crate::{database::Database, error::ServerError, schema::Session};
+use crate::{database::Database, schema::Session};
 
 use rocket::{
     form::{Form, FromForm},
@@ -13,12 +13,7 @@ use rocket_db_pools::Connection;
 use rocket_dyn_templates::{context, Template};
 
 #[get("/")]
-fn get(
-    flash: Option<FlashMessage<'_>>,
-    session: Result<Session, ServerError>,
-) -> Result<Template, Flash<Redirect>> {
-    let session = session.map_err(|e| e.flash_redirect("/login"))?;
-
+fn get(flash: Option<FlashMessage<'_>>, session: Session) -> Result<Template, Flash<Redirect>> {
     Ok(Template::render("logout", context! {flash, session}))
 }
 
@@ -32,17 +27,16 @@ async fn post(
     db: Connection<Database>,
     form: Form<LogoutForm>,
     cookies: &CookieJar<'_>,
-    session: Result<Session, ServerError>,
+    session: Session,
 ) -> Result<Redirect, Flash<Redirect>> {
-    let session = session.map_err(|e| e.flash_redirect("/login"))?;
-
-    cookies.remove_private(Cookie::named("session"));
     if form.all {
         session.revoke_all(&db).await
     } else {
         session.revoke_self(&db).await
     }
     .map_err(|e| e.flash_redirect("/logout"))?;
+
+    cookies.remove_private(Cookie::named("session"));
 
     Ok(Redirect::to("/"))
 }

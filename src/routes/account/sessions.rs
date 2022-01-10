@@ -1,6 +1,5 @@
-use crate::{database::Database, error::ServerError, schema::Session};
+use crate::{database::Database, schema::Session};
 
-use chrono::{DateTime, NaiveDateTime, Utc};
 use rocket::{
     delete, get,
     request::FlashMessage,
@@ -9,15 +8,14 @@ use rocket::{
 };
 use rocket_db_pools::Connection;
 use rocket_dyn_templates::{context, Template};
-use std::convert::TryInto;
+use uuid::Uuid;
 
 #[get("/")]
 async fn list(
     db: Connection<Database>,
     flash: Option<FlashMessage<'_>>,
-    session: Result<Session, ServerError>,
+    session: Session,
 ) -> Result<Template, Flash<Redirect>> {
-    let session = session.map_err(|e| e.flash_redirect("/login"))?;
     let sessions = session
         .show_all(&db)
         .await
@@ -29,27 +27,24 @@ async fn list(
     ))
 }
 
-#[delete("/<creation_nano>")]
+#[delete("/<id>")]
 async fn delete(
     db: Connection<Database>,
-    session: Result<Session, ServerError>,
-    creation_nano: i64,
+    session: Session,
+    id: Uuid,
 ) -> Result<Flash<Redirect>, Flash<Redirect>> {
-    let session = session.map_err(|e| e.flash_redirect("/login"))?;
-    let creation = DateTime::<Utc>::from_utc(
-        NaiveDateTime::from_timestamp(
-            creation_nano / 1000000000,
-            (creation_nano % 1000000000).try_into().unwrap(),
-        ),
-        Utc,
-    );
+    let redir = if session.id == id {
+        "/login"
+    } else {
+        "/sessions"
+    };
 
     session
-        .revoke(&db, &creation)
+        .revoke(&db, Some(id))
         .await
         .map_err(|e| e.flash_redirect("/login"))?;
 
-    Ok(Flash::success(Redirect::to("/sessions"), "Session revoked"))
+    Ok(Flash::success(Redirect::to(redir), "Session revoked"))
 }
 
 pub fn routes() -> Vec<Route> {

@@ -22,13 +22,17 @@ rust-argon2 = "1.0"
 
 [dependencies.rocket]
 version = "0.5.0-rc.1"
-features = [ "json", "secrets" ]
+features = [ "json", "secrets", "uuid" ]
 [dependencies.rocket_dyn_templates]
 version = "0.1.0-rc.1"
 features = [ "tera" ]
 [dependencies.rocket_db_pools]
 version = "0.1.0-rc"
 features = [ "deadpool_postgres" ]
+
+[dependencies.uuid]
+version = "0.8"
+features = [ "serde", "v4"]
 
 [dependencies.serde]
 version = "1.0"
@@ -40,7 +44,7 @@ features = [ "serde" ]
 
 [dependencies.postgres-types]
 version = "0.2"
-features = [ "with-chrono-0_4" ]
+features = [ "with-chrono-0_4", "with-uuid-0_8" ]
 
 [build-dependencies.grass]
 version = "0.10"

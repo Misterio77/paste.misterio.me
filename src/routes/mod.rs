@@ -31,7 +31,16 @@ pub mod assets {
 
 pub mod errors {
     use crate::error::ServerError;
-    use rocket::{catch, catchers, http::Status, Catcher, Request};
+    use rocket::{catch, catchers, http::Status, Catcher, Request, response::{Flash, Redirect}};
+    #[catch(401)]
+    fn unauthorized() -> Flash<Redirect> {
+        ServerError::builder()
+            .code(Status::Unauthorized)
+            .message("Please login first")
+            .build()
+            .flash_redirect("/login")
+    }
+
     #[catch(404)]
     fn not_found() -> ServerError {
         ServerError::builder()
@@ -57,6 +66,6 @@ pub mod errors {
     }
 
     pub fn catchers() -> Vec<Catcher> {
-        catchers![not_found, service_unavailable, unknown_error]
+        catchers![not_found, service_unavailable, unknown_error, unauthorized]
     }
 }

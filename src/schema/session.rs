@@ -7,30 +7,30 @@ use chrono::{DateTime, Utc};
 use serde::Serialize;
 use std::convert::{TryFrom, TryInto};
 use std::net::IpAddr;
+use uuid::Uuid;
 
 #[derive(Debug, Serialize)]
 pub struct Session {
+    pub id: Uuid,
     pub creator: String,
     pub source: IpAddr,
     pub creation: DateTime<Utc>,
-    #[serde(skip_serializing)]
-    token: String,
 }
 
 impl Session {
-    async fn get(db: &Client, token: &str) -> Result<Session, ServerError> {
+    async fn get(db: &Client, id: Uuid) -> Result<Session, ServerError> {
         db.query_one(
-            "SELECT token, creator, source, creation
+            "SELECT id, creator, source, creation
             FROM sessions
-            WHERE token = $1",
-            &[&token],
+            WHERE id = $1",
+            &[&id],
         )
         .await?
         .try_into()
     }
     async fn list(db: &Client, creator: &str) -> Result<Vec<Session>, ServerError> {
         db.query(
-            "SELECT token, creator, source, creation
+            "SELECT id, creator, source, creation
             FROM sessions
             WHERE creator = $1",
             &[&creator],
@@ -40,24 +40,11 @@ impl Session {
         .map(TryInto::try_into)
         .collect()
     }
-    async fn delete(
-        db: &Client,
-        creator: &str,
-        creation: &DateTime<Utc>,
-    ) -> Result<(), ServerError> {
+    async fn delete(db: &Client, creator: &str, id: Option<Uuid>) -> Result<(), ServerError> {
         db.execute(
             "DELETE FROM sessions
-            WHERE creation = $1 AND creator = $2",
-            &[&creation, &creator],
-        )
-        .await?;
-        Ok(())
-    }
-    async fn delete_all(db: &Client, creator: &str) -> Result<(), ServerError> {
-        db.execute(
-            "DELETE FROM sessions
-            WHERE creator = $1",
-            &[&creator],
+            WHERE creator = $1 AND ($2::uuid IS NULL OR id = $2)",
+            &[&creator, &id],
         )
         .await?;
         Ok(())
@@ -65,34 +52,26 @@ impl Session {
     async fn insert(&self, db: &Client) -> Result<(), ServerError> {
         db.execute(
             "INSERT INTO sessions
-            (token, creator, source, creation)
+            (id, creator, source, creation)
             VALUES ($1, $2, $3, $4)",
-            &[&self.token, &self.creator, &self.source, &self.creation],
+            &[&self.id, &self.creator, &self.source, &self.creation],
         )
         .await?;
         Ok(())
     }
 
-    pub async fn create(
-        db: &Client,
-        username: &str,
-        source: IpAddr,
-    ) -> Result<Session, ServerError> {
-        let token = generate_token();
-        let creator = username.into();
-        let creation = Utc::now();
-
+    pub async fn create(db: &Client, username: &str, ip: IpAddr) -> Result<Session, ServerError> {
         let session = Session {
-            token,
-            creator,
-            source,
-            creation,
+            id: Uuid::new_v4(),
+            creator: username.into(),
+            source: ip,
+            creation: Utc::now(),
         };
         session.insert(db).await?;
         Ok(session)
     }
-    pub async fn authenticate(db: &Client, token: &str) -> Result<Session, ServerError> {
-        Session::get(db, token).await.map_err(|e| {
+    pub async fn authenticate(db: &Client, id: Uuid) -> Result<Session, ServerError> {
+        Session::get(db, id).await.map_err(|e| {
             ServerError::builder_from(e)
                 .code(Status::Unauthorized)
                 .message("Session expired, please login again")
@@ -102,36 +81,25 @@ impl Session {
     pub async fn show_all(&self, db: &Client) -> Result<Vec<Session>, ServerError> {
         Session::list(db, &self.creator).await
     }
-    pub async fn revoke(self, db: &Client, creation: &DateTime<Utc>) -> Result<(), ServerError> {
-        Session::delete(db, &self.creator, creation).await?;
+    pub async fn revoke(&self, db: &Client, id: Option<Uuid>) -> Result<(), ServerError> {
+        Session::delete(db, &self.creator, id).await?;
         Ok(())
     }
     pub async fn revoke_self(self, db: &Client) -> Result<(), ServerError> {
-        let creation = self.creation;
-        self.revoke(db, &creation).await?;
+        self.revoke(db, Some(self.id)).await?;
         Ok(())
     }
     pub async fn revoke_all(self, db: &Client) -> Result<(), ServerError> {
-        Session::delete_all(db, &self.creator).await?;
+        self.revoke(db, None).await?;
         Ok(())
     }
-}
-
-fn generate_token() -> String {
-    use rand::{distributions::Alphanumeric, Rng};
-
-    rand::thread_rng()
-        .sample_iter(Alphanumeric)
-        .take(32)
-        .map(char::from)
-        .collect()
 }
 
 impl TryFrom<Row> for Session {
     type Error = ServerError;
     fn try_from(row: Row) -> Result<Session, ServerError> {
         Ok(Session {
-            token: row.try_get("token")?,
+            id: row.try_get("id")?,
             creator: row.try_get("creator")?,
             source: row.try_get("source")?,
             creation: row.try_get("creation")?,
@@ -142,7 +110,7 @@ impl TryFrom<Row> for Session {
 use rocket::http::Cookie;
 impl From<Session> for Cookie<'_> {
     fn from(session: Session) -> Self {
-        Cookie::new("session", session.token)
+        Cookie::new("session", session.id.to_string())
     }
 }
 
@@ -163,9 +131,9 @@ impl<'r> FromRequest<'r> for Session {
             .await
             .map_failure(ServerError::from));
 
-        let token = try_outcome!(cookies
+        let id = try_outcome!(cookies
             .get_private("session")
-            .and_then(|cookie| cookie.value().parse::<String>().ok())
+            .and_then(|cookie| cookie.value().parse::<Uuid>().ok())
             .into_outcome(
                 ServerError::builder()
                     .code(Status::Unauthorized)
@@ -173,7 +141,7 @@ impl<'r> FromRequest<'r> for Session {
                     .build()
             ));
 
-        let session = try_outcome!(Session::authenticate(&db, &token)
+        let session = try_outcome!(Session::authenticate(&db, id)
             .await
             .into_outcome(Status::Unauthorized));
 

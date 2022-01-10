@@ -55,11 +55,11 @@ async fn post(
 
     let LoginForm { username, password } = form.into_inner();
 
-    let (_user, session) = User::login(&db, username, password, source.ip())
+    let new_session = User::login(&db, username, password, source.ip())
         .await
         .map_err(|e| e.flash_redirect("/login"))?;
 
-    cookies.add_private(session.into());
+    cookies.add_private(new_session.into());
 
     Ok(Redirect::to("/"))
 }

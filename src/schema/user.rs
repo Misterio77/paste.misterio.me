@@ -76,11 +76,11 @@ impl User {
         username: String,
         password: String,
         source: IpAddr,
-    ) -> Result<(User, Session), ServerError> {
+    ) -> Result<Session, ServerError> {
         let user = User::get(db, &username).await?;
 
         if verify_password(&password, &user.password)? {
-            Ok((user, Session::create(db, &username, source).await?))
+            Ok(Session::create(db, &username, source).await?)
         } else {
             Err(ServerError::builder()
                 .message("Invalid credentials")

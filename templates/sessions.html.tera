@@ -16,7 +16,8 @@
   <header>
     <hgroup>
       <h2>{{ session_item.source }}</h2>
-      <h3>{{ session_item.creation | date(format="%d/%m/%Y %H:%M") }}</h3>
+      <p>{{ session_item.creation | date(format="%d/%m/%Y %H:%M") }}</p>
+      <p>{{ session.id }}</p>
     </hgroup>
   </header>
   <p>
@@ -26,7 +27,7 @@
       &nbsp;
     {% endif %}
   </p>
-  <form method="post" action="/sessions/{{ session_item.creation | timestamp_nano }}/delete">
+  <form method="post" action="/sessions/{{ session_item.id }}/delete">
     <button>Revoke</button>
   </form>
 </article>

@@ -17,9 +17,9 @@ use rocket_dyn_templates::{context, Template};
 #[get("/")]
 fn get(
     flash: Option<FlashMessage<'_>>,
-    session: Result<Session, ServerError>,
+    session: Option<Session>,
 ) -> Result<Template, Flash<Redirect>> {
-    if session.is_ok() {
+    if session.is_some() {
         return Err(ServerError::builder()
             .message("You're already logged in")
             .build()
@@ -40,7 +40,15 @@ struct RegisterForm {
 async fn post(
     db: Connection<Database>,
     form: Form<RegisterForm>,
+    session: Option<Session>,
 ) -> Result<Flash<Redirect>, Flash<Redirect>> {
+    if session.is_some() {
+        return Err(ServerError::builder()
+            .message("You're already logged in")
+            .build()
+            .flash_redirect("/"));
+    }
+
     let RegisterForm {
         username,
         email,
@@ -51,7 +59,10 @@ async fn post(
         .await
         .map_err(|e| e.flash_redirect("/register"))?;
 
-    Ok(Flash::success(Redirect::to("/login"), "Registration complete. Please login"))
+    Ok(Flash::success(
+        Redirect::to("/login"),
+        "Registration complete. Please login",
+    ))
 }
 
 pub fn routes() -> Vec<Route> {
