@@ -1369,7 +1369,7 @@ dependencies = [
 
 [[package]]
 name = "paste-misterio-me"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "chrono",
  "normpath",

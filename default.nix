@@ -2,7 +2,7 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "paste-misterio-.me";
-  version = "0.1.0";
+  version = "0.1.1";
 
   src = lib.cleanSource ./.;
 
