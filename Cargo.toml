@@ -5,7 +5,7 @@ version = "0.1.5"
 authors = [ "Gabriel Fontes <eu@misterio.me>" ]
 readme = "README.md"
 edition = "2018"
-license = "Unlicense"
+license = "AGPLv3"
 build = "build.rs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
