@@ -3,39 +3,36 @@
 {% block title %}Sessions{% endblock title %}
 
 {% block content%}
+{% set current_session=session %}
 
 <h1>Active Sessions</h1>
 
-{% for session_item in sessions %}
-
-{% if ((loop.index - 1) % 3) == 0 %}
-<div class="grid">
-{% endif %}
-
-<article class="tiled">
-  <header>
-    <hgroup>
-      <h2>{{ session_item.source }}</h2>
-      <p>{{ session_item.creation | date(format="%d/%m/%Y %H:%M") }}</p>
-      <p>{{ session.id }}</p>
-    </hgroup>
-  </header>
-  <p>
-    {% if session_item == session %}
-      Current device
-    {% else %}
-      &nbsp;
-    {% endif %}
-  </p>
-  <form method="post" action="/sessions/{{ session_item.id }}/delete">
-    <button>Revoke</button>
-  </form>
-</article>
-
-{% if (loop.index % 3) == 0 %}
-</div>
-{% endif %}
-
+{% for session in sessions %}
+  {% if ((loop.index - 1) % 3) == 0 %}
+    <div class="grid">
+  {% endif %}
+  <article class="tiled">
+    <header>
+      <hgroup>
+        <h2>{{ session.source }}</h2>
+        <p>{{ session.creation | date(format="%d/%m/%Y %H:%M") }}</p>
+        <p>{{ session.id }}</p>
+      </hgroup>
+    </header>
+    <p>
+      {% if session == current_session %}
+        Current device
+      {% else %}
+        &nbsp;
+      {% endif %}
+    </p>
+    <form method="post" action="/sessions/{{ session.id }}/delete">
+      <button>Revoke</button>
+    </form>
+  </article>
+  {% if (loop.index % 3) == 0 %}
+    </div>
+  {% endif %}
 {% endfor %}
 
 {% endblock content %}

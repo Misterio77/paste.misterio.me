@@ -1,0 +1,21 @@
+{% extends "base" %}
+
+{% block title %}
+  {% if paste.name %}
+    {{ paste.name }}
+  {% else %}
+    Untitled Paste
+  {% endif %}
+{% endblock title %}
+
+{% block content%}
+
+<h1>
+  {% if paste.name %}
+    {{ paste.name }}
+  {% else %}
+    Untitled Paste
+  {% endif %}
+</h1>
+
+{% endblock content %}

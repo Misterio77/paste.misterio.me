@@ -39,9 +39,10 @@
   --mark-background-color: #{mix($grey-300, $amber-300)};
   --mark-color: #{mix($black, $grey-900, 37.5%)};
 
-  // Inserted (<ins>) & Deleted (<ins>)
-  --ins-color: #{$green-700};
-  --del-color: #{$red-800};
+  // Success, Error, Warning
+  --success-color: #{$green-500};
+  --error-color: #{$red-600};
+  --warn-color: #{$amber-700};
 
   // Blockquote
   --blockquote-border-color: var(--muted-border-color);

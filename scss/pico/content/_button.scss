@@ -55,7 +55,7 @@ input[type="reset"],
 a[role="button"] {
   --background-color: var(--primary);
   --border-color: var(--primary);
-  --color: var(--primary-inverse);
+  --color: var(--contrast-inverse);
   --box-shadow: var(--button-box-shadow, 0 0 0 rgba(0, 0, 0, 0));
   padding: var(--form-element-spacing-vertical)
     var(--form-element-spacing-horizontal);

@@ -1,11 +1,8 @@
-// Override default variables
-$primary-500: #b77ce6;
-$primary-600: #a663db;
-$primary-700: #7323B3;
+// Override color
+$primary-hue: 174;
 
 // Import full Pico source code
 @import "pico/pico";
-
 // Import code highlighting
 @import "highlight";
 
@@ -71,9 +68,12 @@ article {
     padding: 0.4rem 0.5rem;
   }
   &.success sup {
-    background-color: var(--ins-color);
+    background-color: var(--success-color);
   }
   &.error sup {
-    background-color: var(--del-color);
+    background-color: var(--error-color);
+  }
+  &.warning sup {
+    background-color: var(--warn-color);
   }
 }

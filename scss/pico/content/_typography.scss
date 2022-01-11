@@ -277,13 +277,13 @@ abbr[title] {
 
 // Ins
 ins {
-  color: var(--ins-color);
+  color: var(--success-color);
   text-decoration: none;
 }
 
 // del
 del {
-  color: var(--del-color);
+  color: var(--error-color);
 }
 
 // selection
