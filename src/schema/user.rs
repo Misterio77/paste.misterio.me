@@ -77,7 +77,12 @@ impl User {
         password: String,
         source: IpAddr,
     ) -> Result<Session, ServerError> {
-        let user = User::get(db, &username).await?;
+        let user = User::get(db, &username).await.map_err(|e| {
+            ServerError::builder_from(e)
+                .message("User not found")
+                .code(Status::Unauthorized)
+                .build()
+        })?;
 
         if verify_password(&password, &user.password)? {
             Ok(Session::create(db, &username, source).await?)

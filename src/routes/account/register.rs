@@ -61,7 +61,7 @@ async fn post(
 
     Ok(Flash::success(
         Redirect::to("/login"),
-        "Registration complete. Please login",
+        "Registration complete. You can now login",
     ))
 }
 

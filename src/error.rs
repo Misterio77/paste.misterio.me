@@ -129,15 +129,22 @@ impl From<argon2::Error> for ServerError {
 }
 impl From<rocket_db_pools::deadpool_postgres::tokio_postgres::Error> for ServerError {
     fn from(e: rocket_db_pools::deadpool_postgres::tokio_postgres::Error) -> Self {
-        let message = match e.as_db_error() {
-            Some(db_e) => db_e.message().into(),
-            None => {
-                format!("{}", e)
+        let (message, code) = match e.as_db_error() {
+            Some(db_e) => {
+                if db_e.constraint() == Some("users_pkey") {
+                    ("This username is already in use".into(), Status::Conflict)
+                } else if db_e.constraint() == Some("users_email_un") {
+                    ("This email is already in use".into(), Status::Conflict)
+                } else {
+                    (db_e.to_string(), Status::InternalServerError)
+                }
             }
+            None => (e.to_string(), Status::InternalServerError),
         };
 
         ServerError::builder()
             .message(&message)
+            .code(code)
             .source(Box::new(e))
             .build()
     }
