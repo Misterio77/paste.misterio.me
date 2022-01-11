@@ -15,7 +15,7 @@ use rocket::{
 };
 use rocket_db_pools::Connection;
 use rocket_dyn_templates::{context, Template};
-use std::net::SocketAddr;
+use std::net::IpAddr;
 
 #[get("/")]
 fn login(
@@ -42,7 +42,7 @@ struct LoginForm {
 async fn post(
     db: Connection<Database>,
     form: Form<LoginForm>,
-    source: SocketAddr,
+    source: IpAddr,
     cookies: &CookieJar<'_>,
     session: Option<Session>,
 ) -> Result<Redirect, Flash<Redirect>> {
@@ -55,7 +55,7 @@ async fn post(
 
     let LoginForm { username, password } = form.into_inner();
 
-    let new_session = User::login(&db, username, password, source.ip())
+    let new_session = User::login(&db, username, password, source)
         .await
         .map_err(|e| e.flash_redirect("/login"))?;
 
