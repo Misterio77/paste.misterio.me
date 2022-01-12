@@ -1,4 +1,4 @@
-use crate::{database::Database, error::ServerError, schema::Paste, schema::Session};
+use crate::{database::Database, error::ServerError, schema::Paste, schema::Session, syntax::SyntaxSet};
 
 use rocket::{
     delete,
@@ -10,7 +10,6 @@ use rocket::{
 };
 use rocket_db_pools::Connection;
 use rocket_dyn_templates::{context, Template};
-use syntect::parsing::SyntaxSet;
 
 use uuid::Uuid;
 

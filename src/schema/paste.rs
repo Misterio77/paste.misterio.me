@@ -1,16 +1,12 @@
 use crate::{
     database::{Client, Row},
     error::{ServerError, Status},
+    syntax::SyntaxSet,
 };
 
 use chrono::{DateTime, Utc};
 use serde::Serialize;
 use std::convert::{TryFrom, TryInto};
-use syntect::{
-    html::{ClassStyle, ClassedHTMLGenerator},
-    parsing::SyntaxSet,
-    util::LinesWithEndings,
-};
 use uuid::Uuid;
 
 #[derive(Debug, Serialize)]
@@ -104,25 +100,11 @@ impl Paste {
                 .into()
         })
     }
-    pub fn extension(&self) -> Option<String> {
-        self.title
-            .as_ref()
-            .and_then(|n| n.split('.').last().map(String::from))
+    pub fn extension(&self) -> Option<&str> {
+        self.title.as_ref().and_then(|n| n.split('.').last())
     }
     pub fn highlight(&self, ss: &SyntaxSet) -> String {
-        let ext = self.extension().unwrap_or_else(|| "txt".into());
-
-        let syntax = ss
-            .find_syntax_by_extension(&ext)
-            .unwrap_or_else(|| ss.find_syntax_plain_text());
-
-        let mut generator =
-            ClassedHTMLGenerator::new_with_class_style(syntax, ss, ClassStyle::Spaced);
-
-        for line in LinesWithEndings::from(&self.content) {
-            generator.parse_html_for_line_which_includes_newline(line);
-        }
-        generator.finalize()
+        ss.highlight(self.extension(), &self.content)
     }
     pub async fn show_all(db: &Client, creator: &str) -> Result<Vec<Paste>, ServerError> {
         Paste::list(db, creator).await

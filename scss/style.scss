@@ -1,6 +1,3 @@
-// Override color
-$primary-hue: 174;
-
 // Import full Pico source code
 @import "pico/pico";
 // Import code highlighting
@@ -78,4 +75,10 @@ button {
   &.warning sup {
     background-color: var(--warn-color);
   }
+}
+
+textarea.code {
+  resize: none;
+  overflow: hidden;
+  font-family: var(--mono-font-family);
 }

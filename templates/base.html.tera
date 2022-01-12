@@ -4,9 +4,9 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}Home{% endblock %} | paste.misterio.me</title>
-    <meta name="description" content="{% block description %}Simple and FLOSS paste hosting service{% endblock description %}"/>
+    <meta name="description" content="{% block description %}Simple FLOSS paste hosting service{% endblock description %}"/>
     <link rel="icon" href="data:,"> <!-- Disable favicon -->
-    <link rel="stylesheet" href="/assets/style.css" />
+    <link rel="stylesheet" href="/assets/{{ version() }}/style.css" />
   </head>
   <body>
     <nav class="container-fluid">

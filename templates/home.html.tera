@@ -28,27 +28,16 @@
       </label>
     </fieldset>
 
-    <label>
-      Content
-      <div id="content-code">
-      </div>
-      <textarea id="content-field" name="content" rows="10" required autofocus></textarea>
-    </label>
     <script>
-      let field = document.getElementById("content-field");
-      field.hidden = true;
-
-      let code = document.getElementById("content-code");
-      code.innerHTML = `
-        <pre name="content"><code contentEditable=true id="content-code-inner" oninput="updateField()"></code></pre>
-      `;
-
-      let inner = document.getElementById("content-code-inner");
-      inner.focus();
-      function updateField() {
-        field.value = inner.innerText;
+      function auto_grow(element) {
+          element.style.height = "auto";
+          element.style.height = (element.scrollHeight+2)+"px";
       }
     </script>
+    <label>
+      Content
+      <textarea class="code" oninput="auto_grow(this)" rows="10" name="content" required autofocus></textarea>
+    </label>
 
     <button>
       Create
@@ -61,7 +50,7 @@
     <h1>Welcome!</h1>
   </header>
   <p>Welcome to my paste hosting service.</p>
-  <p>Please <a href="/login">login</a> or <a href="/register">register</a> to start pasting (no need to you're just here to browse).</p>
+  <p>Please <a href="/login">login</a> or <a href="/register">register</a> to start pasting (no need to if you're just here to browse).</p>
   <p>Let <a href="mailto:eu@misterio.me">me</a> know if you encounter any bugs or have feedback. Enjoy your stay!</p>
 </article>
 {% endif %}

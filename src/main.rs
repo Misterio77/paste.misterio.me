@@ -3,36 +3,29 @@ use paste_misterio_me::{
     error::ServerError,
     routes::{account, assets, errors, home, paste, user},
     style::StyleSheet,
+    syntax::SyntaxSet,
     tera::customize,
 };
 
 use rocket_db_pools::Database as DatabaseTrait;
 use rocket_dyn_templates::Template;
 use rocket_post_as_delete::PostAsDelete;
-use syntect::parsing::SyntaxSet;
 
 static SYNTAXES: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/syntaxes.bin"));
-static CSS: &str = include_str!(concat!(env!("OUT_DIR"), "/style.css"));
+static STYLE: &str = include_str!(concat!(env!("OUT_DIR"), "/style.css"));
 
 #[rocket::main]
 async fn main() -> Result<(), ServerError> {
-    let ss = {
-        let loaded: SyntaxSet = syntect::dumps::from_binary(SYNTAXES);
-        let mut builder = loaded.into_builder();
-        builder.add_plain_text_syntax();
-        builder.build()
-    };
-
-    let css = StyleSheet::new(CSS, 86400);
-
+    let syntaxes = SyntaxSet::new(SYNTAXES);
+    let style = StyleSheet::new(STYLE, 86400);
     rocket::build()
         // Fairings
         .attach(Database::init())
         .attach(Template::custom(customize))
         .attach(PostAsDelete)
         // Manage SyntaxSet and StyleSheet
-        .manage(ss)
-        .manage(css)
+        .manage(syntaxes)
+        .manage(style)
         // Error catchers
         .register("/", errors::catchers())
         // Assets

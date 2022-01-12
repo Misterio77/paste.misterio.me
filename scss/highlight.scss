@@ -16,7 +16,7 @@
   color: var(--code-red-color);
 }
 .constant.numeric {
-  color: var(--code-purple-color);
+  color: var(--code-amber-color);
 }
 .variable {
   color: var(--code-blue-color);
@@ -29,6 +29,9 @@
 }
 .keyword {
   color: var(--code-green-color);
+}
+.keyword.control, .keyword.operator {
+  color: var(--code-purple-color);
 }
 .meta.import .keyword, .keyword.control.import, .keyword.control.import.from, .keyword.other.import, .keyword.control.at-rule.include, .keyword.control.at-rule.import {
   color: var(--code-brown-color);
@@ -52,10 +55,16 @@
   color: var(--code-amber-color);
 }
 .support, .support.type, .support.class {
-  color: var(--code-green-color);
+  color: var(--code-amber-color);
+}
+.support.type.custom-property {
+  color: var(--code-purple-color);
+}
+.support.macro {
+  color: var(--code-red-color);
 }
 .entity.name.function {
-  color: var(--code-amber-color);
+  color: var(--code-blue-color);
 }
 .punctuation.definition.variable {
   color: var(--code-green-color);
@@ -79,7 +88,7 @@
   color: var(--code-grey-color);
 }
 .support.function {
-  color: var(--code-purple-color);
+  color: var(--code-blue-color);
 }
 .punctuation.separator.continuation {
   color: var(--code-red-color);

@@ -19,15 +19,20 @@ pub mod home {
 
 pub mod assets {
     use crate::style::StyleSheet;
-    use rocket::{get, routes, Route, State};
+    use rocket::{get, routes, Route, State, response::Redirect};
 
     #[get("/style.css")]
-    async fn assets(css: &State<StyleSheet>) -> &StyleSheet {
+    fn style() -> Redirect {
+        Redirect::to(format!("/assets/{}/style.css", crate::VERSION))
+    }
+
+    #[get("/<_version>/style.css")]
+    fn style_versioned<'a>(css: &'a State<StyleSheet>, _version: String) -> &'a StyleSheet<'a> {
         css
     }
 
     pub fn routes() -> Vec<Route> {
-        routes![assets]
+        routes![style, style_versioned]
     }
 }
 

@@ -35,8 +35,13 @@ fn humanize(value: &Value, _: &HashMap<String, Value>) -> tera::Result<Value> {
     }
 }
 
+fn version(_: &HashMap<String, Value>) -> tera::Result<Value> {
+    Ok(Value::String(crate::VERSION.to_string()))
+}
+
 pub fn customize(engines: &mut Engines) {
     engines.tera.register_function("exec_path", exec_path);
+    engines.tera.register_function("version", version);
     engines.tera.register_filter("timestamp", timestamp);
     engines.tera.register_filter("humanize", humanize);
 }

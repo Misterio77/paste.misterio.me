@@ -95,12 +95,12 @@
   --code-blue-color: #{hsl(202, 50%, 60%)};
   --code-purple-color: #{hsl(262, 50%, 70%)};
   --code-red-color: #{$red-600};
-  --code-green-color: #{$green-500};
+  --code-green-color: #{$green-400};
   --code-amber-color: #{$amber-700};
   --code-brown-color: #{hsl(40, 10%, 50%)};
-  --code-grey-color: #{mix($grey-700, $grey-600)};
+  --code-grey-color: #{$grey-600};
 
-  --code-background-color: #{mix($black, $grey-900, 35%)};
+  --code-background-color: #{mix($black, $grey-900, 25%)};
   --code-color: var(--color);
   --code-kbd-background-color: var(--contrast);
   --code-kbd-color: var(--contrast-inverse);
