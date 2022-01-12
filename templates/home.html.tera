@@ -13,7 +13,7 @@
     <div class="grid">
       <label>
         Title <small>(optional)</small>
-        <input name="title" type="url" spellcheck="false" autocomplete="off" placeholder="stalin_sort.rs"/>
+        <input name="title" type="url" spellcheck="false" autocomplete="off" autocapitalize="none" autocorrect="off" placeholder="stalin_sort.rs"/>
       </label>
       <label>
         Description <small>(optional)</small>
@@ -36,7 +36,7 @@
     </script>
     <label>
       Content
-      <textarea name="content" class="code" oninput="auto_grow(this)" spellcheck="false" autocomplete="off" rows="10" required autofocus></textarea>
+      <textarea name="content" class="code" oninput="auto_grow(this)" spellcheck="false" autocomplete="off" autocapitalize="none" autocorrect="off" rows="10" required autofocus></textarea>
     </label>
 
     <button>
