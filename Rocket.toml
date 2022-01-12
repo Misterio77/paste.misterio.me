@@ -1,6 +1,5 @@
 [default]
 template_dir = "templates"
-assets_dir = "assets"
 
 [default.databases.database]
 url = "postgresql:///misterio?user=misterio&host=/var/run/postgresql"

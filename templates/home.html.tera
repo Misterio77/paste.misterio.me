@@ -52,6 +52,14 @@
   <p>Welcome to my paste hosting service.</p>
   <p>Please <a href="/login">login</a> or <a href="/register">register</a> to start pasting (no need to if you're just here to browse).</p>
   <p>Let <a href="mailto:eu@misterio.me">me</a> know if you encounter any bugs or have feedback. Enjoy your stay!</p>
+  <footer>
+    <h2>Roadmap</h2>
+    <ul>
+      <li>Password resets</li>
+      <li>Starring others' pastes</li>
+      <li>Forking/cloning</li>
+    </ul>
+  </footer>
 </article>
 {% endif %}
 
