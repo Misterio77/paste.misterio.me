@@ -38,11 +38,11 @@ It should be really easy to build and run.
 
 ### Dependencies
 
-Just grab [rustc and cargo](https://rust-lang.org) (usually through either rustup or your distro's packages, if they're recent enough).
+Just grab [rustc and cargo](https://rust-lang.org) (usually through either rustup or your distro's packages, if they're recent enough). If you're using nix, just run `nix develop` to get a shell with everything you need.
 
 Get a [PostgreSQL](https://postgresql.org) instance up and running (should be available on your distro's repo, or use docker). Either socket or password auth will work just fine.
 
-You're good to go.
+Populate your schema using the `.sql` files in `db/`. These have a version number, so if you're upgrading just run the new ones.
 
 ### Configuration
 
@@ -59,3 +59,52 @@ Just run `cargo run` to run debug mode. Add in `--release` for a optimised (but 
 ### Contributing
 
 Open up a PR on github or send in a patch through sourcehut. I should have some automatic CI set soon(tm).
+
+## Repository structure
+
+Rust code:
+- `src`
+    - `routes`: Routes mounted into the application. Usually GET's that return a rendered template, POST/DELETE's for form submissions, and redirects.
+        - `account`: Account related routes
+        - `mod.rs`: Common routes (home, stylesheet, etc), and module entrypoint
+        - `paste.rs`: Routes for rendering and creating pastes
+        - `user.rs`: Routes for rendering users (in the future, also editing user info)
+    - `schema`: Model matching database schema and business logic. Database operations are private to the structs.
+    - `database.rs`: Database connection
+    - `error.rs`: Error handling structure, used across the app
+    - `lib.rs`: Crate entrypoint (exports other modules)
+    - `main.rs`: Bin entrypoint (starts rocket up)
+    - `style.rs`: StyleSheet struct, manages and serves the bundled CSS sheet
+    - `syntax.rs`: SyntaxSet struct, manages the syntax highlighting binary cache
+    - `tera.rs`: Custom tera filters and functions
+- `build.rs`: Builds highlighting binary cache and SCSS at build time
+- `Cargo.toml`: Project manifest and rust dependencies
+- `Cargo.lock`: Locked rust dependencies
+- `Rocket.toml`: Web server configuration. Can be set through this file (useful for development) or environment variables (better for deployments).
+
+HTML (tera) code:
+- `templates`: Tera templates
+    - `base.html.tera`: Base layout and metadata
+    - `error.html.tera`: Error displaying
+    - `home.html.tera`: Welcome message and paste creation form
+    - `login.html.tera`: Login form
+    - `logout.html.tera`: Logout form
+    - `register.html.tera`: Registration form
+    - `paste.html.tera`: Paste viewing
+    - `user.html.tera`: User viewing
+    - `session.html.tera`: Session management
+
+SCSS code:
+- `scss`: SCSS style sheets
+    - `pico`: Vendored-in pico.css sheets
+    - `highlight.scss`: Variable mapping for syntax highlighting
+    - `style.scss`: Custom styling
+
+SQL code:
+- `db`: Schema definitions, each one corresponds to the changes that version had (so, if you're upgrading, just run the ones between your current and intended version)
+
+Nix code:
+- `default.nix`: Derivation for building this project with nix
+- `flake.nix`: Nix project manifest, includes the derivation (accessible via `nix build`) and a devshell (accessible via `nix develop`).
+- `flake.lock`: Locked nix inputs
+
