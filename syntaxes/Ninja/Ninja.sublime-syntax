@@ -1,0 +1,38 @@
+%YAML 1.2
+---
+# http://www.sublimetext.com/docs/3/syntax.html
+name: Ninja
+file_extensions:
+  - ninja
+scope: source.ninja
+contexts:
+  main:
+    - match: '^\t+(?![#\t]).*\n?'
+      scope: invalid.illegal.tab-not-allowed-here.ninja
+    - match: "$[$: ]"
+      scope: constant.character.escape.ninja
+    - match: \b(build|rule|default)\b
+      scope: storage.type.$1.ninja
+    - match: \b(include|subninja)\b
+      scope: keyword.control.$1.ninja
+    - match: '(\$)[a-zA-Z_][a-zA-Z0-9_]*'
+      scope: variable.other.normal.ninja
+      captures:
+        1: punctuation.definition.variable.ninja
+    - match: '(\$)\{.*?\}'
+      scope: variable.other.bracket.ninja
+      captures:
+        1: punctuation.definition.variable.ninja
+    - match: '^([ \t]+)?(?=#)'
+      captures:
+        1: punctuation.whitespace.comment.leading.ninja
+      push:
+        - match: (?!\G)
+          pop: true
+        - match: "#"
+          captures:
+            0: punctuation.definition.comment.ninja
+          push:
+            - meta_scope: comment.line.number-sign.ninja
+            - match: \n
+              pop: true

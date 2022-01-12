@@ -1,0 +1,281 @@
+%YAML 1.2
+---
+# http://www.sublimetext.com/docs/3/syntax.html
+name: MSBuild
+file_extensions:
+  - proj
+  - targets
+  - msbuild
+  - csproj
+  - vbproj
+  - fsproj
+  - vcxproj
+scope: source.msbuild
+contexts:
+  main:
+    - match: '(<\?)\s*([-_a-zA-Z0-9]+)'
+      comment: Preprocessor directives
+      captures:
+        1: punctuation.definition.tag.begin.msbuild
+        2: entity.name.tag.msbuild
+      push:
+        - meta_scope: meta.tag.preprocessor.msbuild
+        - match: (\?>)
+          captures:
+            1: punctuation.definition.tag.begin.msbuild
+            2: entity.name.tag.msbuild
+          pop: true
+        - match: " ([a-zA-Z-]+)"
+          scope: entity.other.attribute-name.msbuild
+        - include: doubleQuotedString
+        - include: singleQuotedString
+    - match: <!--
+      comment: Comment blocks
+      captures:
+        0: punctuation.definition.comment.msbuild
+      push:
+        - meta_scope: comment.block.msbuild
+        - match: "-->"
+          captures:
+            0: punctuation.definition.comment.msbuild
+          pop: true
+    - match: (</?)(ItemGroup|Import|Output|ParameterGroup|Project|ProjectExtensions|PropertyGroup|Target|UsingTask)\b
+      comment: MSBuild keywords
+      captures:
+        1: punctuation.definition.tag.begin.msbuild
+        2: keyword.other.source.msbuild
+      push:
+        - meta_scope: meta.tag.msbuild
+        - match: (/?>)
+          captures:
+            1: punctuation.definition.tag.end.msbuild
+          pop: true
+        - include: tagAttribute
+    - match: (</?)(Choose|OnError|Otherwise|When)\b
+      comment: MSBuild flow control
+      captures:
+        1: punctuation.definition.tag.begin.msbuild
+        2: keyword.control.source.msbuild
+      push:
+        - meta_scope: meta.tag.msbuild
+        - match: (/?>)
+          captures:
+            1: punctuation.definition.tag.end.msbuild
+          pop: true
+        - include: tagAttribute
+    - match: (</?)(AL|AspNetCompiler|AssignCulture|AssignProjectConfiguration|AssignTargetPath|CallTarget|CombinePath|ConvertToAbsolutePath|Copy|CreateCSharpManifestResourceName|CreateItem|CreateProperty|CreateVisualBasicManifestResourceName|Csc|Delete|Error|Exec|FindAppConfigFile|FindInList|FindUnderPath|FormatUrl|FormatVersion|GenerateApplicationManifest|GenerateDeploymentManifest|GenerateResource|GenerateTrustInfo|GetAssemblyIdentity|GetFrameworkPath|GetFrameworkSdkPath|GetReferenceAssemblyPaths|LC|MakeDir|Message|Move|MSBuild|ReadLinesFromFile|RegisterAssembly|RemoveDir|RemoveDuplicates|RequiresFramework35SP1Assembly|ResolveAssemblyReference|ResolveComReference|ResolveKeySource|ResolveManifestFiles|ResolveNativeReference|REsolveNonMSBuildProjectOutput|SGen|SignFile|Touch|UnregisterAssembly|UpdateManifest|Vbc|Warning|WriteCodeFragment|WriteLinesToFile|XmlPeek|XmlPoke|XslTransformation)\b
+      comment: MSBuild tasks
+      captures:
+        1: punctuation.definition.tag.begin.msbuild
+        2: support.function.source.msbuild
+      push:
+        - meta_scope: meta.tag.msbuild
+        - match: (/?>)
+          captures:
+            1: punctuation.definition.tag.end.msbuild
+          pop: true
+        - include: tagAttribute
+    - match: (</?)(CodeAnalysisDictionary|Compile|Content|EmbeddedResource|None|Reference)\b
+      comment: Project item types
+      captures:
+        1: punctuation.definition.tag.begin.msbuild
+        2: keyword.other.source.msbuild
+      push:
+        - meta_scope: meta.tag.msbuild
+        - match: (/?>)
+          captures:
+            1: punctuation.definition.tag.end.msbuild
+          pop: true
+        - include: tagAttribute
+    - match: "(</?)(?:([-_a-zA-Z0-9]+)((:)))?([-_a-zA-Z0-9:]+)"
+      comment: Standard tags
+      captures:
+        1: punctuation.definition.tag.begin.msbuild
+        2: entity.name.tag.namespace.msbuild
+        3: entity.name.tag.msbuild
+        4: punctuation.separator.namespace.msbuild
+        5: entity.name.tag.localname.msbuild
+      push:
+        - meta_scope: meta.tag.msbuild
+        - match: (/?>)
+          captures:
+            1: punctuation.definition.tag.end.msbuild
+          pop: true
+        - include: tagAttribute
+    - include: entity
+    - include: bareAmpersand
+    - include: reservedProperty
+    - include: wellKnownMetadataEmbedded
+    - include: itemReference
+    - include: variable
+    - match: '<!\[CDATA\['
+      comment: CDATA sections
+      captures:
+        0: punctuation.definition.string.begin.msbuild
+      push:
+        - meta_scope: string.unquoted.cdata.msbuild
+        - match: "]]>"
+          captures:
+            0: punctuation.definition.string.end.msbuild
+          pop: true
+  bareAmpersand:
+    - match: "&"
+      scope: invalid.illegal.bad-ampersand.msbuild
+  doubleQuotedString:
+    - match: '"'
+      captures:
+        0: punctuation.definition.string.begin.msbuild
+      push:
+        - meta_scope: string.quoted.single.msbuild
+        - match: '"'
+          captures:
+            0: punctuation.definition.string.end.msbuild
+          pop: true
+        - include: reservedProperty
+        - include: itemReference
+        - include: variable
+        - include: entity
+        - include: operator
+        - include: predicate
+        - include: bareAmpersand
+  entity:
+    - match: "(&)([:a-zA-Z_][:a-zA-Z0-9_.-]*|#[0-9]+|#x[0-9a-fA-F]+)(;)"
+      scope: constant.character.entity.msbuild
+      captures:
+        1: punctuation.definition.constant.msbuild
+        3: punctuation.definition.constant.msbuild
+  itemFunctions:
+    - match: (\s*->\s*)(AnyHaveMetadataValue|ClearMetadata|Count|DirectoryName|Distinct|DistinctWithCase|HasMetadata|Metadata|Reverse|WithMetadataValue)(\()
+      comment: Item metadata functions like @(VarName -> Count())
+      captures:
+        2: support.function.source.msbuild
+        3: punctuation.definition.parameter-list.begin.msbuild
+      push:
+        - match: \)
+          captures:
+            0: punctuation.definition.parameter-list.end.msbuild
+          pop: true
+        - include: singleQuotedString
+        - include: doubleQuotedString
+        - include: bareAmpersand
+  itemReference:
+    - match: \%\(
+      comment: "%(Foo.Bar) or %(Metadata) references - separate so well-known metadata will only highlight in these variables"
+      captures:
+        0: punctuation.definition.variable.begin.msbuild
+      push:
+        - meta_scope: variable.parameter.item.source.msbuild
+        - match: \)
+          captures:
+            0: punctuation.definition.variable.end.msbuild
+          pop: true
+        - include: wellKnownMetadataInline
+        - include: entity
+        - include: bareAmpersand
+  nestedParens:
+    - match: \(
+      comment: Handles nested parentheses in a property.
+      captures:
+        0: punctuation.definition.variable.begin.msbuild
+      push:
+        - meta_scope: variable.parameter.property.source.msbuild
+        - match: \)
+          captures:
+            0: punctuation.definition.variable.end.msbuild
+          pop: true
+        - include: main
+        - include: variable
+        - include: wellKnownMetadataEmbedded
+        - include: itemReference
+        - include: entity
+        - include: bareAmpersand
+  operator:
+    - match: (==|!=?|&gt;=?|&lt;=?|\bAnd\b|\bOr\b)
+      scope: keyword.operator.source.msbuild
+  predicate:
+    - match: \b(Exists|HasTrailingSlash)(\()
+      captures:
+        1: keyword.other.source.msbuild
+        2: punctuation.definition.parameter-list.begin.msbuild
+      push:
+        - match: \)
+          captures:
+            0: punctuation.definition.parameter-list.end.msbuild
+          pop: true
+        - include: main
+        - include: singleQuotedString
+        - include: doubleQuotedString
+        - include: bareAmpersand
+  reservedProperty:
+    - match: (?i)(\$\()(MSBuild(BinPath|ExtensionsPath(?:32|64)?|LastTaskResult|NodeCount|ProgramFiles32|ProjectDefaultTargets|ProjectDirectory(?:NoRoot)?|ProjectExtension|ProjectFile|ProjectFullPath|ProjectName|StartupDirectory|ThisFile(?:Directory|DirectoryNoRoot|Extension|FullPath|Name)?|ToolsPath|ToolsVersion))(\))
+      comment: Properties provided by MSBuild
+      scope: support.constant.source.msbuild
+      captures:
+        1: punctuation.definition.constant.begin.msbuild
+        2: support.constant.source.msbuild
+        3: punctuation.definition.constant.end.msbuild
+  singleQuotedString:
+    - match: "'"
+      captures:
+        0: punctuation.definition.string.begin.msbuild
+      push:
+        - meta_scope: string.quoted.single.msbuild
+        - match: "'"
+          captures:
+            0: punctuation.definition.string.end.msbuild
+          pop: true
+        - include: reservedProperty
+        - include: itemReference
+        - include: variable
+        - include: entity
+        - include: operator
+        - include: predicate
+        - include: bareAmpersand
+  tagAttribute:
+    - match: '\s+(?:([-_a-zA-Z0-9]+)((:)))?([-_a-zA-Z0-9]+)\s*=\s*'
+      captures:
+        1: entity.other.attribute-name.namespace.msbuild
+        2: entity.other.attribute-name.msbuild
+        3: punctuation.separator.namespace.msbuild
+        4: entity.other.attribute-name.localname.msbuild
+    - include: doubleQuotedString
+    - include: singleQuotedString
+  variable:
+    - match: (?:\$|\@)\(
+      comment: Variables that are properties or lists, not item references
+      captures:
+        0: punctuation.definition.variable.begin.msbuild
+      push:
+        - meta_scope: variable.parameter.property.source.msbuild
+        - match: \)
+          captures:
+            0: punctuation.definition.variable.end.msbuild
+          pop: true
+        - include: main
+        - include: reservedProperty
+        - include: wellKnownMetadataEmbedded
+        - include: itemFunctions
+        - include: itemReference
+        - include: nestedParens
+        - include: entity
+        - include: bareAmpersand
+        - match: "->"
+          scope: keyword.operator.source.msbuild
+        - match: "(?i)Registry:"
+          scope: support.function.source.msbuild
+        - match: '\[(?:(?:Microsoft\.Build\.Utilities\.ToolLocationHelper)|(?:System\.(?:Byte|Char|Convert|DateTime|Decimal|Double|Enum|Environment|Guid|U?Int(?:16|32|64)|IO\.(?:Directory|File|Path)|Math|SByte|Single|String(?:Comparer)?|TimeSpan|Text\.RegularExpressions\.Regex)))\]::[_a-zA-Z0-9]+'
+          comment: Inline framework static class functions supported
+          scope: support.function.source.msbuild
+  wellKnownMetadataEmbedded:
+    - match: (\%\()(?:AccessedTime|CreatedTime|Directory|Extension|Filename|FullPath|Identity|ModifiedTime|RecursiveDir|RelativeDir|RootDir)(\))
+      comment: Well-known metadata like @(VarName -> %(Metadata))
+      scope: support.constant.source.msbuild
+      captures:
+        1: punctuation.definition.variable.begin.msbuild
+        2: punctuation.definition.variable.begin.msbuild
+  wellKnownMetadataInline:
+    - match: (\.)(?:AccessedTime|CreatedTime|Directory|Extension|Filename|FullPath|Identity|ModifiedTime|RecursiveDir|RelativeDir|RootDir)\b
+      comment: Well-known metadata like %(ItemName.Metadata)
+      scope: support.constant.source.msbuild
+      captures:
+        1: variable.other.dot-access.msbuild

@@ -1,0 +1,391 @@
+%YAML 1.2
+---
+# http://www.sublimetext.com/docs/3/syntax.html
+name: HTML (ASP.net)
+comment: This is a modified version of the HTML language that uses ASP VB.NET for embedded source code instead of ruby. Thomas Aylott subtleGradient.com
+file_extensions:
+  - aspx
+  - ascx
+  - master
+scope: text.html.asp.net
+contexts:
+  main:
+    - include: php
+    - include: asp
+    - include: smarty
+    - match: '(<)(\w+)[^>]*((>)</)(\2)(>)'
+      scope: meta.tag.html
+      captures:
+        1: punctuation.definition.tag.html
+        2: entity.name.tag.html
+        3: punctuation.definition.tag.html
+        4: meta.scope.between-tag-pair.html
+        5: entity.name.tag.html
+        6: punctuation.definition.tag.html
+    - match: (<\?)(xml)
+      captures:
+        1: punctuation.definition.tag.html
+        2: entity.name.tag.html
+      push:
+        - meta_scope: meta.tag.metadata.processing.xml.html
+        - match: (\?>)
+          captures:
+            1: punctuation.definition.tag.html
+            2: entity.name.tag.html
+          pop: true
+        - include: tag-generic-attribute
+        - include: string-double-quoted
+        - include: string-single-quoted
+    - match: <!--
+      captures:
+        0: punctuation.definition.comment.asp.net
+      push:
+        - meta_scope: comment.block.html
+        - match: "-->"
+          captures:
+            0: punctuation.definition.comment.asp.net
+          pop: true
+        - match: "--"
+          scope: invalid.illegal.bad-comments-or-CDATA.html
+    - match: <!
+      captures:
+        0: punctuation.definition.tag.asp.net
+      push:
+        - meta_scope: meta.tag.metadata.doctype.html
+        - match: ">"
+          captures:
+            0: punctuation.definition.tag.asp.net
+          pop: true
+        - match: (DOCTYPE)
+          captures:
+            1: entity.name.tag.html
+          push:
+            - match: (?=>)
+              captures:
+                1: entity.name.tag.html
+              pop: true
+            - match: '"[^">]*"'
+              scope: string.quoted.double.doctype.identifiers-and-DTDs.html
+        - match: '\[CDATA\['
+          push:
+            - meta_scope: constant.other.inline-data.html
+            - match: "]](?=>)"
+              pop: true
+        - match: (\s*)(?!--|>)\S(\s*)
+          scope: invalid.illegal.bad-comments-or-CDATA.html
+    - match: '(?:^\s+)?(<)((?i:script))\b(?![^>]*/>)'
+      captures:
+        1: punctuation.definition.tag.html
+        2: entity.name.tag.script.html
+      push:
+        - meta_scope: source.js.embedded.html
+        - match: (?<=</(script|SCRIPT))(>)(?:\s*\n)?
+          captures:
+            1: punctuation.definition.tag.html
+            2: entity.name.tag.script.html
+          pop: true
+        - include: tag-stuff
+        - match: (?<!</(?:script|SCRIPT))(>)
+          captures:
+            1: punctuation.definition.tag.html
+          push:
+            - match: (</)((?i:script))
+              captures:
+                1: punctuation.definition.tag.html
+              pop: true
+            - include: scope:source.js
+    - match: '(?:^\s+)?(<)((?i:style))\b(?![^>]*/>)'
+      captures:
+        1: punctuation.definition.tag.html
+        2: entity.name.tag.style.html
+        3: punctuation.definition.tag.html
+      push:
+        - meta_scope: source.css.embedded.html
+        - match: (</)((?i:style))(>)(?:\s*\n)?
+          captures:
+            1: punctuation.definition.tag.html
+            2: entity.name.tag.style.html
+            3: punctuation.definition.tag.html
+          pop: true
+        - include: tag-stuff
+        - match: (>)
+          captures:
+            1: punctuation.definition.tag.html
+          push:
+            - match: (?=</(?i:style))
+              pop: true
+            - include: scope:source.css
+    - match: (</?)((?i:body|head|html)\b)
+      captures:
+        1: punctuation.definition.tag.html
+        2: entity.name.tag.structure.any.html
+      push:
+        - meta_scope: meta.tag.structure.any.html
+        - match: (>)
+          captures:
+            1: punctuation.definition.tag.html
+            2: entity.name.tag.structure.any.html
+          pop: true
+        - include: tag-stuff
+    - match: (</?)((?i:address|blockquote|dd|div|dl|dt|fieldset|form|frame|frameset|h1|h2|h3|h4|h5|h6|iframe|noframes|object|ol|p|ul|applet|center|dir|hr|menu|pre)\b)
+      captures:
+        1: punctuation.definition.tag.html
+        2: entity.name.tag.block.any.html
+      push:
+        - meta_scope: meta.tag.block.any.html
+        - match: (>)
+          captures:
+            1: punctuation.definition.tag.html
+            2: entity.name.tag.block.any.html
+          pop: true
+        - include: tag-stuff
+    - match: (</?)((?i:a|abbr|acronym|area|b|base|basefont|bdo|big|br|button|caption|cite|code|col|colgroup|del|dfn|em|font|head|html|i|img|input|ins|isindex|kbd|label|legend|li|link|map|meta|noscript|optgroup|option|param|q|s|samp|script|select|small|span|strike|strong|style|sub|sup|table|tbody|td|textarea|tfoot|th|thead|title|tr|tt|u|var)\b)
+      captures:
+        1: punctuation.definition.tag.html
+        2: entity.name.tag.inline.any.html
+      push:
+        - meta_scope: meta.tag.inline.any.html
+        - match: (>)
+          captures:
+            1: punctuation.definition.tag.html
+            2: entity.name.tag.inline.any.html
+          pop: true
+        - include: tag-stuff
+    - match: "(</?)([a-zA-Z0-9:]+)"
+      captures:
+        1: punctuation.definition.tag.html
+        2: entity.name.tag.other.html
+      push:
+        - meta_scope: meta.tag.other.html
+        - match: (>)
+          captures:
+            1: punctuation.definition.tag.html
+            2: entity.name.tag.other.html
+          pop: true
+        - include: tag-stuff
+    - include: entities
+    - match: <>
+      scope: invalid.illegal.incomplete.html
+    - match: <(?=\W)|>
+      scope: invalid.illegal.bad-angle-bracket.html
+  asp:
+    - include: source-asp-embedded-scripttag
+    - include: source-asp-embedded
+    - include: source-asp-bound
+    - include: source-asp-return
+    - match: (<!--)\s+#include.*(-->)
+      scope: meta.source.embedded.asp.include
+      captures:
+        1: punctuation.definition.tag.asp
+        3: punctuation.definition.tag.asp
+  embedded-code:
+    - include: php
+    - include: asp
+    - include: smarty
+  entities:
+    - match: "(&)([a-zA-Z0-9]+|#[0-9]+|#x[0-9a-fA-F]+)(;)"
+      scope: constant.character.entity.html
+      captures:
+        1: punctuation.definition.entity.html
+        3: punctuation.definition.entity.html
+    - match: "&"
+      scope: invalid.illegal.bad-ampersand.html
+  php:
+    - match: (?=(^\s*)?<\?)
+      push:
+        - match: (?!(^\s*)?<\?)
+          pop: true
+        - include: scope:text.html.php
+  ruby:
+    - match: <%+(?!>)=?
+      captures:
+        0: punctuation.section.embedded.begin.ruby
+      push:
+        - meta_scope: source.ruby.embedded.html
+        - match: "-?%>"
+          captures:
+            0: punctuation.section.embedded.end.ruby
+          pop: true
+        - match: (#).*?(?=-?%>)
+          scope: comment.line.number-sign.ruby
+          captures:
+            1: punctuation.definition.comment.ruby
+        - include: scope:source.ruby
+  smarty:
+    - match: '((\{)(literal)(\}))'
+      captures:
+        1: source.smarty.embedded.html
+        2: punctuation.section.embedded.smarty
+        3: support.function.built-in.smarty
+        4: punctuation.section.embedded.smarty
+      push:
+        - match: '((\{/)(literal)(\}))'
+          captures:
+            1: source.smarty.embedded.html
+            2: punctuation.section.embedded.smarty
+            3: support.function.built-in.smarty
+            4: punctuation.section.embedded.smarty
+          pop: true
+    - match: "{{|{"
+      captures:
+        0: punctuation.section.embedded.smarty
+      push:
+        - meta_scope: source.smarty.embedded.html
+        - match: "}}|}"
+          captures:
+            0: punctuation.section.embedded.smarty
+          pop: true
+        - include: scope:source.smarty
+  source-asp-bound:
+    - match: "<%#"
+      captures:
+        0: punctuation.section.embedded.begin.asp
+      push:
+        - meta_scope: meta.source.embedded.bound
+        - match: "%>"
+          captures:
+            0: punctuation.section.embedded.end.asp
+          pop: true
+        - match: (?<=<%#)
+          push:
+            - meta_scope: source.asp.embedded.html
+            - match: (?=%>)
+              pop: true
+            - include: scope:source.asp.vb.net
+  source-asp-embedded:
+    - match: "<%(?![=#])"
+      captures:
+        0: punctuation.section.embedded.begin.asp
+      push:
+        - meta_scope: meta.source.embedded
+        - match: "%>"
+          captures:
+            0: punctuation.section.embedded.end.asp
+          pop: true
+        - match: (?<=<%)
+          push:
+            - meta_scope: source.asp.embedded.html
+            - match: (?=%>)
+              pop: true
+            - include: scope:source.asp.vb.net
+  source-asp-embedded-scripttag:
+    - match: '(?:^\s+)?(<)(script).*runat=.server[^>]*(>)'
+      captures:
+        1: punctuation.definition.tag.html
+        2: entity.name.tag.script.html
+        3: punctuation.definition.tag.html
+      push:
+        - meta_scope: meta.source.embedded.script-tag
+        - match: (</)(script)(>)(?:\s*$\n)?
+          captures:
+            1: punctuation.definition.tag.html
+            2: entity.name.tag.script.html
+            3: punctuation.definition.tag.html
+          pop: true
+        - match: (?<=(>))
+          push:
+            - meta_scope: source.asp.embedded.html
+            - match: (?=</script>)
+              pop: true
+            - include: scope:source.asp.vb.net
+  source-asp-return:
+    - match: <%=
+      captures:
+        0: punctuation.section.embedded.begin.asp
+      push:
+        - meta_scope: meta.source.embedded.return-value
+        - match: "%>"
+          captures:
+            0: punctuation.section.embedded.end.asp
+          pop: true
+        - match: (?<=<%=)
+          push:
+            - meta_scope: source.asp.embedded.html
+            - match: (?=%>)
+              pop: true
+            - include: scope:source.asp.vb.net
+  source-asp-single-line:
+    - match: <%(=|#|@)
+      comment: DEBUG
+      captures:
+        0: punctuation.section.embedded.begin.asp
+      push:
+        - meta_scope: meta.source.embedded.single-line
+        - match: "%>"
+          captures:
+            0: punctuation.section.embedded.end.asp
+          pop: true
+        - match: (?<=<%)
+          push:
+            - meta_scope: source.asp.embedded.html
+            - match: (?=%>)
+              pop: true
+            - include: scope:source.asp.vb.net
+  string-double-quoted:
+    - match: '"'
+      captures:
+        0: punctuation.definition.string.begin.html
+      push:
+        - meta_scope: string.quoted.double.html
+        - match: '"'
+          captures:
+            0: punctuation.definition.string.end.html
+          pop: true
+        - include: embedded-code
+        - include: entities
+  string-single-quoted:
+    - match: "'"
+      captures:
+        0: punctuation.definition.string.begin.html
+      push:
+        - meta_scope: string.quoted.single.html
+        - match: "'"
+          captures:
+            0: punctuation.definition.string.end.html
+          pop: true
+        - include: embedded-code
+        - include: entities
+  tag-generic-attribute:
+    - match: '\b([a-zA-Z-:]+)'
+      scope: entity.other.attribute-name.html
+  tag-id-attribute:
+    - match: \b(id)\b\s*(=)
+      captures:
+        1: entity.other.attribute-name.id.html
+        2: punctuation.separator.key-value.html
+      push:
+        - meta_scope: meta.attribute-with-value.id.html
+        - match: (?<='|")
+          captures:
+            1: entity.other.attribute-name.id.html
+            2: punctuation.separator.key-value.html
+          pop: true
+        - match: '"'
+          captures:
+            0: punctuation.definition.string.begin.html
+          push:
+            - meta_scope: string.quoted.double.html
+            - meta_content_scope: meta.toc-list.id.html
+            - match: '"'
+              captures:
+                0: punctuation.definition.string.end.html
+              pop: true
+            - include: embedded-code
+            - include: entities
+        - match: "'"
+          captures:
+            0: punctuation.definition.string.begin.html
+          push:
+            - meta_scope: string.quoted.single.html
+            - meta_content_scope: meta.toc-list.id.html
+            - match: "'"
+              captures:
+                0: punctuation.definition.string.end.html
+              pop: true
+            - include: embedded-code
+            - include: entities
+  tag-stuff:
+    - include: tag-id-attribute
+    - include: tag-generic-attribute
+    - include: string-double-quoted
+    - include: string-single-quoted

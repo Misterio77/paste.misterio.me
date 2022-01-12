@@ -1,0 +1,12 @@
+%YAML 1.2
+---
+# http://www.sublimetext.com/docs/3/syntax.html
+name: Dart Doc Comments
+scope: text.dart-doccomments
+contexts:
+  main:
+    - match: '\[(.*)\]\((.*)\)'
+      scope: mata.link.inline.dart-doccomments
+      captures:
+        1: string.other.link.title.dart-doccomments
+        2: markup.underline.link.dart-doccomments

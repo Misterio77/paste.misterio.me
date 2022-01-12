@@ -17,7 +17,7 @@ pub struct User {
 }
 
 impl User {
-    async fn get(db: &Client, username: &str) -> Result<User, ServerError> {
+    async fn fetch(db: &Client, username: &str) -> Result<User, ServerError> {
         db.query_one(
             "SELECT username, email, password
             FROM users
@@ -56,6 +56,9 @@ impl User {
         Ok(())
     }
 
+    pub async fn get(db: &Client, username: &str) -> Result<User, ServerError> {
+        User::fetch(db, username).await
+    }
     pub async fn register(
         db: &Client,
         username: String,

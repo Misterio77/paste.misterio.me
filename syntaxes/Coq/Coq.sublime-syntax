@@ -1,0 +1,357 @@
+%YAML 1.2
+---
+name: Coq
+file_extensions: [v]
+scope: source.coq
+
+variables:
+  integer: '(-?\d+)'
+  ident: '([a-zA-Z_][a-zA-Z0-9_'']*)'
+  b: '(?!'')\b'
+  colon: ':(?![<>=:])'
+  dot: '\.(?![a-zA-Z_(])'
+  accessor: '\.(?!\s)'
+  hilight_type_base: '\s*((\.?{{ident}}|->|)\s*)+'
+  hilight_type_guard: '(?:[,.:)}\]|&]|=>)'
+  hilight_type: '(?={{hilight_type_base}}{{hilight_type_guard}})'
+  hilight_type_line: '(?={{hilight_type_base}}({{hilight_type_guard}}|$))'
+  kw_term_binder: '(fun|forall|exists|exists2)'
+  kw_term_definition: '(let|fix|cofix|with)'
+  kw_term_other: '(as|at|else|end|for|if|IF|in|match|mod|return|then|using|where)'
+  kw_term: '({{kw_term_binder}}|{{kw_term_definition}}|{{kw_term_other}})'
+  sort: '(Prop|Set|Type)'
+  builtin_definition: '(True|False|nat|bool|list)'
+  builtin_constructor: '(S|O|true|false|nil|cons)'
+  operator: '(!|%|&|&&|\*|\+|\+\+|,|-|->|\.\(|\.\.|/\\|/|::|:<|:=|:>|:|;|<|<-|<->|<:|<=|<>|=|=>|=_D|>|>->|>=|\?|\?=|@|\[|\\/|\]|\^|\{|\||\|-|\|\||\}|~)'
+  bullet: '[*+-]+'
+  kw_declaration: '(Axiom|Conjecture|Parameter|Parameters|Variable|Variables|Hypothesis|Hypotheses)'
+  kw_definition: '(Theorem|Lemma|Remark|Fact|Corollary|Proposition|Example|Let|Definition|Fixpoint|CoFixpoint)'
+  kw_inductive: '(Inductive|CoInductive)'
+  kw_qed: '(Qed|Defined|Admitted|Save|Abort)'
+  kw_require: '(Require|Import|Export)'
+  kw_other: '(Proof|Print|Check|Compute|Goal|Require)'
+  kw_command: '({{kw_declaration}}|{{kw_definition}}|{{kw_inductive}}|{{kw_qed}}|{{kw_require}}|{{kw_other}})'
+  tactic: '(admit|apply|assert|assumption|auto|autounfold|case|clear|compute|constructor|contradiction|dependent|destruct|discriminate|do|eapply|eauto|easy''?|exfalso|pose|elim|exact|exists|firstorder|generalize|give_up|induction|injection|inversion|into|intros|intro|intuition|omega|pattern|refine|reflexivity|rename|remember|repeat|replace|revert|rewrite|ring|set|simpl|specialize|split|symmetry|subst|tauto|trivial|try|unfold)'
+  # command_other: '(About|Add|Admit|All|Arguments|Assumptions|Back|BackTo|Bind|Blacklist|Canonical|Cd|Check|Class|Classes|Close|Coercion|Coercions|Collection|Combined|Constant|Constraint|Constructor|Constructors|Context|Create|Cumulative|Declare|Delimit|Derive|Drop|End|Existential|Existing|Extract|Extraction|Fail|Field|File|Focus|Function|Functional|Generalizable|Global|Grab|Grammar|Graph|Guarded|Haskell|Heap|Hint|HintDb|Hints|Identity|If|Immediate|Implicit|Implicits|Include|Infix|Info|Initial|Inline|Inlined|Inspect|Instance|Inversion|Language|Left|Libraries|Library|Load|LoadPath|Local|Locate|Ltac|ML|Module|Modules|Monomorphic|Morphism|Next|No|NoInline|NonCumulative|Notation|OCaml|Obligation|Obligations|Opaque|Open|Optimize|Options|Parametric|Path|Paths|Polymorphic|Prenex|Preterm|Print|Printing|Profile|Program|Pwd|Quit|Rec|Record|Records|Recursive|Redirect|Reduction|Relation|Remove|Reset|Resolve|Restart|Rewrite|Right|Ring|Scheme|Scope|Search|SearchHead|SearchPattern|Separate|Set|Setoid|Section|Show|Signatures|Solve|Step|Strategy|Structure|Table|Tactic|Test|TestCompile|Time|Timeout|Transparent|Type|Typeclasses|Types|Undelimit|Undo|Unfocus|Unfocused|Unfold|Universe|Universes|Unset|Unshelve|Variant|View|Visibility)'
+
+contexts:
+  prototype:
+    - include: comment_begin
+    - match: (?={{dot}})
+      scope: punctuation.terminator.coq
+      pop: true
+
+  # Illegal syntax
+  illegal_punct:
+    - match: '\)'
+      scope: invalid.illegal.stray-paren-end
+    - match: '\}'
+      scope: invalid.illegal.stray-brace-end
+    - match: '\]'
+      scope: invalid.illegal.stray-bracket-end
+  illegal_any:
+    - match: '\S'
+      scope: invalid.illegal
+
+  # Sentences
+  main:
+    - meta_include_prototype: false
+    - include: comment_begin
+    - match: '\b{{kw_declaration}}{{b}}'
+      scope: keyword.declaration.coq
+      push: binders
+    - match: '\b{{kw_definition}}{{b}}'
+      scope: keyword.definition.coq
+      push: [term, definition]
+    - match: '\b{{kw_inductive}}{{b}}'
+      scope: keyword.definition.coq
+      push: [inductive, definition]
+    - match: '\bPrint{{b}}'
+      scope: keyword.coq
+      push: ident
+    - match: '\b(Check|Compute|Eval){{b}}'
+      scope: keyword.coq
+      push: term
+    - match: '\bProof{{b}}'
+      scope: keyword.coq
+      push: proof
+    - match: '\bGoal{{b}}'
+      scope: keyword.coq
+      push: [tactic, term]
+    - match: '\bRequire{{b}}'
+      scope: keyword.control.import.coq
+      push: require
+    - match: '\b{{ident}}{{b}}'
+      scope: invalid.illegal.unknown-sentence.coq
+      push: sentence_unknown
+  sentence_unknown:
+    - meta_scope: meta.sentence.coq
+    - match: '(?=\b{{kw_command}}\b)'
+      pop: true
+
+  # Proofs
+  proof:
+    - meta_include_prototype: false
+    - include: comment_begin
+    - match: '\.'
+      scope: punctuation.terminator.coq
+      set: tactic
+    - match: '(?=\b{{kw_command}}\b)'
+      pop: true
+  tactic:
+    - meta_scope: meta.proof.coq
+    - meta_include_prototype: false
+    - include: comment_begin
+    - match: '{{bullet}}'
+      scope: entity.name.section.coq
+    - match: '\b{{kw_qed}}{{b}}'
+      scope: keyword.coq
+      pop: true
+    - match: '(?=\b{{kw_command}}\b)'
+      pop: true
+    - match: '\b(repeat|try|do){{b}}'
+      scope: support.function.coq
+    - match: '\b{{tactic}}{{b}}'
+      scope: support.function.coq
+      push: tactic_term
+    - match: '{{ident}}'
+      scope: variable.function.coq
+      push: tactic_term
+    - match: '{{integer}}'
+      scope: constant.numeric.integer
+    - match: ';'
+      scope: punctuation.separator.coq
+      set: tactic_sequence
+    - match: '\['
+      scope: invalid.illegal.stray-bracket-begin
+    - match: '\('
+      scope: punctuation.section.parens.begin.coq
+      push: tactic_paren
+    - include: illegal_punct
+  tactic_sequence:
+    - meta_scope: meta.proof.coq
+    - meta_include_prototype: false
+    - match: '{{dot}}'
+      set: tactic
+    - match: '\['
+      scope: punctuation.section.braces.begin.coq
+      push: tactic_local
+    - include: tactic
+  tactic_local:
+    - meta_scope: meta.proof.coq
+    - meta_include_prototype: false
+    - match: '\]'
+      scope: punctuation.section.braces.begin.coq
+      pop: true
+    - include: tactic
+  tactic_paren:
+    - meta_scope: meta.proof.coq
+    - meta_include_prototype: false
+    - match: '\)'
+      scope: punctuation.section.parens.end.coq
+      pop: true
+    - include: tactic
+  tactic_term:
+    - match: '(?=[;|)\]])'
+      pop: true
+    - include: term
+
+  # Other commands
+  require:
+    - match: '\b{{kw_require}}{{b}}'
+      scope: keyword.control.import.coq
+    - match: '(?=\b{{kw_command}}{{b}})'
+      pop: true
+    - match: '{{ident}}'
+      scope: support.module.coq
+
+  ident:
+    - match: '{{ident}}'
+      scope: variable.other.coq
+    - include: illegal_any
+
+  # Terms
+  term:
+    # Punctuation
+    - match: '_'
+      scope: keyword.coq
+    - match: ',|{{colon}}'
+      scope: punctuation.separator.coq
+    - match: ';'
+      scope: punctuation.terminator.coq
+      pop: true
+    - match: '\('
+      scope: punctuation.section.parens.begin.coq
+      push: term_paren
+    - match: '\{'
+      scope: punctuation.section.braces.begin.coq
+      push: [term_brace, binders]
+    - match: '\['
+      scope: punctuation.section.brackets.begin.coq
+      push: term_bracket
+    - include: illegal_punct
+    - match: '{{operator}}'
+      scope: keyword.operator.coq
+    # Keywords
+    - match: '\bmatch{{b}}'
+      scope: keyword.coq
+      push: term
+    - match: '\bwith{{b}}'
+      scope: keyword.coq
+      pop: true
+    - match: '\b({{kw_term_binder}}){{b}}'
+      scope: keyword.coq
+      push: binders
+    - match: '\b({{kw_term_definition}}){{b}}'
+      scope: keyword.coq
+      push: definition_local
+    - match: '\b{{kw_term_other}}{{b}}'
+      scope: keyword.coq
+    - match: '(?=^\s*{{kw_command}}\b)'
+      scope: keyword.coq
+      pop: true
+    # Literals
+    - match: '{{integer}}'
+      scope: constant.numeric.integer
+    - include: string_begin
+    # Identifiers
+    - include: builtin
+    - match: '({{ident}})({{accessor}})'
+      scope: meta.namespace.coq
+      captures:
+        1: support.module.coq
+        2: punctuation.accessor.coq
+    - match: '{{ident}}'
+      scope: variable.other.coq
+    - include: illegal_any
+  term_paren:
+    - match: '\)'
+      scope: punctuation.section.parens.end.coq
+      pop: true
+    - include: term
+  term_brace:
+    - match: '\}'
+      scope: punctuation.section.braces.end.coq
+      pop: true
+    - include: term
+  term_bracket:
+    - match: '\]'
+      scope: punctuation.section.brackets.end.coq
+      pop: true
+    - include: term
+  type:
+    - match: '\b{{sort}}{{b}}'
+      scope: support.type.coq
+    - match: '\b{{builtin_definition}}{{b}}'
+      scope: support.function.coq
+    - match: '({{ident}})({{accessor}})'
+      scope: meta.namespace.coq
+      captures:
+        1: storage.type.coq
+        2: punctuation.accessor.coq
+    - match: '(?!{{kw_term}}){{ident}}'
+      scope: storage.type.coq
+    - include: term
+
+  # Inductives
+  inductive:
+    - match: ':='
+      scope: keyword.operator.coq
+    - match: '\|'
+      scope: keyword.operator.coq
+    - match: '(?!{{kw_term}}){{ident}}'
+      scope: entity.name.function.coq
+    - match: '{{colon}}'
+      scope: punctuation.separator.coq
+      push: inductive_type
+    - include: type
+
+  inductive_type:
+    - match: '\bwith{{b}}'
+      scope: keyword.coq
+      push: definition
+    - match: '\|'
+      scope: keyword.operator.coq
+      pop: true
+    - include: type
+
+  # Binders and definitions
+  definition:
+    - include: decl_terminator
+    - match: '{{ident}}'
+      scope: entity.name.function.coq
+      set: binders
+    - match: '(?=\S)'
+      set: binders
+
+  definition_local:
+    - include: decl_terminator
+    - match: '{{ident}}'
+      scope: variable.other.coq
+      set: binders
+    - match: '(?=\S)'
+      set: binders
+
+  binders:
+    - match: '{{colon}}{{hilight_type}}'
+      scope: punctuation.separator.coq
+      set: decl_type_hilight
+    - match: '{{colon}}'
+      scope: punctuation.separator.coq
+      set: decl_type
+    - include: decl_terminator
+    - match: '{{ident}}'
+      scope: variable.parameter.coq
+    - match: '\('
+      scope: punctuation.section.parens.begin.coq
+      push: [term_paren, binders]
+
+  decl_type_hilight:
+    - include: decl_terminator
+    - match: '_'
+      scope: keyword.coq
+    - include: type
+
+  decl_type:
+    - include: builtin
+    - include: decl_terminator
+    - include: term
+
+  decl_terminator:
+    - match: '(?=\b{{kw_term}}\b|\b{{kw_command}}\b|{{hilight_type_guard}})'
+      pop: true
+
+  # Builtins
+  builtin:
+    - match: '\b{{sort}}{{b}}'
+      scope: support.type.coq
+    - match: '\b{{builtin_definition}}{{b}}'
+      scope: support.function.coq
+    - match: '\b{{builtin_constructor}}{{b}}'
+      scope: support.constant.coq
+
+  # Comments
+  comment_begin:
+    - match: '\(\*'
+      scope: punctuation.definition.comment.begin.coq
+      push: comment_body
+  comment_body:
+    - meta_scope: comment.block.coq
+    - include: comment_begin
+    - include: string_begin
+    - match: '\*\)'
+      scope: punctuation.definition.comment.end.coq
+      pop: true
+
+  # Strings
+  string_begin:
+    - match: '"'
+      scope: punctuation.definition.string.begin.coq
+      push: string_body
+  string_body:
+    - meta_scope: string.quoted.double.coq
+    - match: '""'
+      scope: constant.character.escape.coq
+    - match: '"'
+      scope: punctuation.definition.string.end.coq
+      pop: true

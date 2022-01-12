@@ -1,0 +1,78 @@
+%YAML 1.2
+---
+# http://www.sublimetext.com/docs/3/syntax.html
+name: Crontab
+file_extensions:
+  - crontab
+scope: text.crontab
+contexts:
+  main:
+    - match: '(^[ \t]*)(?=#)'
+      captures:
+        1: punctuation.whitespace.comment.leading.crontab
+      push:
+        - match: (?!\G)
+          pop: true
+        - match: "#"
+          captures:
+            0: punctuation.definition.comment.crontab
+          push:
+            - meta_scope: comment.line.number-sign.crontab
+            - match: \n
+              pop: true
+    - match: |-
+        (?x)^\s*
+                      (?:
+                          ((?:\*|(?:\d+|\*)(?:[-,\/]\d+)*))\s+        # Minute
+                    ((?:\*|(?:\d+|\*)(?:[-,\/]\d+)*))\s+        # Hour
+                    ((?:\*|(?:\d+|\*)(?:[-,\/]\d+)*))\s+        # Day of the month
+                    ((?:\*|(?:\d+|\*)(?:[-,\/]\d+)*|((?i:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec))))\s+   # Month
+                    ((?:\*|[0-7*](?:[-,\/][0-7])*|((?i:Mon|Tue|Wed|Thu|Fri|Sat|Sun))))\s+                       # Day of the week
+                    |
+                    (\@(?:reboot|midnight|(?:year|annual|month|week|dai|hour)ly)\b)   # Special keywords
+                  )
+                  (
+                    (?:(@AppleNotOnBattery)\s+)?
+                    .+?   # The command
+                  )
+                  ((?<!\\)(%).*?)*  # Optional standard input for the command
+                  \s*$\n?
+      comment: This doesn't work as it should do for multiple %s
+      scope: meta.schedule.crontab
+      captures:
+        1: constant.numeric.minute.crontab
+        2: constant.numeric.hour.crontab
+        3: constant.numeric.day-of-month.crontab
+        4: constant.numeric.month.crontab
+        5: keyword.other.month.crontab
+        6: constant.numeric.day-of-week.crontab
+        7: keyword.other.weekday.crontab
+        8: keyword.other.special.schedule.crontab
+        9: string.unquoted.command.crontab
+        10: keyword.other.crontab
+        11: string.unquoted.input.crontab
+        12: keyword.other.input-separator.crontab
+    - match: |-
+        (?x)^\s*
+        (
+          (['"]|)
+          (?i:(MAILTO)|.+?)
+          (\2)
+        )
+        \s*(=)\s*
+        (
+          (['"]|)
+          .+?
+          (\7)
+        )
+        \s*$\n?
+      scope: meta.environment-assign.crontab
+      captures:
+        1: variable.other.environment.crontab
+        2: punctuation.definition.variable.begin.crontab
+        3: variable.language.mailto.crontab
+        4: punctuation.definition.variable.end.crontab
+        5: keyword.operator.assign.crontab
+        6: string.quoted.other.value.crontab
+        7: punctuation.definition.string.begin.crontab
+        8: punctuation.definition.string.end.crontab

@@ -1,0 +1,437 @@
+%YAML 1.2
+---
+# http://www.sublimetext.com/docs/3/syntax.html
+name: Protocol Buffer
+file_extensions:
+  - proto
+scope: source.proto
+
+
+variables:
+  ident: '\b[A-Za-z_][A-Za-z_0-9]*\b'
+  fullident: '(?:{{ident}}(\.))*({{ident}})'
+
+  enum: '\b(enum)\b\s*({{ident}})'
+  is_enum: '(?=\b(enum)\b\s*({{ident}}))'
+
+  message: '\b(message)\b\s*({{ident}})'
+  is_message: '(?=\b(message)\b\s*({{ident}}))'
+
+  extend: '\b(extend)\b\s*{{fullident}}'
+  is_extend: '(?=\b(extend)\b\s*{{fullident}})'
+
+  oneof: '\b(oneof)\b\s*({{ident}})'
+  is_oneof: '(?=\b(oneof)\b\s*({{ident}}))'
+
+  service: '\b(service)\b\s*({{ident}})'
+  is_service: '(?=\b(service)\b\s*({{ident}}))'
+
+  is_field_def: '(?={{fullident}}\s*{{ident}}\s*\=)'
+  is_field_def_map: '(?=\b(map<)\b)'
+
+  option_name: '(({{ident}}|(\(\.?({{ident}}\.)*{{ident}}\)))\.)*({{ident}}|(\(\.?({{ident}}\.)*{{ident}}\)))'
+
+  map_type: 'map\s*<\s*{{ident}}\s*,\s*{{ident}}\s*>'
+
+
+contexts:
+  main:
+    - include: comments
+    - include: syntax
+    - include: package
+    - include: import
+    - include: option
+    - match: '{{is_enum}}'
+      scope: meta.enum.proto
+      push: enum
+    - match: '{{is_message}}'
+      scope: meta.message.proto
+      push: message
+    - match: '{{is_extend}}'
+      scope: meta.extend.proto
+      push: extend
+    - match: '{{is_service}}'
+      scope: meta.service.proto
+      push: service
+
+# Comments
+  comments:
+    - match: /\*\*/
+      scope: comment.block.empty.proto
+      captures:
+        0: punctuation.definition.comment.proto
+    - include: comments-inline
+  comments-inline:
+    - match: /\*
+      captures:
+        0: punctuation.definition.comment.proto
+      push:
+        - meta_scope: comment.block.proto
+        - match: \*/
+          captures:
+            0: punctuation.definition.comment.proto
+          pop: true
+    - match: \s*((//).*$\n?)
+      captures:
+        1: comment.line.double-slash.proto
+        2: punctuation.definition.comment.proto
+
+# Others
+  right-brace:
+    - match: '}'
+      pop: true
+  pre-right-brace:
+    - match: '(?=\})'
+      pop: true
+  semicolon:
+    - match: ';'
+      captures:
+        0: punctuation.terminator.proto
+      pop: true
+  operator-assignment:
+    - match: '='
+      scope: keyword.operator.assignment.proto
+
+
+# Syntax
+  syntax:
+    - match: '\b(syntax)\b\s*(?=\=)'
+      captures:
+        1: keyword.control.proto
+      push:
+        - include: operator-assignment
+        - match: '\"proto[23]\"'
+          scope: string.quoted.double.proto
+        - include: semicolon
+
+
+# Import
+  import:
+    - match: '\b(import)\b'
+      scope: keyword.source.proto
+      push:
+        - match: '\b(public)\b'
+          scope: keyword.control.proto
+        - include: strings
+        - include: semicolon
+
+
+# Package
+  package:
+    - match: '\b(package)\b'
+      captures:
+        1: keyword.control.proto
+      push:
+        - match: '{{fullident}}'
+          scope: storage.modifier.package.proto
+        - include: semicolon
+
+
+# Option
+  option:
+    - match: '\b(option)\b'
+      scope: keyword.control.proto
+      push:
+        - match: '({{option_name}})\s*(?=\=)'
+          captures:
+            1: variable.parameter.proto
+        - include: operator-assignment
+        - include: values
+        - include: semicolon
+        - include: option-uninterpreted-block
+  option-uninterpreted-block:
+    - match: '{'
+      push: option-uninterpreted-block
+    - include: right-brace
+
+
+  field-label:
+    - match: '\b(repeated|optional|required)\b'
+      captures:
+        1: storage.modifier.proto
+
+  field-definition:
+    - match: '({{ident}})\s*(?=\=)'
+      captures:
+        1: variable.other.proto
+    - include: all-types
+    - include: operator-assignment
+    - include: constants-numeric
+    - match: '\['
+      push: field-option
+    - include: semicolon
+    - match: '{'
+      push:
+        - include: field-group
+        - include: pre-right-brace
+    - include: right-brace
+
+  field-option:
+    - match: '({{option_name}})\s*(?=\=)'
+      captures:
+        1: variable.parameter.proto
+    - match: '='
+      scope: keyword.operator.assignment.proto
+      push:
+      - match: '{{ident}}'
+        scope: constant.other.proto
+      - include: values
+      - match: '(?=\])'
+        pop: true
+    - include: option-uninterpreted-block
+    - match: '\]'
+      pop: true
+  
+  field-group:
+    - include: field-label
+    - match: '{{is_field_def}}'
+      push: field-definition
+
+
+# Message
+  message:
+    - match: '{{message}}'
+      captures:
+        1: storage.modifier.proto
+        2: entity.name.type.message.proto
+    - match: '{'
+      push:
+        - meta_scope: meta.message.body.proto
+        - include: message-body
+        - include: pre-right-brace
+    - include: right-brace
+  message-body:
+    - include: comments
+    - match: '{{is_enum}}'
+      scope: meta.enum.proto
+      push: enum
+    - match: '{{is_message}}'
+      scope: meta.message.proto
+      push: message
+    - match: '{{is_extend}}'
+      scope: meta.extend.proto
+      push: extend
+    - match: '{{is_oneof}}'
+      scope: meta.oneof.proto
+      push: oneof
+    - include: reserved
+    - include: extensions
+    - include: option
+    - include: field-label
+    - match: '{{is_field_def}}'
+      push: field-definition
+    - match: '{{is_field_def_map}}'
+      push: field-definition
+
+
+# Enum
+  enum:
+    - match: '{{enum}}'
+      captures:
+        1: storage.modifier.proto
+        2: entity.name.type.enum.proto
+    - match: '{'
+      push:
+        - meta_scope: meta.enum.body.proto
+        - include: enum-body
+        - include: pre-right-brace
+    - include: right-brace
+  enum-body:
+    - include: comments
+    - match: '{{is_enum}}'
+      scope: meta.enum.proto
+      push: enum
+    - include: option
+    - match: '(?={{ident}}\s*\=)'
+      push: enum-field
+  enum-field:
+    - match: '({{ident}})\s*(?=\=)'
+      captures:
+        1: constant.language.proto
+    - include: operator-assignment
+    - include: constants-numeric
+    - include: semicolon
+
+
+# Extend
+  extend:
+    - match: '{{extend}}'
+      captures:
+        1: storage.modifier.proto
+        3: entity.name.type.extend.proto
+    - match: '{'
+      push:
+        - meta_scope: meta.extend.body.proto
+        - include: extend-body
+        - include: pre-right-brace
+    - include: right-brace
+  extend-body:
+    - include: comments
+    - include: field-label
+    - match: '{{is_field_def}}'
+      push: field-definition
+
+
+# Oneof
+  oneof:
+    - match: '{{oneof}}'
+      captures:
+        1: storage.modifier.proto
+        2: entity.name.type.oneof.proto
+    - match: '{'
+      push:
+        - meta_scope: meta.oneof.body.proto
+        - include: oneof-body
+        - include: pre-right-brace
+    - include: right-brace
+  oneof-body:
+    - include: comments
+    - match: '{{is_field_def}}'
+      push: field-definition
+
+
+# Service
+  service:
+    - match: '{{service}}'
+      captures:
+        1: storage.modifier.proto
+        2: entity.name.type.service.proto
+    - match: '{'
+      push:
+        - meta_scope: meta.service.body.proto
+        - include: service-body
+        - include: pre-right-brace
+    - include: right-brace
+  service-body:
+    - include: comments
+    - match: '(?=\b(rpc)\b\s+({{ident}})\s*\()'
+      push: rpc
+
+
+# Rpc
+  rpc:
+    - match: '\b(rpc)\b\s+({{ident}})\s*(?=\()'
+      captures:
+        1: keyword.control.proto
+        2: entity.name.function.proto
+    - match: '\('
+      push:
+        - include: rpc-parameter
+    - match: '\b(returns)\b'
+      scope: keyword.control.proto
+    - include: semicolon
+    - match: '{'
+      push:
+        - include: rpc-body
+        - include: pre-right-brace
+    - include: right-brace
+  
+  rpc-parameter:
+    - match: '(\b(?:stream)\b)?\s*{{fullident}}'
+      captures:
+        1: storage.modifier.proto
+        3: storage.type.proto
+    - match: '\)'
+      pop: true
+
+  rpc-body:
+    - include: option
+
+
+# Reserved
+  reserved:
+    - match: '\b(reserved)\b'
+      captures:
+        1: storage.modifier.proto
+      push:
+        - match: '\b(to)\b'
+          scope: keyword.operator.proto
+        - include: strings
+        - include: constants-numeric
+        - include: semicolon
+
+# Extensions
+  extensions:
+    - match: '\b(extensions)\b'
+      captures:
+        1: storage.modifier.proto
+      push:
+        - match: '\b(to)\b'
+          scope: keyword.operator.proto
+        - include: constants
+        - include: semicolon
+
+
+# Values
+  values:
+    - include: strings
+    - include: constants
+
+  constants:
+    - include: constants-alpha
+    - include: constants-numeric
+    - include: constants-others
+  constants-alpha:
+    - match: \b(true|false|max)\b
+      scope: constant.language.proto
+  constants-numeric:
+    - match: '\b((0(x|X)[0-9a-fA-F]*)|(([0-9]+\.?[0-9]*)|(\.[0-9]+))((e|E)(\+|-)?[0-9]+)?)([LlFfUuDd]|UL|ul)?\b'
+      scope: constant.numeric.proto
+  constants-others:
+    - match: '(\.)?\b([A-Z][A-Z0-9_]+)(?!<|\s*\w+\s*=)\b'
+      scope: constant.other.proto
+      captures:
+        1: keyword.operator.dereference.proto
+
+  strings:
+    - match: '"'
+      captures:
+        0: punctuation.definition.string.begin.proto
+      push:
+        - meta_scope: string.quoted.double.proto
+        - match: '"'
+          captures:
+            0: punctuation.definition.string.end.proto
+          pop: true
+        - match: \\.
+          scope: constant.character.escape.proto
+    - match: "'"
+      captures:
+        0: punctuation.definition.string.begin.proto
+      push:
+        - meta_scope: string.quoted.single.proto
+        - match: "'"
+          captures:
+            0: punctuation.definition.string.end.proto
+          pop: true
+        - match: \\.
+          scope: constant.character.escape.proto
+
+
+# All types
+  all-types:
+    - include: object-types
+    - include: primitive-types
+
+  object-types:
+    - include: map-type
+    - match: '{{fullident}}'
+      captures:
+        2: storage.type.proto
+
+  map-type:
+    - match: '\b(map<)\b'
+      push:
+        - meta_scope: storage.type.generic.proto
+        - match: '>'
+          pop: true
+        - include: object-types
+        - match: '<'
+          push:
+            - meta_scope: storage.type.generic.proto
+            - match: '>|[^\w\s,\[\]<]'
+              pop: true
+ 
+  primitive-types:
+    - match: \b(double|float|int32|int64|uint32|uint64|sint32|sint64|fixed32|fixed64|sfixed32|sfixed64|bool|string|bytes)\b
+      scope: storage.type.primitive.proto

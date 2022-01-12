@@ -1,0 +1,356 @@
+%YAML 1.2
+---
+# http://www.sublimetext.com/docs/3/syntax.html
+name: DM
+file_extensions:
+  - dm
+  - dme
+scope: source.dm
+contexts:
+  main:
+    - include: preprocessor-rule-enabled
+    - include: preprocessor-rule-disabled
+    - include: preprocessor-rule-other
+    - include: comments
+    - match: '(?x)(var)[\/ ](?:(static|global|tmp|const)\/)?(?:(datum|atom(?:\/movable)?|obj|mob|turf|area|savefile|list|client|sound|image|database|matrix|regex|exception|icon)\/)?(?:([a-zA-Z0-9_\-$]*)\/)*([A-Za-z0-9_$]*)\b'
+      scope: meta.initialization.dm
+      captures:
+        1: storage.type.dm
+        2: storage.modifier.dm
+        3: storage.type.dm
+        5: variable.other.dm
+    - match: '\b((0(x|X)[0-9a-fA-F]*)|(([0-9]+\.?[0-9]*)|(\.[0-9]+))((e|E)(\+|-)?[0-9]+)?)\b'
+      scope: constant.numeric.dm
+    - match: \b(sleep|spawn|break|continue|do|else|for|goto|if|return|switch|while|try|catch|throw)\b
+      scope: keyword.control.dm
+    - match: \b(del|new)\b
+      scope: keyword.other.dm
+    - match: \b(proc|verb|datum|atom(/movable)?|obj|mob|turf|area|savefile|list|client|sound|image|database|matrix|regex|exception|icon)\b
+      scope: storage.type.dm
+    - match: \b(as|const|global|set|static|tmp)\b
+      scope: storage.modifier.dm
+    - match: \b(usr|world|src|args)\b
+      scope: variable.language.dm
+    - match: (\?|(>|<)(=)?|\.|:|/(=)?|~|\+(\+|=)?|-(-|=)?|\*(\*|=)?|%|>>|<<|=(=)?|!(=)?|<>|&|&&|\^|\||\|\||\bto\b|\bin\b|\bstep\b)
+      scope: keyword.operator.dm
+    - match: '\b([A-Z_][A-Z_0-9]*)\b'
+      scope: constant.language.dm
+    - match: \bnull\b
+      scope: constant.language.dm
+    - match: '{"'
+      captures:
+        0: punctuation.definition.string.begin.dm
+      push:
+        - meta_scope: string.quoted.triple.dm
+        - match: '"}'
+          captures:
+            0: punctuation.definition.string.end.dm
+          pop: true
+        - include: string_escaped_char
+        - include: string_embedded_expression
+    - match: '"'
+      captures:
+        0: punctuation.definition.string.begin.dm
+      push:
+        - meta_scope: string.quoted.double.dm
+        - match: '"'
+          captures:
+            0: punctuation.definition.string.end.dm
+          pop: true
+        - include: string_escaped_char
+        - include: string_embedded_expression
+    - match: "'"
+      captures:
+        0: punctuation.definition.string.begin.dm
+      push:
+        - meta_scope: string.quoted.single.dm
+        - match: "'"
+          captures:
+            0: punctuation.definition.string.end.dm
+          pop: true
+        - include: string_escaped_char
+    - match: '(?x)^\s* ((\#)\s*define) \s+((?<id>[a-zA-Z_][a-zA-Z0-9_]*))(?:(\()(\s* \g<id> \s*((,) \s* \g<id> \s*)*(?:\.\.\.)?)(\)))'
+      captures:
+        1: keyword.control.directive.define.dm
+        2: punctuation.definition.directive.dm
+        3: entity.name.function.preprocessor.dm
+        5: punctuation.definition.parameters.begin.dm
+        6: variable.parameter.preprocessor.dm
+        8: punctuation.separator.parameters.dm
+        9: punctuation.definition.parameters.end.dm
+      push:
+        - meta_scope: meta.preprocessor.macro.dm
+        - match: (?=(?://|/\*))|(?<!\\)(?=\n)
+          pop: true
+        - include: $top_level_main
+    - match: '(?x)^\s* ((\#)\s*define) \s+((?<id>[a-zA-Z_][a-zA-Z0-9_]*))'
+      captures:
+        1: keyword.control.directive.define.dm
+        2: punctuation.definition.directive.dm
+        3: variable.other.preprocessor.dm
+      push:
+        - meta_scope: meta.preprocessor.macro.dm
+        - match: (?=(?://|/\*))|(?<!\\)(?=\n)
+          pop: true
+        - include: $top_level_main
+    - match: ^\s*(#\s*(error|warn))\b
+      captures:
+        1: keyword.control.import.error.dm
+      push:
+        - meta_scope: meta.preprocessor.diagnostic.dm
+        - match: $
+          captures:
+            1: keyword.control.import.error.dm
+          pop: true
+        - match: (?>\\\s*\n)
+          scope: punctuation.separator.continuation.dm
+    - match: ^\s*(?:((#)\s*(?:elif|else|if|ifdef|ifndef))|((#)\s*(undef|include)))\b
+      captures:
+        1: keyword.control.directive.conditional.dm
+        2: punctuation.definition.directive.dm
+        3: keyword.control.directive.$5.dm
+        4: punctuation.definition.directive.dm
+      push:
+        - meta_scope: meta.preprocessor.dm
+        - match: (?=(?://|/\*))|(?<!\\)(?=\n)
+          pop: true
+        - match: (?>\\\s*\n)
+          scope: punctuation.separator.continuation.dm
+    - include: block
+    - match: '(?x)(?:^|(?:(?=\s)(?<!else|new|return)(?<=\w)|(?=\s*[A-Za-z_])(?<!&&)(?<=[*&>])))(\s*)(?!(while|for|do|if|else|switch|catch|enumerate|return|r?iterate)\s*\()((?: [A-Za-z_][A-Za-z0-9_]*+ | :: )++ |(?: (?<=operator) (?: [-*&<>=+!]+ | \(\) | \[\] ) ))\s*(?=\()'
+      captures:
+        1: punctuation.whitespace.function.leading.dm
+        3: entity.name.function.dm
+        4: punctuation.definition.parameters.dm
+      push:
+        - meta_scope: meta.function.dm
+        - match: '(?<=\})|(?=#)|(;)?'
+          pop: true
+        - include: comments
+        - include: parens
+        - match: \bconst\b
+          scope: storage.modifier.dm
+        - include: block
+  access:
+    - match: '\.[a-zA-Z_][a-zA-Z_0-9]*\b(?!\s*\()'
+      scope: variable.other.dot-access.dm
+  block:
+    - match: '\{'
+      push:
+        - meta_scope: meta.block.dm
+        - match: '\}'
+          pop: true
+        - include: block_innards
+  block_innards:
+    - include: preprocessor-rule-enabled-block
+    - include: preprocessor-rule-disabled-block
+    - include: preprocessor-rule-other-block
+    - include: access
+    - match: '(?x) (?: (?= \s )  (?:(?<=else|new|return) | (?<!\w)) (\s+))?(\b(?!(while|for|do|if|else|switch|catch|enumerate|return|r?iterate)\s*\()(?:(?!NS)[A-Za-z_][A-Za-z0-9_]*+\b | :: )++)\s*(\()'
+      scope: meta.function-call.dm
+      captures:
+        1: punctuation.whitespace.function-call.leading.dm
+        2: support.function.any-method.dm
+        3: punctuation.definition.parameters.dm
+    - include: block
+    - include: $top_level_main
+  comments:
+    - match: ^/\* =(\s*.*?)\s*= \*/$\n?
+      scope: comment.block.dm
+      captures:
+        1: meta.toc-list.banner.block.dm
+    - match: /\*
+      captures:
+        0: punctuation.definition.comment.dm
+      push:
+        - meta_scope: comment.block.dm
+        - match: \*/
+          captures:
+            0: punctuation.definition.comment.dm
+          pop: true
+        - include: comments
+    - match: \*/.*\n
+      scope: invalid.illegal.stray-comment-end.dm
+    - match: ^// =(\s*.*?)\s*=\s*$\n?
+      scope: comment.line.banner.dm
+      captures:
+        1: meta.toc-list.banner.line.dm
+    - match: //
+      captures:
+        0: punctuation.definition.comment.dm
+      push:
+        - meta_scope: comment.line.double-slash.dm
+        - match: $\n?
+          pop: true
+        - match: (?>\\\s*\n)
+          scope: punctuation.separator.continuation.dm
+  disabled:
+    - match: ^\s*#\s*if(n?def)?\b.*$
+      comment: eat nested preprocessor if(def)s
+      push:
+        - match: ^\s*#\s*endif\b.*$
+          pop: true
+        - include: disabled
+  parens:
+    - match: \(
+      push:
+        - meta_scope: meta.parens.dm
+        - match: \)
+          pop: true
+        - include: $top_level_main
+  preprocessor-rule-disabled:
+    - match: ^\s*(#(if)\s+(0)\b).*
+      captures:
+        1: meta.preprocessor.dm
+        2: keyword.control.import.if.dm
+        3: constant.numeric.preprocessor.dm
+      push:
+        - match: ^\s*(#\s*(endif)\b)
+          captures:
+            1: meta.preprocessor.dm
+            2: keyword.control.import.if.dm
+            3: constant.numeric.preprocessor.dm
+          pop: true
+        - match: ^\s*(#\s*(else)\b)
+          captures:
+            1: meta.preprocessor.dm
+            2: keyword.control.import.else.dm
+          push:
+            - match: (?=^\s*#\s*endif\b.*$)
+              captures:
+                1: meta.preprocessor.dm
+                2: keyword.control.import.else.dm
+              pop: true
+            - include: $top_level_main
+        - match: ""
+          push:
+            - meta_scope: comment.block.preprocessor.if-branch
+            - match: (?=^\s*#\s*(else|endif)\b.*$)
+              pop: true
+            - include: disabled
+  preprocessor-rule-disabled-block:
+    - match: ^\s*(#(if)\s+(0)\b).*
+      captures:
+        1: meta.preprocessor.dm
+        2: keyword.control.import.if.dm
+        3: constant.numeric.preprocessor.dm
+      push:
+        - match: ^\s*(#\s*(endif)\b)
+          captures:
+            1: meta.preprocessor.dm
+            2: keyword.control.import.if.dm
+            3: constant.numeric.preprocessor.dm
+          pop: true
+        - match: ^\s*(#\s*(else)\b)
+          captures:
+            1: meta.preprocessor.dm
+            2: keyword.control.import.else.dm
+          push:
+            - match: (?=^\s*#\s*endif\b.*$)
+              captures:
+                1: meta.preprocessor.dm
+                2: keyword.control.import.else.dm
+              pop: true
+            - include: block_innards
+        - match: ""
+          push:
+            - meta_scope: comment.block.preprocessor.if-branch.in-block
+            - match: (?=^\s*#\s*(else|endif)\b.*$)
+              pop: true
+            - include: disabled
+  preprocessor-rule-enabled:
+    - match: ^\s*(#(if)\s+(0*1)\b)
+      captures:
+        1: meta.preprocessor.dm
+        2: keyword.control.import.if.dm
+        3: constant.numeric.preprocessor.dm
+      push:
+        - match: ^\s*(#\s*(endif)\b)
+          captures:
+            1: meta.preprocessor.dm
+            2: keyword.control.import.if.dm
+            3: constant.numeric.preprocessor.dm
+          pop: true
+        - match: ^\s*(#\s*(else)\b).*
+          captures:
+            1: meta.preprocessor.dm
+            2: keyword.control.import.else.dm
+          push:
+            - meta_content_scope: comment.block.preprocessor.else-branch
+            - match: (?=^\s*#\s*endif\b.*$)
+              captures:
+                1: meta.preprocessor.dm
+                2: keyword.control.import.else.dm
+              pop: true
+            - include: disabled
+        - match: ""
+          push:
+            - match: (?=^\s*#\s*(else|endif)\b.*$)
+              pop: true
+            - include: $top_level_main
+  preprocessor-rule-enabled-block:
+    - match: ^\s*(#(if)\s+(0*1)\b)
+      captures:
+        1: meta.preprocessor.dm
+        2: keyword.control.import.if.dm
+        3: constant.numeric.preprocessor.dm
+      push:
+        - match: ^\s*(#\s*(endif)\b)
+          captures:
+            1: meta.preprocessor.dm
+            2: keyword.control.import.if.dm
+            3: constant.numeric.preprocessor.dm
+          pop: true
+        - match: ^\s*(#\s*(else)\b).*
+          captures:
+            1: meta.preprocessor.dm
+            2: keyword.control.import.else.dm
+          push:
+            - meta_content_scope: comment.block.preprocessor.else-branch.in-block
+            - match: (?=^\s*#\s*endif\b.*$)
+              captures:
+                1: meta.preprocessor.dm
+                2: keyword.control.import.else.dm
+              pop: true
+            - include: disabled
+        - match: ""
+          push:
+            - match: (?=^\s*#\s*(else|endif)\b.*$)
+              pop: true
+            - include: block_innards
+  preprocessor-rule-other:
+    - match: ^\s*((#\s*(if(n?def)?))\b.*?(?:(?=(?://|/\*))|$))
+      captures:
+        1: meta.preprocessor.dm
+        2: keyword.control.import.dm
+      push:
+        - match: ^\s*((#\s*(endif))\b).*$
+          captures:
+            1: meta.preprocessor.dm
+            2: keyword.control.import.dm
+          pop: true
+        - include: $top_level_main
+  preprocessor-rule-other-block:
+    - match: ^\s*(#\s*(if(n?def)?)\b.*?(?:(?=(?://|/\*))|$))
+      captures:
+        1: meta.preprocessor.dm
+        2: keyword.control.import.dm
+      push:
+        - match: ^\s*(#\s*(endif)\b).*$
+          captures:
+            1: meta.preprocessor.dm
+            2: keyword.control.import.dm
+          pop: true
+        - include: block_innards
+  string_embedded_expression:
+    - match: '(?<!\\)\['
+      push:
+        - meta_scope: string.interpolated.dm
+        - match: '\]'
+          pop: true
+        - include: main
+  string_escaped_char:
+    - match: '(?x)\\(h(?:(?:er|im)self|ers|im)|([tTsS]?he)|He|[Hh]is|[aA]n?|(?:im)?proper|\.\.\.|(?:icon|ref|[Rr]oman)(?=\[)|[s<>"n\ n\[])'
+      scope: constant.character.escape.dm
+    - match: \\.
+      scope: invalid.illegal.unknown-escape.dm

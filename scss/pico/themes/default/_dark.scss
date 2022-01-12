@@ -90,14 +90,24 @@
   --table-row-stripped-background-color: #{rgba($grey-500, 0.05)};
 
   // Code
-  --code-background-color: #{mix($black, $grey-900, 12.5%)};
-  --code-color: var(--muted-color);
+  --code-pink-color: #{hsl(330, 30%, 50%)};
+  --code-cyan-color: #{hsl(185, 30%, 50%)};
+  --code-blue-color: #{hsl(202, 50%, 60%)};
+  --code-purple-color: #{hsl(262, 50%, 70%)};
+  --code-red-color: #{$red-600};
+  --code-green-color: #{$green-500};
+  --code-amber-color: #{$amber-700};
+  --code-brown-color: #{hsl(40, 10%, 50%)};
+  --code-grey-color: #{mix($grey-700, $grey-600)};
+
+  --code-background-color: #{mix($black, $grey-900, 35%)};
+  --code-color: var(--color);
   --code-kbd-background-color: var(--contrast);
   --code-kbd-color: var(--contrast-inverse);
-  --code-tag-color: #{hsl(330, 30%, 50%)};
-  --code-property-color: #{hsl(185, 30%, 50%)};
-  --code-value-color: #{hsl(40, 10%, 50%)};
-  --code-comment-color: #{mix($grey-700, $grey-600)};
+  --code-tag-color: var(--code-pink-color);
+  --code-property-color: var(--code-cyan-color);
+  --code-value-color: var(--code-brown-color);
+  --code-comment-color: var(--muted-color);
 
   // Accordion (<details>)
   --accordion-border-color: var(--muted-border-color);

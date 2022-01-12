@@ -1,0 +1,567 @@
+%YAML 1.2
+---
+# http://www.sublimetext.com/docs/3/syntax.html
+name: GraphQL
+file_extensions:
+  - graphql
+  - graphqls
+  - gql
+  - graphcool
+scope: source.graphql
+contexts:
+  main:
+    - include: graphql
+  graphql:
+    - include: graphql-comment
+    - include: graphql-description-docstring
+    - include: graphql-description-singleline
+    - include: graphql-fragment-definition
+    - include: graphql-directive-definition
+    - include: graphql-type-interface
+    - include: graphql-enum
+    - include: graphql-scalar
+    - include: graphql-union
+    - include: graphql-schema
+    - include: graphql-operation-def
+  graphql-ampersand:
+    - match: \s*(&)
+      captures:
+        1: keyword.operator.logical.graphql
+  graphql-arguments:
+    - match: \s*(\()
+      captures:
+        1: meta.brace.round.directive.graphql
+      push:
+        - meta_scope: meta.arguments.graphql
+        - match: \s*(\))
+          captures:
+            1: meta.brace.round.directive.graphql
+          pop: true
+        - include: graphql-comment
+        - include: graphql-description-docstring
+        - include: graphql-description-singleline
+        - match: '\s*([_A-Za-z][_0-9A-Za-z]*)(?:\s*(:))'
+          captures:
+            1: variable.parameter.graphql
+            2: punctuation.colon.graphql
+          push:
+            - match: '(?=\s*(?:(?:([_A-Za-z][_0-9A-Za-z]*)\s*(:))|\)))|\s*(,)'
+              captures:
+                3: punctuation.comma.graphql
+              pop: true
+            - include: graphql-comment
+            - include: graphql-description-docstring
+            - include: graphql-description-singleline
+            - include: graphql-value
+            - include: graphql-skip-newlines
+  graphql-boolean-value:
+    - match: \s*\b(true|false)\b
+      captures:
+        1: constant.language.boolean.graphql
+  graphql-colon:
+    - match: \s*(:)
+      captures:
+        1: punctuation.colon.graphql
+  graphql-comma:
+    - match: \s*(,)
+      captures:
+        1: punctuation.comma.graphql
+  graphql-comment:
+    - match: (\s*)(#).*
+      comment: need to prefix comment space with a scope else Atom's reflow cmd doesn't work
+      scope: comment.line.graphql.js
+      captures:
+        1: punctuation.whitespace.comment.leading.graphql
+    - match: (""")
+      captures:
+        1: punctuation.whitespace.comment.leading.graphql
+      push:
+        - meta_scope: comment.line.graphql.js
+        - match: (""")
+          pop: true
+    - match: (")
+      captures:
+        1: punctuation.whitespace.comment.leading.graphql
+      push:
+        - meta_scope: comment.line.graphql.js
+        - match: (")
+          pop: true
+  graphql-description-docstring:
+    - match: '"""'
+      push:
+        - meta_scope: comment.block.graphql
+        - match: '"""'
+          pop: true
+  graphql-description-singleline:
+    - match: '#(?=([^"]*"[^"]*")*[^"]*$).*$'
+      scope: comment.line.number-sign.graphql
+  graphql-directive:
+    - match: '\s*((@)\s*([_A-Za-z][_0-9A-Za-z]*))'
+      captures:
+        1: entity.name.function.directive.graphql
+      push:
+        - include: graphql-comment
+        - include: graphql-description-docstring
+        - include: graphql-description-singleline
+        - include: graphql-arguments
+        - include: graphql-skip-newlines
+        - match: (?=.)
+          pop: true
+  graphql-directive-definition:
+    - match: '\s*(\bdirective\b)\s*(@[_A-Za-z][_0-9A-Za-z]*)'
+      captures:
+        1: keyword.directive.graphql
+        2: entity.name.function.directive.graphql
+        3: keyword.on.graphql
+        4: support.type.graphql
+      push:
+        - include: graphql-variable-definitions
+        - match: '\s*(\bon\b)\s*([_A-Za-z]*)'
+          captures:
+            1: keyword.on.graphql
+            2: support.type.location.graphql
+          push:
+            - include: graphql-skip-newlines
+            - include: graphql-comment
+            - match: '\s*(\|)\s*([_A-Za-z]*)'
+              captures:
+                2: support.type.location.graphql
+            - match: (?=.)
+              pop: true
+        - include: graphql-skip-newlines
+        - include: graphql-comment
+        - match: (?=.)
+          pop: true
+  graphql-enum:
+    - match: '\s*+\b(enum)\b\s*([_A-Za-z][_0-9A-Za-z]*)'
+      captures:
+        1: keyword.enum.graphql
+        2: support.type.enum.graphql
+      push:
+        - meta_scope: meta.enum.graphql
+        - match: "(?<=})"
+          pop: true
+        - match: '\s*({)'
+          captures:
+            1: punctuation.operation.graphql
+          push:
+            - meta_scope: meta.type.object.graphql
+            - match: '\s*(})'
+              captures:
+                1: punctuation.operation.graphql
+              pop: true
+            - include: graphql-comment
+            - include: graphql-description-docstring
+            - include: graphql-description-singleline
+            - include: graphql-enum-value
+  graphql-enum-value:
+    - match: '\s*(?!=\b(true|false|null)\b)([_A-Za-z][_0-9A-Za-z]*)'
+      scope: constant.character.enum.graphql
+  graphql-field:
+    - match: '\s*([_A-Za-z][_0-9A-Za-z]*)\s*(:)'
+      captures:
+        1: string.unquoted.alias.graphql
+        2: punctuation.colon.graphql
+    - match: '\s*([_A-Za-z][_0-9A-Za-z]*)'
+      captures:
+        1: variable.graphql
+    - include: graphql-arguments
+    - include: graphql-directive
+    - include: graphql-selection-set
+    - include: graphql-skip-newlines
+  graphql-float-value:
+    - match: '\s*(-?(0|[1-9][0-9]*)(\.[0-9]+)?((e|E)(\+|-)?[0-9]+)?)'
+      captures:
+        1: constant.numeric.float.graphql
+  graphql-fragment-definition:
+    - match: '\s*(?:(\bfragment\b)\s*([_A-Za-z][_0-9A-Za-z]*)?\s*(?:(\bon\b)\s*([_A-Za-z][_0-9A-Za-z]*)))'
+      captures:
+        1: keyword.fragment.graphql
+        2: entity.name.fragment.graphql
+        3: keyword.on.graphql
+        4: support.type.graphql
+      push:
+        - meta_scope: meta.fragment.graphql
+        - match: "(?<=})"
+          captures:
+            1: keyword.fragment.graphql
+            2: entity.name.fragment.graphql
+            3: keyword.on.graphql
+            4: support.type.graphql
+          pop: true
+        - include: graphql-comment
+        - include: graphql-description-docstring
+        - include: graphql-description-singleline
+        - include: graphql-selection-set
+        - include: graphql-directive
+        - include: graphql-skip-newlines
+  graphql-fragment-spread:
+    - match: '\s*(\.\.\.)\s*(?!\bon\b)([_A-Za-z][_0-9A-Za-z]*)'
+      captures:
+        1: keyword.operator.spread.graphql
+        2: variable.fragment.graphql
+      push:
+        - include: graphql-comment
+        - include: graphql-description-docstring
+        - include: graphql-description-singleline
+        - include: graphql-selection-set
+        - include: graphql-directive
+        - include: graphql-skip-newlines
+        - match: (?=.)
+          captures:
+            1: keyword.operator.spread.graphql
+            2: variable.fragment.graphql
+          pop: true
+  graphql-ignore-spaces:
+    - match: \s*
+  graphql-inline-fragment:
+    - match: '\s*(\.\.\.)\s*(?:(\bon\b)\s*([_A-Za-z][_0-9A-Za-z]*))?'
+      captures:
+        1: keyword.operator.spread.graphql
+        2: keyword.on.graphql
+        3: support.type.graphql
+      push:
+        - include: graphql-comment
+        - include: graphql-description-docstring
+        - include: graphql-description-singleline
+        - include: graphql-selection-set
+        - include: graphql-directive
+        - include: graphql-skip-newlines
+        - match: (?=.)
+          captures:
+            1: keyword.operator.spread.graphql
+            2: keyword.on.graphql
+            3: support.type.graphql
+          pop: true
+  graphql-input-types:
+    - include: graphql-scalar-type
+    - match: '\s*([_A-Za-z][_0-9A-Za-z]*)(?:\s*(!))?'
+      captures:
+        1: support.type.graphql
+        2: keyword.operator.nulltype.graphql
+    - match: '\s*(\[)'
+      captures:
+        1: meta.brace.square.graphql
+        2: keyword.operator.nulltype.graphql
+      push:
+        - meta_scope: meta.type.list.graphql
+        - match: '\s*(\])(?:\s*(!))?'
+          captures:
+            1: meta.brace.square.graphql
+            2: keyword.operator.nulltype.graphql
+          pop: true
+        - include: graphql-comment
+        - include: graphql-description-docstring
+        - include: graphql-description-singleline
+        - include: graphql-input-types
+        - include: graphql-comma
+  graphql-list-value:
+    - match: '\s*+(\[)'
+      captures:
+        1: meta.brace.square.graphql
+      push:
+        - meta_scope: meta.listvalues.graphql
+        - match: '\s*(\])'
+          captures:
+            1: meta.brace.square.graphql
+          pop: true
+        - include: graphql-value
+  graphql-name:
+    - match: '\s*([_A-Za-z][_0-9A-Za-z]*)'
+      captures:
+        1: entity.name.function.graphql
+  graphql-null-value:
+    - match: \s*\b(null)\b
+      captures:
+        1: constant.language.null.graphql
+  graphql-object-field:
+    - match: '\s*(([_A-Za-z][_0-9A-Za-z]*))\s*(:)'
+      captures:
+        1: constant.object.key.graphql
+        2: string.unquoted.graphql
+        3: punctuation.graphql
+  graphql-object-value:
+    - match: '\s*+({)'
+      captures:
+        1: meta.brace.curly.graphql
+      push:
+        - meta_scope: meta.objectvalues.graphql
+        - match: '\s*(})'
+          captures:
+            1: meta.brace.curly.graphql
+          pop: true
+        - include: graphql-object-field
+        - include: graphql-value
+  graphql-operation-def:
+    - include: graphql-query-mutation
+    - include: graphql-name
+    - include: graphql-variable-definitions
+    - include: graphql-directive
+    - include: graphql-selection-set
+  graphql-query-mutation:
+    - match: \s*\b(query|mutation)\b
+      captures:
+        1: keyword.operation.graphql
+  graphql-scalar:
+    - match: '\s*\b(scalar)\b\s*([_A-Za-z][_0-9A-Za-z]*)'
+      captures:
+        1: keyword.scalar.graphql
+        2: entity.scalar.graphql
+  graphql-scalar-type:
+    - match: \s*\b(Int|Float|String|Boolean|ID)\b(?:\s*(!))?
+      captures:
+        1: support.type.builtin.graphql
+        2: keyword.operator.nulltype.graphql
+  graphql-schema:
+    - match: \s*\b(schema)\b
+      captures:
+        1: keyword.schema.graphql
+      push:
+        - match: "(?<=})"
+          pop: true
+        - match: '\s*({)'
+          captures:
+            1: punctuation.operation.graphql
+          push:
+            - match: '\s*(})'
+              captures:
+                1: punctuation.operation.graphql
+              pop: true
+            - match: '\s*([_A-Za-z][_0-9A-Za-z]*)(?=\s*\(|:)'
+              captures:
+                1: variable.arguments.graphql
+              push:
+                - match: '(?=\s*(([_A-Za-z][_0-9A-Za-z]*)\s*(\(|:)|(})))|\s*(,)'
+                  captures:
+                    5: punctuation.comma.graphql
+                  pop: true
+                - match: '\s*([_A-Za-z][_0-9A-Za-z]*)'
+                  captures:
+                    1: support.type.graphql
+                - include: graphql-comment
+                - include: graphql-description-docstring
+                - include: graphql-description-singleline
+                - include: graphql-colon
+                - include: graphql-skip-newlines
+            - include: graphql-comment
+            - include: graphql-description-docstring
+            - include: graphql-description-singleline
+            - include: graphql-skip-newlines
+        - include: graphql-comment
+        - include: graphql-description-docstring
+        - include: graphql-description-singleline
+        - include: graphql-skip-newlines
+  graphql-selection-set:
+    - match: '\s*({)'
+      captures:
+        1: punctuation.operation.graphql
+      push:
+        - meta_scope: meta.selectionset.graphql
+        - match: '\s*(})'
+          captures:
+            1: punctuation.operation.graphql
+          pop: true
+        - include: graphql-comment
+        - include: graphql-description-docstring
+        - include: graphql-description-singleline
+        - include: graphql-field
+        - include: graphql-fragment-spread
+        - include: graphql-inline-fragment
+        - include: graphql-comma
+        - include: native-interpolation
+  graphql-skip-newlines:
+    - match: \s*
+  graphql-string-content:
+    - match: '\\[/''"\\nrtbf]'
+      scope: constant.character.escape.graphql
+    - match: '\\u([0-9a-fA-F]{4})'
+      scope: constant.character.escape.graphql
+  graphql-string-value:
+    - match: \s*+(("))
+      captures:
+        1: string.quoted.double.graphql
+        2: punctuation.definition.string.begin.graphql
+      push:
+        - meta_content_scope: string.quoted.double.graphql
+        - match: |-
+            \s*+(?:(("))|(
+            ))
+          captures:
+            1: string.quoted.double.graphql
+            2: punctuation.definition.string.end.graphql
+            3: invalid.illegal.newline.graphql
+          pop: true
+        - include: graphql-string-content
+  graphql-type-definition:
+    - match: '\s*([_A-Za-z][_0-9A-Za-z]*)(?=\s*\(|:)'
+      comment: "key (optionalArgs): Type"
+      captures:
+        1: variable.graphql
+      push:
+        - match: '(?=\s*(([_A-Za-z][_0-9A-Za-z]*)\s*(\(|:)|(})))|\s*(,)'
+          captures:
+            5: punctuation.comma.graphql
+          pop: true
+        - include: graphql-comment
+        - include: graphql-description-docstring
+        - include: graphql-description-singleline
+        - include: graphql-variable-definitions
+        - include: graphql-type-object
+        - include: graphql-colon
+        - include: graphql-input-types
+  graphql-type-interface:
+    - match: '\s*\b(?:(extends?)?\b\s*\b(type)|(interface)|(input))\b\s*([_A-Za-z][_0-9A-Za-z]*)?'
+      captures:
+        1: keyword.type.graphql
+        2: keyword.type.graphql
+        3: keyword.interface.graphql
+        4: keyword.input.graphql
+        5: support.type.graphql
+      push:
+        - meta_scope: meta.type.interface.graphql
+        - match: \s*\b(implements)\b\s*
+          captures:
+            1: keyword.implements.graphql
+          push:
+            - match: '\s*(?={)'
+              pop: true
+            - match: '\s*([_A-Za-z][_0-9A-Za-z]*)'
+              captures:
+                1: support.type.graphql
+            - include: graphql-ampersand
+            - include: graphql-comma
+        - include: graphql-comment
+        - include: graphql-description-docstring
+        - include: graphql-description-singleline
+        - include: graphql-directive
+        - include: graphql-type-object
+        - include: graphql-ignore-spaces
+        - match: (?=.)
+          captures:
+            1: keyword.type.graphql
+            2: keyword.type.graphql
+            3: keyword.interface.graphql
+            4: keyword.input.graphql
+            5: support.type.graphql
+          pop: true
+  graphql-type-object:
+    - match: '\s*({)'
+      captures:
+        1: punctuation.operation.graphql
+      push:
+        - meta_scope: meta.type.object.graphql
+        - match: '\s*(})'
+          captures:
+            1: punctuation.operation.graphql
+          pop: true
+        - include: graphql-comment
+        - include: graphql-description-docstring
+        - include: graphql-description-singleline
+        - include: graphql-type-definition
+  graphql-union:
+    - match: '\s*\b(union)\b\s*([_A-Za-z][_0-9A-Za-z]*)'
+      captures:
+        1: keyword.union.graphql
+        2: support.type.graphql
+      push:
+        - match: '\s*(=)\s*([_A-Za-z][_0-9A-Za-z]*)'
+          captures:
+            1: punctuation.assignment.graphql
+            2: support.type.graphql
+          push:
+            - include: graphql-comment
+            - include: graphql-description-docstring
+            - include: graphql-description-singleline
+            - include: graphql-skip-newlines
+            - match: '\s*(\|)\s*([_A-Za-z][_0-9A-Za-z]*)'
+              captures:
+                1: punctuation.or.graphql
+                2: support.type.graphql
+            - match: (?=.)
+              captures:
+                1: punctuation.assignment.graphql
+                2: support.type.graphql
+              pop: true
+        - include: graphql-comment
+        - include: graphql-description-docstring
+        - include: graphql-description-singleline
+        - include: graphql-skip-newlines
+        - match: (?=.)
+          captures:
+            1: keyword.union.graphql
+            2: support.type.graphql
+          pop: true
+  graphql-union-mark:
+    - match: \s*(\|)
+      captures:
+        1: punctuation.union.graphql
+  graphql-value:
+    - include: graphql-comment
+    - include: graphql-description-docstring
+    - include: graphql-variable-name
+    - include: graphql-float-value
+    - include: graphql-string-value
+    - include: graphql-boolean-value
+    - include: graphql-null-value
+    - include: graphql-enum-value
+    - include: graphql-list-value
+    - include: graphql-object-value
+  graphql-variable-assignment:
+    - match: \s(=)
+      captures:
+        1: punctuation.assignment.graphql
+      push:
+        - include: graphql-value
+        - match: |-
+            (?=[
+            ,)])
+          pop: true
+  graphql-variable-definition:
+    - match: '\s*(\$?[_A-Za-z][_0-9A-Za-z]*)(?=\s*\(|:)'
+      comment: "variable: type = value,.... which may be a list"
+      captures:
+        1: variable.parameter.graphql
+      push:
+        - meta_scope: meta.variables.graphql
+        - match: '(?=\s*((\$?[_A-Za-z][_0-9A-Za-z]*)\s*(\(|:)|(}|\))))|\s*(,)'
+          captures:
+            5: punctuation.comma.graphql
+          pop: true
+        - include: graphql-comment
+        - include: graphql-description-docstring
+        - include: graphql-description-singleline
+        - include: graphql-colon
+        - include: graphql-input-types
+        - include: graphql-variable-assignment
+        - include: graphql-skip-newlines
+  graphql-variable-definitions:
+    - match: \s*(\()
+      captures:
+        1: meta.brace.round.graphql
+      push:
+        - match: \s*(\))
+          captures:
+            1: meta.brace.round.graphql
+          pop: true
+        - include: graphql-comment
+        - include: graphql-description-docstring
+        - include: graphql-description-singleline
+        - include: graphql-variable-definition
+  graphql-variable-name:
+    - match: '\s*(\$[_A-Za-z][_0-9A-Za-z]*)'
+      captures:
+        1: variable.graphql
+  native-interpolation:
+    - match: '\s*(\${)'
+      captures:
+        1: keyword.other.substitution.begin
+      push:
+        - meta_scope: native.interpolation
+        - match: "(})"
+          captures:
+            1: keyword.other.substitution.end
+          pop: true
+        - include: scope:source.js
+        - include: scope:source.ts
+        - include: scope:source.js.jsx
+        - include: scope:source.tsx

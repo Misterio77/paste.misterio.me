@@ -1,0 +1,51 @@
+%YAML 1.2
+---
+# http://www.sublimetext.com/docs/3/syntax.html
+name: Cap’n Proto
+file_extensions:
+  - capnp
+scope: source.capnp
+contexts:
+  main:
+    - match: '\b(struct)(?:\s+([A-Za-z]+))?'
+      captures:
+        1: keyword.other.struct.capnp
+        2: entity.name.type.capnp
+    - match: \b(using|import|union|enum|const|interface|annotation)\b
+      scope: keyword.other.capnp
+    - match: ':(Void|Bool|U?Int(8|16|32|64)|Float(32|64)|Text|Data|List\([.a-zA-Z0-9()]*\)|Object|union|group)'
+      scope: storage.type.builtin.capnp
+    - match: ":[.a-zA-Z0-9()]+"
+      scope: storage.type.custom.capnp
+    - match: \b(true|false|void)\b
+      scope: constant.language.capnp
+    - match: '\b(0x[0-9A-Fa-f]+|\d+(\.\d+)?)\b'
+      scope: constant.numeric.capnp
+    - match: "@0x[0-9A-Fa-f]+"
+      scope: constant.numeric.unique-id.capnp
+    - match: '@\d+'
+      scope: constant.numeric.ordinal.capnp
+    - match: '"'
+      push:
+        - meta_scope: string.quoted.double.capnp
+        - match: '"'
+          pop: true
+        - match: \.
+          scope: constant.character.escape.capnp
+    - match: '(^[ \t]+)?(?=#)'
+      captures:
+        1: punctuation.whitespace.comment.leading.capnp
+      push:
+        - match: (?!\G)
+          pop: true
+        - match: "#"
+          captures:
+            0: punctuation.definition.comment.capnp
+          push:
+            - meta_scope: comment.line.number-sign.capnp
+            - match: \n
+              pop: true
+    - match: '(\{)(\})'
+      captures:
+        1: punctuation.section.block.begin.capnp
+        2: punctuation.section.block.end.capnp

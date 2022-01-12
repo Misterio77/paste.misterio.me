@@ -1,0 +1,82 @@
+%YAML 1.2
+---
+# http://www.sublimetext.com/docs/3/syntax.html
+name: CUDA C++
+file_extensions:
+  - cu
+  - cuh
+first_line_match: '-\*- C\+\+ -\*-'
+scope: source.cuda-c++
+contexts:
+  main:
+    - include: scope:source.c++
+    - match: \b__(global|device|host|noinline|forceinline)__\b
+      comment: B.1 FUNCTION TYPE QUALIFIERS
+      scope: keyword.function.qualifier.cuda-c++
+    - match: \b__(device|constant|managed|shared|restrict)__\b
+      comment: B.2 VARIABLE TYPE QUALIFIERS
+      scope: storage.modifier.cuda-c++
+    - match: '\b(dim3|char[1-4]|uchar[1-4]|short[1-4]|ushort[1-4]|int[1-4]|uint[1-4]|long[1-4]|ulong[1-4]|longlong[1-4]|ulonglong[1-4]|float[1-4]|double[1-4])\b'
+      comment: B.3 BUILT-IN VECTOR TYPES
+      scope: support.type.cuda-c++
+    - match: \b(gridDim|blockIdx|blockDim|threadIdx|warpSize)\b
+      comment: B.4 BUILT-IN VARIABLES
+      scope: variable.language.cuda-c++
+    - match: \b__(threadfence_system|threadfence_block|threadfence)\b
+      comment: B.5 MEMORY FENCE FUNCTIONS
+      scope: support.function.cuda-c++
+    - match: \b__(syncthreads_count|syncthreads_and|syncthreads_or|syncthreads)\b
+      comment: B.6 SYNCHRONIZATION FUNCTIONS
+      scope: support.function.cuda-c++
+    - match: \b(texCubemapLayered|tex1Dlayered|tex2Dlayered|tex2Dgather|tex1Dfetch|texCubemap|tex1D|tex2D|tex3D)\b
+      comment: B.8 TEXTURE FUNCTIONS
+      scope: support.function.cuda-c++
+    - match: \b(surfCubemapLayeredwrite|surfCubemapLayeredread|surf1DLayeredwrite|surf2DLayeredwrite|surf1DLayeredread|surf2DLayeredread|surfCubemapwrite|surfCubemapread|surf1Dwrite|surf2Dwrite|surf3Dwrite|surf1Dread|surf2Dread|surf3Dread)\b
+      comment: B.9 SURFACE FUNCTIONS
+      scope: support.function.cuda-c++
+    - match: \b__ldg\b
+      comment: B.10 READ-ONLY DATA CACHE LOAD FUNCTION
+      scope: support.function.cuda-c++
+    - match: \b(clock|clock64)\b
+      comment: B.11 TIME FUNCTION
+      scope: support.function.cuda-c++
+    - match: \b(atomicExch|atomicAdd|atomicSub|atomicMin|atomicMax|atomicInc|atomicDec|atomicCAS|atomicAnd|atomicXor|atomicOr)\b
+      comment: B.12 ATOMIC FUNCTIONS
+      scope: support.function.cuda-c++
+    - match: \b__(ballot|all|any)\b
+      comment: B.13 WARP VOTE FUNCTIONS
+      scope: support.function.cuda-c++
+    - match: \b__(shfl_down|shfl_xor|shfl_up|shfl)\b
+      comment: B.14 WARP SHUFFLE FUNCTIONS
+      scope: support.function.cuda-c++
+    - match: \b__(prof_trigger)\b
+      comment: B.15 PROFILER COUNTER FUNCTION
+      scope: support.function.cuda-c++
+    - match: \bassert\b
+      comment: B.16 ASSERTION
+      scope: support.function.cuda-c++
+    - match: \bprintf\b
+      comment: B.17 FORMATTED OUTPUT
+      scope: support.function.cuda-c++
+    - match: \b(malloc|free|memcpy|memset)\b
+      comment: B.18 DYNAMIC GLOBAL MEMORY ALLOCATION AND OPERATIONS
+      scope: support.function.cuda-c++
+    - match: (<<<)
+      comment: B.19 EXECUTION CONFIGURATION
+      push:
+        - meta_scope: keyword.operator.cuda-c++
+        - match: (>>>)
+          pop: true
+        - include: $top_level_main
+    - match: \b__launch_bounds__\b
+      comment: B.20 LAUNCH BOUNDS
+      scope: support.function.qualifier.cuda-c++
+    - match: \b__(fdividef|sincosf|log10f|exp10f|log2f|logf|expf|powf|sinf|cosf|tanf)\b
+      comment: D.2 INTRINSIC FUNCTIONS Table 8
+      scope: support.function.cuda-c++
+    - match: \b__((fsqrt|frcp|fadd|fsub|fmul|fmaf|fdiv)_(rn|rz|ru|rd)|frsqrt_rn)\b
+      comment: D.2 INTRINSIC FUNCTIONS Table 9
+      scope: support.function.cuda-c++
+    - match: \b__(dsqrt|dadd|dsub|dmul|ddiv|drcp|fma)_(rn|rz|ru|rd)\b
+      comment: D.2 INTRINSIC FUNCTIONS Table 10
+      scope: support.function.cuda-c++

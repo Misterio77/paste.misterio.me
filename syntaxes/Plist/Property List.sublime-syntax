@@ -1,0 +1,377 @@
+%YAML 1.2
+---
+# http://www.sublimetext.com/docs/3/syntax.html
+name: Property List (XML)
+file_extensions: []
+first_line_match: \s*<\?xml .*\n\s*<!DOCTYPE\s*(?i:plist)\s
+scope: text.xml.plist
+contexts:
+  main:
+    - include: xml
+  xml:
+    - match: ((<)((plist\b)))
+      captures:
+        1: meta.tag.plist.xml.plist
+        2: punctuation.definition.tag.xml.plist
+        3: entity.name.tag.xml.plist
+        4: entity.name.tag.localname.xml.plist
+        5: punctuation.definition.tag.xml.plist
+      push:
+        - match: ((/)((plist))(>))
+          captures:
+            1: meta.tag.plist.xml.plist
+            2: punctuation.definition.tag.xml.plist
+            3: entity.name.tag.xml.plist
+            4: entity.name.tag.localname.xml.plist
+            5: punctuation.definition.tag.xml.plist
+          pop: true
+        - match: (?<=<plist)(?!>)\s*(?:(version)(=)(?:((").*?("))|((').*?('))))?
+          captures:
+            1: entity.other.attribute-name.version.xml.plist
+            2: punctuation.separator.key-value.xml.plist
+            3: string.quoted.double.xml.plist
+            4: punctuation.definition.string.begin.xml.plist
+            5: punctuation.definition.string.end.xml.plist
+            6: string.quoted.single.xml.plist
+            7: punctuation.definition.string.begin.xml.plist
+            8: punctuation.definition.string.end.xml.plist
+          push:
+            - meta_scope: meta.tag.plist.xml.plist
+            - match: (?=>)
+              pop: true
+        - match: ((>(<)))(?=/plist)
+          comment: Tag with no content
+          captures:
+            1: meta.tag.plist.xml.plist
+            2: punctuation.definition.tag.xml.plist
+            3: meta.scope.between-tag-pair.xml.plist
+        - match: ((>))(?!</plist)
+          captures:
+            1: meta.tag.plist.xml.plist
+            2: punctuation.definition.tag.xml.plist
+          push:
+            - match: (<)(?=/plist)
+              captures:
+                0: meta.tag.plist.xml.plist
+                1: punctuation.definition.tag.xml.plist
+              pop: true
+            - include: xml_tags
+    - include: xml_invalid
+    - include: xml_comment
+    - include: scope:text.xml
+    - include: xml_stray-char
+  xml_comment:
+    - match: <!--
+      captures:
+        0: punctuation.definition.comment.xml.plist
+      push:
+        - meta_scope: comment.block.xml.plist
+        - match: (?<!-)-->
+          captures:
+            0: punctuation.definition.comment.xml.plist
+          pop: true
+        - match: "-(?=-->)|--"
+          scope: invalid.illegal.double-dash-not-allowed.xml.plist
+  xml_innertag:
+    - match: "&([a-zA-Z0-9_-]+|#[0-9]+|#x[0-9a-fA-F]+);"
+      scope: constant.character.entity.xml.plist
+    - match: "&"
+      scope: invalid.illegal.bad-ampersand.xml.plist
+  xml_invalid:
+    - match: ((<)/?(\w+).*?(>))
+      comment: Invalid tag
+      captures:
+        1: meta.tag.boolean.xml.plist
+        2: punctuation.definition.tag.xml.plist
+        3: invalid.illegal.tag-not-recognized.xml.plist
+        4: punctuation.definition.tag.xml.plist
+  xml_stray-char:
+    - match: \S
+      scope: invalid.illegal.character-data-not-allowed-here.xml.plist
+  xml_tags:
+    - match: ((<)((dict))(>))(((<)/)((dict))(>))
+      comment: "Empty tag: Dictionary"
+      captures:
+        1: meta.tag.dict.xml.plist
+        2: punctuation.definition.tag.xml.plist
+        3: entity.name.tag.xml.plist
+        4: entity.name.tag.localname.xml.plist
+        5: punctuation.definition.tag.xml.plist
+        6: meta.tag.dict.xml.plist
+        7: punctuation.definition.tag.xml.plist
+        8: meta.scope.between-tag-pair.xml.plist
+        9: entity.name.tag.xml.plist
+        10: entity.name.tag.localname.xml.plist
+        11: punctuation.definition.tag.xml.plist
+    - match: ((<)((array))(>))(((<)/)((array))(>))
+      comment: "Empty tag: Array"
+      captures:
+        1: meta.tag.array.xml.plist
+        2: punctuation.definition.tag.xml.plist
+        3: entity.name.tag.xml.plist
+        4: entity.name.tag.localname.xml.plist
+        5: punctuation.definition.tag.xml.plist
+        6: meta.tag.array.xml.plist
+        7: punctuation.definition.tag.xml.plist
+        8: meta.scope.between-tag-pair.xml.plist
+        9: entity.name.tag.xml.plist
+        10: entity.name.tag.localname.xml.plist
+        11: punctuation.definition.tag.xml.plist
+    - match: ((<)((string))(>))(((<)/)((string))(>))
+      comment: "Empty tag: String"
+      captures:
+        1: meta.tag.string.xml.plist
+        2: punctuation.definition.tag.xml.plist
+        3: entity.name.tag.xml.plist
+        4: entity.name.tag.localname.xml.plist
+        5: punctuation.definition.tag.xml.plist
+        6: meta.tag.string.xml.plist
+        7: punctuation.definition.tag.xml.plist
+        8: meta.scope.between-tag-pair.xml.plist
+        9: entity.name.tag.xml.plist
+        10: entity.name.tag.localname.xml.plist
+        11: punctuation.definition.tag.xml.plist
+    - match: ((<)((key))(>))
+      comment: the extra captures are required to duplicate the effect of the namespace parsing in the XML syntax
+      captures:
+        1: meta.tag.key.xml.plist
+        2: punctuation.definition.tag.xml.plist
+        3: entity.name.tag.xml.plist
+        4: entity.name.tag.localname.xml.plist
+        5: punctuation.definition.tag.xml.plist
+      push:
+        - meta_content_scope: constant.other.name.xml.plist
+        - match: ((</)((key))(>))
+          captures:
+            1: meta.tag.key.xml.plist
+            2: punctuation.definition.tag.xml.plist
+            3: entity.name.tag.xml.plist
+            4: entity.name.tag.localname.xml.plist
+            5: punctuation.definition.tag.xml.plist
+          pop: true
+        - match: '<!\[CDATA\['
+          captures:
+            0: punctuation.definition.constant.xml
+          push:
+            - match: "]]>"
+              captures:
+                0: punctuation.definition.constant.xml
+              pop: true
+    - match: ((<)((dict))\s*?/(>))
+      comment: Self-closing Dictionary
+      captures:
+        1: meta.tag.dict.xml.plist
+        2: punctuation.definition.tag.xml.plist
+        3: entity.name.tag.xml.plist
+        4: entity.name.tag.localname.xml.plist
+        5: punctuation.definition.tag.xml.plist
+    - match: ((<)((array))\s*?/(>))
+      comment: Self-closing Array
+      captures:
+        1: meta.tag.array.xml.plist
+        2: punctuation.definition.tag.xml.plist
+        3: entity.name.tag.xml.plist
+        4: entity.name.tag.localname.xml.plist
+        5: punctuation.definition.tag.xml.plist
+    - match: ((<)((string))\s*?/(>))
+      comment: Self-closing String
+      captures:
+        1: meta.tag.string.xml.plist
+        2: punctuation.definition.tag.xml.plist
+        3: entity.name.tag.xml.plist
+        4: entity.name.tag.localname.xml.plist
+        5: punctuation.definition.tag.xml.plist
+    - match: ((<)((key))\s*?/(>))
+      comment: Self-closing Key
+      captures:
+        1: meta.tag.key.xml.plist
+        2: punctuation.definition.tag.xml.plist
+        3: entity.name.tag.xml.plist
+        4: entity.name.tag.localname.xml.plist
+        5: punctuation.definition.tag.xml.plist
+    - match: ((<)((dict))(>))
+      comment: Dictionary
+      captures:
+        1: meta.tag.dict.xml.plist
+        2: punctuation.definition.tag.xml.plist
+        3: entity.name.tag.xml.plist
+        4: entity.name.tag.localname.xml.plist
+        5: punctuation.definition.tag.xml.plist
+      push:
+        - match: ((</)((dict))(>))
+          captures:
+            1: meta.tag.dict.xml.plist
+            2: punctuation.definition.tag.xml.plist
+            3: entity.name.tag.xml.plist
+            4: entity.name.tag.localname.xml.plist
+            5: punctuation.definition.tag.xml.plist
+          pop: true
+        - include: xml_tags
+    - match: ((<)((array))(>))
+      comment: Array
+      captures:
+        1: meta.tag.array.xml.plist
+        2: punctuation.definition.tag.xml.plist
+        3: entity.name.tag.xml.plist
+        4: entity.name.tag.localname.xml.plist
+        5: punctuation.definition.tag.xml.plist
+      push:
+        - match: ((</)((array))(>))
+          captures:
+            1: meta.tag.array.xml.plist
+            2: punctuation.definition.tag.xml.plist
+            3: entity.name.tag.xml.plist
+            4: entity.name.tag.localname.xml.plist
+            5: punctuation.definition.tag.xml.plist
+          pop: true
+        - include: xml_tags
+    - match: ((<)((string))(>))
+      comment: Strings
+      captures:
+        1: meta.tag.string.xml.plist
+        2: punctuation.definition.tag.xml.plist
+        3: entity.name.tag.xml.plist
+        4: entity.name.tag.localname.xml.plist
+        5: punctuation.definition.tag.xml.plist
+      push:
+        - meta_content_scope: string.quoted.other.xml.plist
+        - match: ((</)((string))(>))
+          captures:
+            1: meta.tag.string.xml.plist
+            2: punctuation.definition.tag.xml.plist
+            3: entity.name.tag.xml.plist
+            4: entity.name.tag.localname.xml.plist
+            5: punctuation.definition.tag.xml.plist
+          pop: true
+        - include: xml_innertag
+        - match: '<!\[CDATA\['
+          captures:
+            0: punctuation.definition.string.xml
+          push:
+            - meta_scope: string.unquoted.cdata.xml
+            - match: "]]>"
+              captures:
+                0: punctuation.definition.string.xml
+              pop: true
+    - match: ((<)((real))(>))
+      comment: Numeric
+      captures:
+        1: meta.tag.real.xml.plist
+        2: punctuation.definition.tag.xml.plist
+        3: entity.name.tag.xml.plist
+        4: entity.name.tag.localname.xml.plist
+        5: punctuation.definition.tag.xml.plist
+      push:
+        - match: ((</)((real))(>))
+          captures:
+            1: meta.tag.real.xml.plist
+            2: punctuation.definition.tag.xml.plist
+            3: entity.name.tag.xml.plist
+            4: entity.name.tag.localname.xml.plist
+            5: punctuation.definition.tag.xml.plist
+          pop: true
+        - match: '(<!\[CDATA\[)'
+          captures:
+            0: punctuation.definition.constant.xml
+            1: constant.numeric.real.xml.plist
+          push:
+            - match: "(]]>)"
+              captures:
+                0: punctuation.definition.constant.xml
+                1: constant.numeric.real.xml.plist
+              pop: true
+            - match: '[-+]?\d+(\.\d*)?(E[-+]\d+)?'
+              scope: constant.numeric.real.xml.plist
+            - match: .
+              scope: invalid.illegal.not-a-number.xml.plist
+        - match: '[-+]?\d+(\.\d*)?(E[-+]\d+)?'
+          scope: constant.numeric.real.xml.plist
+        - match: .
+          scope: invalid.illegal.not-a-number.xml.plist
+    - match: ((<)((integer))(>))
+      comment: Integer
+      captures:
+        1: meta.tag.integer.xml.plist
+        2: punctuation.definition.tag.xml.plist
+        3: entity.name.tag.xml.plist
+        4: entity.name.tag.localname.xml.plist
+        5: punctuation.definition.tag.xml.plist
+      push:
+        - match: ((</)((integer))(>))
+          captures:
+            1: meta.tag.integer.xml.plist
+            2: punctuation.definition.tag.xml.plist
+            3: entity.name.tag.xml.plist
+            4: entity.name.tag.localname.xml.plist
+            5: punctuation.definition.tag.xml.plist
+          pop: true
+        - match: '[-+]?\d+'
+          scope: constant.numeric.integer.xml.plist
+        - match: .
+          scope: invalid.illegal.not-a-number.xml.plist
+    - match: ((<)((true|false))\s*?(/>))
+      comment: Boolean
+      captures:
+        1: meta.tag.boolean.xml.plist
+        2: punctuation.definition.tag.xml.plist
+        3: entity.name.tag.xml.plist
+        4: entity.name.tag.localname.xml.plist
+        5: punctuation.definition.tag.xml.plist
+    - match: ((<)((data))(>))
+      comment: Data
+      captures:
+        1: meta.tag.data.xml.plist
+        2: punctuation.definition.tag.xml.plist
+        3: entity.name.tag.xml.plist
+        4: entity.name.tag.localname.xml.plist
+        5: punctuation.definition.tag.xml.plist
+      push:
+        - match: ((</)((data))(>))
+          captures:
+            1: meta.tag.data.xml.plist
+            2: punctuation.definition.tag.xml.plist
+            3: entity.name.tag.xml.plist
+            4: entity.name.tag.localname.xml.plist
+            5: punctuation.definition.tag.xml.plist
+          pop: true
+        - match: "[A-Za-z0-9+/]"
+          scope: constant.numeric.base64.xml.plist
+        - match: "="
+          scope: constant.numeric.base64.xml.plist
+        - match: '[^ \n\t]'
+          scope: invalid.illegal.invalid-character.xml.plist
+    - match: ((<)((date))(>))
+      comment: Date
+      captures:
+        1: meta.tag.date.xml.plist
+        2: punctuation.definition.tag.xml.plist
+        3: entity.name.tag.xml.plist
+        4: entity.name.tag.localname.xml.plist
+        5: punctuation.definition.tag.xml.plist
+      push:
+        - match: ((</)((date))(>))
+          captures:
+            1: meta.tag.date.xml.plist
+            2: punctuation.definition.tag.xml.plist
+            3: entity.name.tag.xml.plist
+            4: entity.name.tag.localname.xml.plist
+            5: punctuation.definition.tag.xml.plist
+          pop: true
+        - match: |-
+            (?x)
+              [0-9]{4}            # Year
+              -               # Divider
+              (0[1-9]|1[012])         # Month
+              -               # Divider
+              (?!00|3[2-9])[0-3][0-9]     # Day
+              T               # Separator
+              (?!2[5-9])[0-2][0-9]      # Hour
+              :               # Divider
+              [0-5][0-9]            # Minute
+              :               # Divider
+              (?!6[1-9])[0-6][0-9]      # Second
+              Z               # Zulu
+          scope: constant.other.date.xml.plist
+    - include: xml_invalid
+    - include: xml_comment
+    - include: xml_stray-char

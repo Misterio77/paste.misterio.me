@@ -1,0 +1,373 @@
+%YAML 1.2
+---
+# http://www.sublimetext.com/docs/3/syntax.html
+name: Thrift
+file_extensions:
+  - thrift
+  - frugal
+scope: source.thrift
+contexts:
+  main:
+    - include: comments
+    - match: '(?<!\S)(include)(?!\S)(?:\s+(([''"])(?>.*?(\3))))?'
+      scope: meta.include.thrift
+      captures:
+        1: keyword.other.include.thrift
+        2: string.quoted.thrift
+        3: punctuation.definition.string.begin.thrift
+        4: punctuation.definition.string.end.thrift
+    - match: '(?<!\S)(cpp_include)(?!\S)(?:\s+(([''"])(?>.*?(\3))))?'
+      scope: meta.cpp-include.thrift
+      captures:
+        1: keyword.other.cpp-include.thrift
+        2: string.quoted.thrift
+        3: punctuation.definition.string.begin.thrift
+        4: punctuation.definition.string.end.thrift
+    - match: '(?<!\S)(namespace)(?!\S)(?:\s+([a-zA-Z_][\w.]*)(?:\s+([a-zA-Z_][\w.]*))?)?'
+      scope: meta.namespace.thrift
+      captures:
+        1: keyword.other.namespace.thrift
+        2: support.other.namespace-language.thrift
+        3: variable.other.namespace.thrift
+    - match: '(?<!\S)((?:php|xsd)_namespace)(?!\S)(?:\s+([a-zA-Z_][\w.]*))?'
+      scope: meta.namespace.thrift
+      captures:
+        1: keyword.other.namespace.thrift
+        2: variable.other.namespace.thrift
+    - match: '(?<!\S)((?:cpp|ruby|csharp)_namespace|py_module|(?:java|perl)_package|smalltalk_(?:category|prefix)|cocoa_prefix)(?!\S)(?:\s+([a-zA-Z_][\w.]*))?'
+      captures:
+        1: invalid.deprecated.namespace.thrift
+        2: variable.other.namespace.thrift
+    - match: (?=(struct|s?enum|union|service|const|typedef|exception)\b)
+      comment: begin the definition list
+      push:
+        - match: "(?x)$.^ # this regex should never end"
+          pop: true
+        - include: comments
+        - match: '(?<!\S)(const)(?!\S)(?:\s+(?<ft>map\s*<\s*\g<ft>\s*,\s*\g<ft>\s*>|set\s*<\s*\g<ft>\s*>|list\s*<\s*\g<ft>\s*>\s*cpp_type|[a-zA-Z_][\w.]*)(?:\s+([a-zA-Z_][\w.]*)(?:\s*=)?)?)?'
+          captures:
+            1: keyword.other.const.thrift
+            2: storage.type.const.thrift
+            3: variable.other.const.thrift
+          push:
+            - meta_scope: meta.const.thrift
+            - match: $|^
+              pop: true
+            - include: comments
+            - include: value
+        - match: '(?<!\S)(typedef)(?!\S)(?:\s+(?<ft>map\s*<\s*\g<ft>\s*,\s*\g<ft>\s*>|set\s*<\s*\g<ft>\s*>|list\s*<\s*\g<ft>\s*>\s*cpp_type|[a-zA-Z_][\w.]*)(?:\s+([a-zA-Z_][\w.]*))?)?'
+          captures:
+            1: keyword.other.typedef.thrift
+            2: storage.type.typedef.thrift
+            3: variable.other.typedef.thrift
+          push:
+            - meta_scope: meta.typedef.thrift
+            - match: $|^
+              pop: true
+            - include: comments
+        - match: '(?<!\S)(union)(?!\S)(?:\s+([a-zA-Z_][\w.]*)\s*(?![^\s{]))?'
+          captures:
+            1: keyword.other.union.thrift
+            2: entity.name.type.union.thrift
+          push:
+            - meta_scope: meta.union.thrift
+            - match: '(?<=\})|$'
+              pop: true
+            - match: (?<!\S)xsd_all(?!\S)
+              scope: keyword.other.xsd-all.thrift
+            - match: '\{'
+              captures:
+                0: punctuation.section.union.begin.thrift
+              push:
+                - match: '\}'
+                  captures:
+                    0: punctuation.section.union.end.thrift
+                  pop: true
+                - include: comments
+                - include: field
+        - match: '(?<!\S)(enum)(?!\S)(?:\s+([a-zA-Z_][\w.]*)\s*(?![^\s{]))?'
+          captures:
+            1: keyword.other.enum.thrift
+            2: entity.name.type.enum.thrift
+          push:
+            - meta_scope: meta.enum.thrift
+            - match: '(?<=\})|$'
+              pop: true
+            - match: '\{'
+              captures:
+                0: punctuation.section.enum.begin.thrift
+              push:
+                - match: '\}'
+                  captures:
+                    0: punctuation.section.enum.end.thrift
+                  pop: true
+                - match: '(?<!\S)([a-zA-Z_][\w.]*)(?:\s*=\s*(\d*)(?:\s*[,;])?)?'
+                  captures:
+                    1: variable.other.enum.thrift
+                    2: constant.numeric.integer.thrift
+                - include: comments
+                - match: \S
+                  scope: invalid.illegal.thrift
+        - match: '(?<!\S)(senum)(?!\S)(?:\s+([a-zA-Z_][\w.]*)\s*(?![^\s{]))?'
+          captures:
+            1: keyword.other.senum.thrift
+            2: entity.name.type.senum.thrift
+          push:
+            - meta_scope: meta.senum.thrift
+            - match: '(?<=\})|$'
+              pop: true
+            - match: '\{'
+              captures:
+                0: punctuation.section.senum.begin.thrift
+              push:
+                - match: '\}'
+                  captures:
+                    0: punctuation.section.senum.end.thrift
+                  pop: true
+                - match: '(?<!\S)([a-zA-Z_][\w.]*)(?:\s*[,;])?'
+                  captures:
+                    1: variable.other.senum.thrift
+                - include: comments
+                - match: \S
+                  scope: invalid.illegal.thrift
+        - match: '(?<!\S)(struct)(?!\S)(?:\s+([a-zA-Z_][\w.]*)\s*(?![^\s{]))?'
+          captures:
+            1: keyword.other.struct.thrift
+            2: entity.name.type.struct.thrift
+          push:
+            - meta_scope: meta.struct.thrift
+            - match: '(?<=\})|$'
+              pop: true
+            - match: (?<!\S)xsd_all(?!\S)
+              scope: keyword.other.xsd-all.thrift
+            - match: '\{'
+              captures:
+                0: punctuation.section.struct.begin.thrift
+              push:
+                - match: '\}'
+                  captures:
+                    0: punctuation.section.struct.end.thrift
+                  pop: true
+                - include: comments
+                - include: field
+        - match: '(?<!\S)(exception)(?!\S)(?:\s+([a-zA-Z_][\w.]*)\s*(?![^\s{]))?'
+          captures:
+            1: keyword.other.exception.thrift
+            2: entity.name.type.exception.thrift
+          push:
+            - meta_scope: meta.exception.thrift
+            - match: '(?<=\})|$'
+              pop: true
+            - match: '\{'
+              captures:
+                0: punctuation.section.exception.begin.thrift
+              push:
+                - match: '\}'
+                  captures:
+                    0: punctuation.section.exception.end.thrift
+                  pop: true
+                - include: comments
+                - include: field
+        - match: '(?<!\S)(service)(?!\S)(?:\s+([a-zA-z_][\w.]*)(?:\s+(extends)(?:\s+([a-zA-Z_][\w.]*))?)?\s*(?![^\s{]))?'
+          captures:
+            1: keyword.other.service.thrift
+            2: entity.name.type.service.thrift
+            3: keyword.other.service.extends.thrift
+            4: entity.other.inherited-class.thrift
+          push:
+            - meta_scope: meta.service.thrift
+            - match: '(?<=\})|$'
+              pop: true
+            - match: '\{'
+              captures:
+                0: punctuation.section.service.begin.thrift
+              push:
+                - match: '\}'
+                  captures:
+                    0: punctuation.section.service.end.thrift
+                  pop: true
+                - include: comments
+                - match: |-
+                    (?x)(?<!\S)
+                    (async(?!\S))?\s*
+                    (?<ft>
+                      map\s*<\s*\g<ft>\s*,\s*\g<ft>\s*> |
+                      set\s*<\s*\g<ft>\s*> |
+                      list\s*<\s*\g<ft>\s*>\s*(cpp_type(?!\S))? |
+                      (?!async\b)[a-zA-Z_][\w.]*
+                    )\s*
+                    (?:
+                      (?<!\S)([a-zA-Z_][\w.]*)\s*(?![^\s(])
+                    )?
+                  captures:
+                    1: keyword.other.async.thrift
+                    2: storage.type.function.thrift
+                    3: keyword.other.cpp_type.thrift
+                    4: entity.name.function.thrift
+                  push:
+                    - meta_scope: meta.service.function.thrift
+                    - match: $|^
+                      pop: true
+                    - match: \(
+                      captures:
+                        0: punctuation.definition.arguments.begin.thrift
+                      push:
+                        - match: \)
+                          captures:
+                            0: punctuation.definition.arguments.end.thrift
+                          pop: true
+                        - include: comments
+                        - include: field
+                    - match: '(?<![^\s)])(throws)(?![^\s(])'
+                      captures:
+                        1: keyword.other.service.function.throws.thrift
+                      push:
+                        - match: $
+                          pop: true
+                        - match: \(
+                          captures:
+                            0: punctuation.definition.arguments.begin.thrift
+                          push:
+                            - match: \)
+                              captures:
+                                0: punctuation.definition.arguments.end.thrift
+                              pop: true
+                            - include: comments
+                            - include: field
+                    - include: comments
+  comments:
+    - match: '(^[ \t]+)?(?=#)'
+      captures:
+        1: punctuation.whitespace.comment.leading.thrift
+      push:
+        - match: (?!\G)
+          pop: true
+        - match: "#"
+          captures:
+            0: punctuation.definition.comment.thrift
+          push:
+            - meta_scope: comment.line.number-sign.thrift
+            - match: \n
+              pop: true
+    - match: '(^[ \t]+)?(?=//)'
+      captures:
+        1: punctuation.whitespace.comment.leading.thrift
+      push:
+        - match: (?!\G)
+          pop: true
+        - match: //
+          captures:
+            0: punctuation.definition.comment.thrift
+          push:
+            - meta_scope: comment.line.double-slash.thrift
+            - match: \n
+              pop: true
+    - match: /\*\*
+      captures:
+        0: punctuation.definition.comment.begin.thrift
+      push:
+        - meta_scope: comment.block.documentation.thrift
+        - match: \*/
+          captures:
+            0: punctuation.definition.comment.end.thrift
+          pop: true
+    - match: /\*
+      captures:
+        0: punctuation.definition.comment.begin.thrift
+      push:
+        - meta_scope: comment.block.thrift
+        - match: \*/
+          captures:
+            0: punctuation.definition.comment.end.thrift
+          pop: true
+  field:
+    - match: |-
+        (?x)
+        (?<![^\s{(])(?=\S)
+        (\d+\s*:)?[ \t]*
+        (?: (required|optional)(?!\S)[ \t]*
+        | (?=\S)(?!=required|optional|\d)
+        )
+      captures:
+        1: entity.other.field-id.thrift
+        2: keyword.other.requiredness.thrift
+      push:
+        - meta_scope: meta.field.thrift
+        - match: '[,;]|(?=[)#]|//|/\*)|$'
+          captures:
+            0: punctuation.separator.fields.thrift
+          pop: true
+        - match: |-
+            (?x)
+            (?<ft>
+              map\s*<\s*\g<ft>\s*,\s*\g<ft>\s*> |
+              set\s*<\s*\g<ft>\s*> |
+              list\s*<\s*\g<ft>\s*>\s*(cpp_type(?!\S))? |
+              [a-zA-Z_][\w.]*
+            )[ \t]*
+            (?:([a-zA-Z_][\w.]*)[ \t]*)? # identifier
+          captures:
+            1: storage.type.field.thrift
+            2: keyword.other.cpp-type.thrift
+            3: variable.other.field-name.thrift
+          push:
+            - match: '(?=[,;]|[)#]|//|/\*)|$'
+              pop: true
+            - match: "="
+              push:
+                - match: '(?=[,;]|[)#]|//|/\*)|$'
+                  pop: true
+                - match: (?<!\S)(xsd_optional)\b
+                  scope: keyword.other.xsd_optional.thrift
+                - match: (?<!\S)(xsd_nillable)\b
+                  scope: keyword.other.xsd_nillable.thrift
+                - include: value
+  value:
+    - match: '[+-]?\d*\.\d+([eE][+-]?\d+)?'
+      scope: constant.numeric.float.thrift
+    - match: '[+-]?\d+'
+      scope: constant.numeric.integer.thrift
+    - match: '[a-zA-Z_][\w.]*'
+      scope: constant.other.const-data.thrift
+    - match: "'"
+      captures:
+        0: punctuation.definition.string.begin.thrift
+      push:
+        - meta_scope: string.quoted.single.thrift
+        - match: "'"
+          captures:
+            0: punctuation.definition.string.end.thrift
+          pop: true
+    - match: '"'
+      captures:
+        0: punctuation.definition.string.begin.thrift
+      push:
+        - meta_scope: string.quoted.double.thrift
+        - match: '"'
+          captures:
+            0: punctuation.definition.string.begin.thrift
+          pop: true
+    - match: '\['
+      captures:
+        0: punctuation.definition.array.begin.thrift
+      push:
+        - meta_scope: meta.array.thrift
+        - match: '\]'
+          captures:
+            0: punctuation.definition.array.end.thrift
+          pop: true
+        - match: "[,;]"
+        - include: value
+    - match: '\{'
+      captures:
+        0: punctuation.definition.map.begin.thrift
+      push:
+        - meta_scope: meta.map.thrift
+        - match: '\}'
+          captures:
+            0: punctuation.definition.map.end.thrift
+          pop: true
+        - match: "[:,;]"
+        - include: value
+    - match: \S
+      scope: invalid.illegal.thrift

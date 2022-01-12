@@ -20,8 +20,7 @@ $primary-hue: 174;
 }
 
 // Style navbar
-body>nav {
-  box-shadow: var(--card-box-shadow);
+body>nav { box-shadow: var(--card-box-shadow);
   background-color: var(--card-sectionning-background-color);
 }
 
@@ -43,16 +42,19 @@ article {
       max-width: 30em;
     }
   }
+  margin-top: var(--typography-spacing-vertical);
   margin-bottom: var(--typography-spacing-vertical);
+}
 
-  // Remove bottom margin from headers
-  header {
-    h1, h2, h3, h4, h5, h6 {
-      margin-bottom: 0;
-    }
-    hgroup, .headings {
-      margin-bottom: 0;
-    }
+button {
+  &.delete {
+    background-color: var(--error-color);
+    border-color: var(--error-color);
+  }
+  &.small {
+    width: auto;
+    display: inline;
+    margin-bottom: auto;
   }
 }
 

@@ -1,6 +1,7 @@
 {% extends "base" %}
 
 {% block title %}Error{% endblock title %}
+{% block description %}{{code | as_str}} - {{ description }}{% endblock %}
 
 {% block auth %}
 {% endblock auth %}

@@ -1,0 +1,82 @@
+%YAML 1.2
+---
+# http://www.sublimetext.com/docs/syntax.html
+file_extensions:
+  - v
+  - vh
+  - sv
+  - svh
+  - svi
+  - vlib
+  - vp
+  - svp
+scope: source.verilog
+contexts:
+  main:
+    - match: \b(accept_on|alias|always|always_comb|always_ff|always_latch|and|assert|assign|assume|automatic|before|begin|bind|bins|binsof|bit|break|buf|bufif0|bufif1|byte|case|casex|casez|cell|chandle|checker|class|clocking|cmos|config|const|constraint|context|continue|cover|covergroup|coverpoint|cross|deassign|default|defparam|design|disable|dist|do|edge|else|end|endcase|endchecker|endclass|endclocking|endconfig|endfunction|endgenerate|endgroup|endinterface|endmodule|endpackage|endprimitive|endprogram|endproperty|endsequence|endspecify|endtable|endtask|enum|event|eventually|expect|export|extends|extern|final|first_match|for|force|foreach|forever|fork|forkjoin|function|generate|genvar|global|highz0|highz1|if|iff|ifnone|ignore_bins|illegal_bins|implements|implies|import|initial|inout|input|inside|instance|int|integer|interconnect|interface|intersect|join|join_any|join_none|large|let|liblist|local|localparam|logic|longint|macromodule|matches|medium|modport|module|nand|negedge|nettype|new|nexttime|nmos|nor|noshowcancelled|not|notif0|notif1|null|or|output|package|packed|parameter|pmos|posedge|primitive|priority|program|property|protected|pull0|pull1|pulldown|pullup|pulsestyle_ondetect|pulsestyle_onevent|pure|rand|randc|randcase|randsequence|rcmos|real|realtime|ref|reg|reject_on|release|repeat|restrict|return|rnmos|rpmos|rtran|rtranif0|rtranif1|s_always|s_eventually|s_nexttime|s_until|s_until_with|scalared|sequence|shortint|shortreal|showcancelled|signed|small|soft|solve|specify|specparam|static|string|strong|strong0|strong1|struct|super|supply0|supply1|sync_accept_on|sync_reject_on|table|tagged|task|this|throughout|time|timeprecision|timeunit|tran|tranif0|tranif1|tri|tri0|tri1|triand|trior|trireg|type|typedef|union|unique|unique0|unsigned|until|until_with|untyped|use|uwire|var|vectored|virtual|void|wait|wait_order|wand|weak|weak0|weak1|while|wildcard|wire|with|within|wor|xnor|xor)\b
+      scope: keyword.control.verilog
+    - match: 'PATHPULSE\$([a-z]|[A-Z]|_)([a-z]|[A-Z]|_|[0-9]|\$)*'
+      scope: support.function.path_pulse.verilog
+    - match: |-
+        `(([a-z]|[A-Z]|_)([a-z]|[A-Z]|_|[0-9]|\$)*|\\(`[^\"\s ﻿\  \
+        \
+        ]|[^`\s ﻿\  \
+        \
+        ])[^\s ﻿\ \
+        \
+        ]+)
+      scope: variable.other.constant.macro.verilog
+    - match: '`'
+      scope: variable.other.constant.incomplete_macro.verilog
+    - match: '\$([a-z]|[A-Z]|_|[0-9]|\$)+'
+      scope: support.function.system_id.verilog
+    - match: |-
+        (([a-z]|[A-Z]|_)([a-z]|[A-Z]|_|[0-9]|\$)*|\\[^\s ﻿\ \
+        \
+        ]+)
+      scope: identifier.valid.verilog
+    - match: '[0-9]([0-9]|_)*(\.[0-9]([0-9]|_)*)?(s|ms|us|ns|ps|fs)'
+      scope: constant.numeric.time_literal.verilog
+    - match: '[0-9]([0-9]|_)*(\.[0-9]([0-9]|_)*((e|E)(-|\+)?[0-9]([0-9]|_)*)?|(e|E)(-|\+)?[0-9]([0-9]|_)*)'
+      scope: constant.numeric.real.verilog
+    - match: '[0-9]([0-9]|_)*'
+      scope: constant.numeric.decimal_number.verilog
+    - match: |-
+        '(s|S)?((d|D)(((\s| |﻿|\  |\
+        )|\
+        ))*(([0-9]|_)*|(x|X)_*|(z|Z|\?)_*)|(h|H)(((\s| |﻿|\ |\
+        )|\
+        ))*((x|X)|(z|Z|\?)|[0-9]|[a-f]|[A-F]|_)*|(o|O)(((\s| |﻿|\ |\
+        )|\
+        ))*((x|X)|(z|Z|\?)|[0-7]|_)*|(b|B)(((\s| |﻿|\ |\
+        )|\
+        ))*((x|X)|(z|Z|\?)|[0-1]|_)*)
+      scope: constant.numeric.based_number.verilog
+    - match: |-
+        \"(\\.|\\\
+        \
+        |[^\\\
+        \
+        \"])*\"
+      scope: string.quoted.double.verilog
+    - match: |-
+        \"(\\.|\\\
+        \
+        |[^\\\
+        \
+        \"])*(\
+        \
+        |\
+        |\
+        |)
+      scope: string.quoted.double.verilog
+    - match: /\*
+      push:
+        - meta_scope: comment.block.verilog
+        - match: \*/
+          pop: true
+    - match: |-
+        //[^\
+        ]*\
+        ?
+      scope: comment.line.verilog

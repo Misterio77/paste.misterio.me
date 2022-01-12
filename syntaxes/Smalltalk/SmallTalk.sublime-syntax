@@ -1,0 +1,114 @@
+%YAML 1.2
+---
+# http://www.sublimetext.com/docs/3/syntax.html
+name: Smalltalk
+file_extensions:
+  - st
+scope: source.smalltalk
+contexts:
+  main:
+    - match: \$.
+      scope: constant.character.smalltalk
+    - match: \b(class)\b
+      scope: storage.type.$1.smalltalk
+    - match: \b(extend|super|self)\b
+      scope: storage.modifier.$1.smalltalk
+    - match: \b(yourself|new|Smalltalk)\b
+      scope: keyword.control.$1.smalltalk
+    - match: ":="
+      scope: keyword.operator.assignment.smalltalk
+    - match: /^:\w*\s*\|/
+      comment: "Parse the variable declaration like: |a b c|"
+      scope: constant.other.block.smalltalk
+    - match: '(\|)(\s*\w[\w ]*)(\|)'
+      captures:
+        1: punctuation.definition.instance-variables.begin.smalltalk
+        3: punctuation.definition.instance-variables.end.smalltalk
+    - match: '\[((\s+|:\w+)*)\|'
+      comment: "Parse the blocks like: [ :a :b | ...... ]"
+      captures:
+    - include: numeric
+    - match: <(?!<|=)|>(?!<|=|>)|<=|>=|=|==|~=|~~|>>|\^
+      scope: keyword.operator.comparison.smalltalk
+    - match: (\*|\+|\-|/|\\)
+      scope: keyword.operator.arithmetic.smalltalk
+    - match: '(?<=[ \t])!+|\bnot\b|&|\band\b|\||\bor\b'
+      scope: keyword.operator.logical.smalltalk
+    - match: '(?<!\.)\b(ensure|resume|retry|signal)\b(?![?!])'
+      comment: Fake reserved word -> main Smalltalk messages
+      scope: keyword.control.smalltalk
+    - match: "ifCurtailed:|ifTrue:|ifFalse:|whileFalse:|whileTrue:"
+      comment: Fake conditionals. Smalltalk Methods.
+      scope: keyword.control.conditionals.smalltalk
+    - match: (\w+)(\s+(subclass:))\s*(\w*)
+      scope: meta.class.smalltalk
+      captures:
+        1: entity.other.inherited-class.smalltalk
+        3: keyword.control.smalltalk
+        4: entity.name.type.class.smalltalk
+    - match: '"'
+      captures:
+        0: punctuation.definition.comment.begin.smalltalk
+      push:
+        - meta_scope: comment.block.smalltalk
+        - match: '"'
+          captures:
+            0: punctuation.definition.comment.end.smalltalk
+          pop: true
+    - match: \b(true|false)\b
+      scope: constant.language.boolean.smalltalk
+    - match: \b(nil)\b
+      scope: constant.language.nil.smalltalk
+    - match: '(?>[a-zA-Z_]\w*(?>[?!])?)(:)(?!:)'
+      comment: messages/methods
+      scope: constant.other.messages.smalltalk
+      captures:
+        1: punctuation.definition.constant.smalltalk
+    - match: "(#)[a-zA-Z_][a-zA-Z0-9_:]*"
+      comment: symbols
+      scope: constant.other.symbol.smalltalk
+      captures:
+        1: punctuation.definition.constant.smalltalk
+    - match: '#\['
+      captures:
+        0: punctuation.definition.constant.begin.smalltalk
+      push:
+        - meta_scope: meta.array.byte.smalltalk
+        - match: '\]'
+          captures:
+            0: punctuation.definition.constant.end.smalltalk
+          pop: true
+        - match: "[0-9]+(r[a-zA-Z0-9]+)?"
+          scope: constant.numeric.integer.smalltalk
+        - match: '[^\s\]]+'
+          scope: invalid.illegal.character-not-allowed-here.smalltalk
+    - match: '#\('
+      comment: Array Constructor
+      captures:
+        0: punctuation.definition.constant.begin.smalltalk
+      push:
+        - meta_scope: constant.other.array.smalltalk
+        - match: \)
+          captures:
+            0: punctuation.definition.constant.end.smalltalk
+          pop: true
+    - match: "'"
+      captures:
+        0: punctuation.definition.string.begin.smalltalk
+      push:
+        - meta_scope: string.quoted.single.smalltalk
+        - match: "'"
+          captures:
+            0: punctuation.definition.string.end.smalltalk
+          pop: true
+    - match: '\b[A-Z]\w*\b'
+      scope: variable.other.constant.smalltalk
+  numeric:
+    - match: '(?<!\w)[0-9]+\.[0-9]+s[0-9]*'
+      scope: constant.numeric.float.scaled.smalltalk
+    - match: '(?<!\w)[0-9]+\.[0-9]+([edq]-?[0-9]+)?'
+      scope: constant.numeric.float.smalltalk
+    - match: '(?<!\w)-?[0-9]+r[a-zA-Z0-9]+'
+      scope: constant.numeric.integer.radix.smalltalk
+    - match: '(?<!\w)-?[0-9]+([edq]-?[0-9]+)?'
+      scope: constant.numeric.integer.smalltalk

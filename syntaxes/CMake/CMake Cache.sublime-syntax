@@ -1,0 +1,41 @@
+%YAML 1.2
+---
+# http://www.sublimetext.com/docs/3/syntax.html
+name: CMake Cache
+file_extensions:
+  - CMakeCache.txt
+scope: source.cache.cmake
+contexts:
+  main:
+    - include: comments
+    - include: assignation
+  assignation:
+    - match: '([a-zA-Z0-9_\-\d]+)(:)(STRING|FILE|FILEPATH|BOOL|INTERNAL|STATIC)(\=)(.*)'
+      scope: variable.other.cmake
+      captures:
+        1: variable.language.cache.cmake
+        2: keyword.other.argument-separator.cmake
+        3: constant.language.cache.cmake
+        4: keyword.operator.cmake
+        5: string.unquoted.cmake
+  comments:
+    - match: '(^[ \t]+)?(?=//|\#)'
+      captures:
+        1: punctuation.whitespace.comment.leading.cmake
+      push:
+        - match: (?!\G)
+          pop: true
+        - match: //
+          captures:
+            0: punctuation.definition.comment.cmake
+          push:
+            - meta_scope: comment.line.double-slash.cmake
+            - match: \n
+              pop: true
+        - match: '\#'
+          captures:
+            0: punctuation.definition.comment.cmake
+          push:
+            - meta_scope: comment.line.sign-line.cmake
+            - match: \n
+              pop: true

@@ -1,0 +1,1652 @@
+%YAML 1.2
+---
+# http://www.sublimetext.com/docs/3/syntax.html
+name: Apex
+file_extensions:
+  - apex
+  - cls
+  - trigger
+scope: source.apex
+contexts:
+  main:
+    - include: javadoc-comment
+    - include: comment
+    - include: directives
+    - include: declarations
+    - include: script-top-level
+  comment:
+    - match: /\*(\*)?
+      captures:
+        0: punctuation.definition.comment.apex
+      push:
+        - meta_scope: comment.block.apex
+        - match: \*/
+          captures:
+            0: punctuation.definition.comment.apex
+          pop: true
+    - match: (^\s+)?(?=//)
+      captures:
+        1: punctuation.whitespace.comment.leading.apex
+      push:
+        - match: (?=$)
+          pop: true
+        - match: (?<!/)///(?!/)
+          captures:
+            0: punctuation.definition.comment.apex
+          push:
+            - meta_scope: comment.block.documentation.apex
+            - match: (?=$)
+              pop: true
+            - include: xml-doc-comment
+        - match: (?<!/)//(?:(?!/)|(?=//))
+          captures:
+            0: punctuation.definition.comment.apex
+          push:
+            - meta_scope: comment.line.double-slash.apex
+            - match: (?=$)
+              pop: true
+  annotation-declaration:
+    - match: '([@][_[:alpha:]]+)\b'
+      captures:
+        1: storage.type.annotation.apex
+      push:
+        - match: (?<=\)|$)
+          pop: true
+        - match: \(
+          captures:
+            0: punctuation.parenthesis.open.apex
+          push:
+            - match: \)
+              captures:
+                0: punctuation.parenthesis.close.apex
+              pop: true
+            - include: expression
+        - include: statement
+  argument-list:
+    - match: \(
+      captures:
+        0: punctuation.parenthesis.open.apex
+      push:
+        - match: \)
+          captures:
+            0: punctuation.parenthesis.close.apex
+          pop: true
+        - include: named-argument
+        - include: expression
+        - include: punctuation-comma
+  array-creation-expression:
+    - match: |-
+        (?x)
+        \b(new)\b\s*
+        (?<type-name>
+          (?:
+            (?:
+              (?:(?<identifier>@?[_[:alpha:]][_[:alnum:]]*)\s*\:\:\s*)? # alias-qualification
+              (?<name-and-type-args> # identifier + type arguments (if any)
+                \g<identifier>\s*
+                (?<type-args>\s*<(?:[^<>]|\g<type-args>)+>\s*)?
+              )
+              (?:\s*\.\s*\g<name-and-type-args>)*
+            )
+            (?:\s*\?\s*)? # nullable suffix?
+            (?:\s*\[(?:\s*,\s*)*\]\s*)* # array suffix?
+          )
+        )?\s*
+        (?=\[)
+      captures:
+        1: keyword.control.new.apex
+      push:
+        - match: '(?<=\])'
+          pop: true
+        - include: bracketed-argument-list
+  block:
+    - match: '\{'
+      captures:
+        0: punctuation.curlybrace.open.apex
+      push:
+        - match: '\}'
+          captures:
+            0: punctuation.curlybrace.close.apex
+          pop: true
+        - include: statement
+  boolean-literal:
+    - match: (?<!\.)\btrue\b
+      scope: constant.language.boolean.true.apex
+    - match: (?<!\.)\bfalse\b
+      scope: constant.language.boolean.false.apex
+  bracketed-argument-list:
+    - match: '\['
+      captures:
+        0: punctuation.squarebracket.open.apex
+      push:
+        - match: '\]'
+          captures:
+            0: punctuation.squarebracket.close.apex
+          pop: true
+        - include: soql-query-expression
+        - include: named-argument
+        - include: expression
+        - include: punctuation-comma
+  break-or-continue-statement:
+    - match: (?<!\.)\b(?:(break)|(continue))\b
+      captures:
+        1: keyword.control.flow.break.apex
+        2: keyword.control.flow.continue.apex
+  cast-expression:
+    - match: |-
+        (?x)
+        (\()\s*
+        (?<type-name>
+          (?:
+            (?:
+              (?:(?<identifier>@?[_[:alpha:]][_[:alnum:]]*)\s*\:\:\s*)? # alias-qualification
+              (?<name-and-type-args> # identifier + type arguments (if any)
+                \g<identifier>\s*
+                (?<type-args>\s*<(?:[^<>]|\g<type-args>)+>\s*)?
+              )
+              (?:\s*\.\s*\g<name-and-type-args>)*
+            )
+            (?:\s*\?\s*)? # nullable suffix?
+            (?:\s*\[(?:\s*,\s*)*\]\s*)* # array suffix?
+          )
+        )\s*
+        (\))(?=\s*@?[_[:alnum:]\(])
+      captures:
+        1: punctuation.parenthesis.open.apex
+        6: punctuation.parenthesis.close.apex
+  catch-clause:
+    - match: (?<!\.)\b(catch)\b
+      captures:
+        1: keyword.control.try.catch.apex
+      push:
+        - match: '(?<=\})'
+          pop: true
+        - match: \(
+          captures:
+            0: punctuation.parenthesis.open.apex
+          push:
+            - match: \)
+              captures:
+                0: punctuation.parenthesis.close.apex
+              pop: true
+            - match: |-
+                (?x)
+                (?<type-name>
+                  (?:
+                    (?:
+                      (?:(?<identifier>@?[_[:alpha:]][_[:alnum:]]*)\s*\:\:\s*)? # alias-qualification
+                      (?<name-and-type-args> # identifier + type arguments (if any)
+                        \g<identifier>\s*
+                        (?<type-args>\s*<(?:[^<>]|\g<type-args>)+>\s*)?
+                      )
+                      (?:\s*\.\s*\g<name-and-type-args>)*
+                    )
+                    (?:\s*\?\s*)? # nullable suffix?
+                    (?:\s*\[(?:\s*,\s*)*\]\s*)* # array suffix?
+                  )
+                )\s*
+                (?:(\g<identifier>)\b)?
+              captures:
+                5: entity.name.variable.local.apex
+        - include: comment
+        - include: block
+  class-declaration:
+    - match: (?=\bclass\b)
+      push:
+        - match: '(?<=\})'
+          pop: true
+        - match: |-
+            (?x)
+            \b(class)\b\s+
+            (@?[_[:alpha:]][_[:alnum:]]*)\s*
+          captures:
+            1: keyword.other.class.apex
+            2: entity.name.type.class.apex
+          push:
+            - match: '(?=\{)'
+              pop: true
+            - include: javadoc-comment
+            - include: comment
+            - include: type-parameter-list
+            - include: extends-class
+            - include: implements-class
+        - match: '\{'
+          captures:
+            0: punctuation.curlybrace.open.apex
+          push:
+            - match: '\}'
+              captures:
+                0: punctuation.curlybrace.close.apex
+              pop: true
+            - include: class-or-trigger-members
+        - include: javadoc-comment
+        - include: comment
+  class-or-trigger-members:
+    - include: javadoc-comment
+    - include: comment
+    - include: storage-modifier
+    - include: sharing-modifier
+    - include: type-declarations
+    - include: field-declaration
+    - include: property-declaration
+    - include: indexer-declaration
+    - include: variable-initializer
+    - include: constructor-declaration
+    - include: method-declaration
+    - include: punctuation-semicolon
+  colon-expression:
+    - match: ":"
+      scope: keyword.operator.conditional.colon.apex
+  conditional-operator:
+    - match: '(?<!\?)\?(?!\?|\.|\[)'
+      captures:
+        0: keyword.operator.conditional.question-mark.apex
+      push:
+        - match: ":"
+          captures:
+            0: keyword.operator.conditional.colon.apex
+          pop: true
+        - include: expression
+  constructor-declaration:
+    - match: '(?=@?[_[:alpha:]][_[:alnum:]]*\s*\()'
+      push:
+        - match: '(?<=\})|(?=;)'
+          pop: true
+        - match: '(@?[_[:alpha:]][_[:alnum:]]*)\b'
+          captures:
+            1: entity.name.function.apex
+        - match: (:)
+          captures:
+            1: punctuation.separator.colon.apex
+          push:
+            - match: '(?=\{|=>)'
+              pop: true
+            - include: constructor-initializer
+        - include: parenthesized-parameter-list
+        - include: comment
+        - include: expression-body
+        - include: block
+  constructor-initializer:
+    - match: \b(?:(this))\b\s*(?=\()
+      captures:
+        1: keyword.other.this.apex
+      push:
+        - match: (?<=\))
+          pop: true
+        - include: argument-list
+  date-literal-with-params:
+    - match: \b((LAST_N_DAYS|NEXT_N_DAYS|NEXT_N_WEEKS|LAST_N_WEEKS|NEXT_N_MONTHS|LAST_N_MONTHS|NEXT_N_QUARTERS|LAST_N_QUARTERS|NEXT_N_YEARS|LAST_N_YEARS|NEXT_N_FISCAL_QUARTERS|LAST_N_FISCAL_QUARTERS|NEXT_N_FISCAL_YEARS|LAST_N_FISCAL_YEARS)\s*\:\d+)\b
+      captures:
+        1: keyword.operator.query.date.apex
+  date-literals:
+    - match: \b(YESTERDAY|TODAY|TOMORROW|LAST_WEEK|THIS_WEEK|NEXT_WEEK|LAST_MONTH|THIS_MONTH|NEXT_MONTH|LAST_90_DAYS|NEXT_90_DAYS|THIS_QUARTER|LAST_QUARTER|NEXT_QUARTER|THIS_YEAR|LAST_YEAR|NEXT_YEAR|THIS_FISCAL_QUARTER|LAST_FISCAL_QUARTER|NEXT_FISCAL_QUARTER|THIS_FISCAL_YEAR|LAST_FISCAL_YEAR|NEXT_FISCAL_YEAR)\b\s*
+      captures:
+        1: keyword.operator.query.date.apex
+  declarations:
+    - include: type-declarations
+    - include: punctuation-semicolon
+  directives:
+    - include: punctuation-semicolon
+  do-statement:
+    - match: (?<!\.)\b(do)\b
+      captures:
+        1: keyword.control.loop.do.apex
+      push:
+        - match: "(?=;|})"
+          pop: true
+        - include: statement
+  element-access-expression:
+    - match: |-
+        (?x)
+        (?:(\??\.)\s*)?                       # safe navigator or accessor
+        (?:(@?[_[:alpha:]][_[:alnum:]]*)\s*)? # property name
+        (?:(\?)\s*)?                          # null-conditional operator?
+        (?=\[)                                # open bracket of argument list
+      captures:
+        2: variable.other.object.property.apex
+        3: keyword.operator.null-conditional.apex
+      push:
+        - match: '(?<=\])(?!\s*\[)'
+          pop: true
+        - include: bracketed-argument-list
+  else-part:
+    - match: (?<!\.)\b(else)\b
+      captures:
+        1: keyword.control.conditional.else.apex
+      push:
+        - match: '(?<=\})|(?=;)'
+          pop: true
+        - include: statement
+  enum-declaration:
+    - match: (?=\benum\b)
+      push:
+        - match: '(?<=\})'
+          pop: true
+        - match: (?=enum)
+          push:
+            - match: '(?=\{)'
+              pop: true
+            - include: javadoc-comment
+            - include: comment
+            - match: '(enum)\s+(@?[_[:alpha:]][_[:alnum:]]*)'
+              captures:
+                1: keyword.other.enum.apex
+                2: entity.name.type.enum.apex
+        - match: '\{'
+          captures:
+            0: punctuation.curlybrace.open.apex
+          push:
+            - match: '\}'
+              captures:
+                0: punctuation.curlybrace.close.apex
+              pop: true
+            - include: javadoc-comment
+            - include: comment
+            - include: punctuation-comma
+            - match: "@?[_[:alpha:]][_[:alnum:]]*"
+              captures:
+                0: entity.name.variable.enum-member.apex
+              push:
+                - match: '(?=(,|\}))'
+                  pop: true
+                - include: javadoc-comment
+                - include: comment
+                - include: variable-initializer
+        - include: javadoc-comment
+        - include: comment
+  expression:
+    - include: comment
+    - include: merge-expression
+    - include: support-expression
+    - include: throw-expression
+    - include: this-expression
+    - include: trigger-context-declaration
+    - include: conditional-operator
+    - include: expression-operators
+    - include: soql-query-expression
+    - include: object-creation-expression
+    - include: array-creation-expression
+    - include: invocation-expression
+    - include: member-access-expression
+    - include: element-access-expression
+    - include: cast-expression
+    - include: literal
+    - include: parenthesized-expression
+    - include: initializer-expression
+    - include: identifier
+  expression-body:
+    - match: "=>"
+      captures:
+        0: keyword.operator.arrow.apex
+      push:
+        - match: '(?=[,\);}])'
+          pop: true
+        - include: expression
+  expression-operators:
+    - match: \*=|/=|%=|\+=|-=
+      scope: keyword.operator.assignment.compound.apex
+    - match: \&=|\^=|<<=|>>=|\|=
+      scope: keyword.operator.assignment.compound.bitwise.apex
+    - match: "<<|>>"
+      scope: keyword.operator.bitwise.shift.apex
+    - match: "==|!="
+      scope: keyword.operator.comparison.apex
+    - match: <=|>=|<|>
+      scope: keyword.operator.relational.apex
+    - match: \!|&&|\|\|
+      scope: keyword.operator.logical.apex
+    - match: \&|~|\^|\|
+      scope: keyword.operator.bitwise.apex
+    - match: \=
+      scope: keyword.operator.assignment.apex
+    - match: "--"
+      scope: keyword.operator.decrement.apex
+    - match: \+\+
+      scope: keyword.operator.increment.apex
+    - match: '%|\*|/|-|\+'
+      scope: keyword.operator.arithmetic.apex
+  extends-class:
+    - match: '(extends)\b\s+([_[:alpha:]][_[:alnum:]]*)'
+      captures:
+        1: keyword.other.extends.apex
+        2: entity.name.type.extends.apex
+      push:
+        - match: "(?={|implements)"
+          pop: true
+  field-declaration:
+    - match: |-
+        (?x)
+        (?<type-name>
+          (?:
+            (?:
+              (?:(?<identifier>@?[_[:alpha:]][_[:alnum:]]*)\s*\:\:\s*)? # alias-qualification
+              (?<name-and-type-args> # identifier + type arguments (if any)
+                \g<identifier>\s*
+                (?<type-args>\s*<(?:[^<>]|\g<type-args>)+>\s*)?
+              )
+              (?:\s*\.\s*\g<name-and-type-args>)*
+            )
+            (?:\s*\?\s*)? # nullable suffix?
+            (?:\s*\[(?:\s*,\s*)*\]\s*)* # array suffix?
+          )
+        )\s+
+        (\g<identifier>)\s* # first field name
+        (?!=>|==)(?=,|;|=|$)
+      captures:
+        5: entity.name.variable.field.apex
+      push:
+        - match: (?=;)
+          pop: true
+        - match: "@?[_[:alpha:]][_[:alnum:]]*"
+          scope: entity.name.variable.field.apex
+        - include: punctuation-comma
+        - include: comment
+        - include: variable-initializer
+        - include: class-or-trigger-members
+  finally-clause:
+    - match: (?<!\.)\b(finally)\b
+      captures:
+        1: keyword.control.try.finally.apex
+      push:
+        - match: '(?<=\})'
+          pop: true
+        - include: comment
+        - include: block
+  for-apex-syntax:
+    - match: '([_.[:alpha:]][_.[:alnum:]]+)\s+([_.[:alpha:]][_.[:alnum:]]*)\s*(\:)'
+      captures:
+        2: entity.name.variable.local.apex
+        3: keyword.operator.iterator.colon.apex
+  for-statement:
+    - match: (?<!\.)\b(for)\b\s*(?=\()
+      captures:
+        1: keyword.control.loop.for.apex
+      push:
+        - match: '(?<=\})|(?=;)'
+          pop: true
+        - match: \(
+          captures:
+            0: punctuation.parenthesis.open.apex
+          push:
+            - match: \)
+              captures:
+                0: punctuation.parenthesis.close.apex
+              pop: true
+            - include: for-apex-syntax
+            - include: local-variable-declaration
+            - include: expression
+            - include: punctuation-comma
+            - include: punctuation-semicolon
+            - include: colon-expression
+        - include: statement
+  from-clause:
+    - match: '(FROM)\b\s*([_\.[:alnum:]]+\b)?'
+      captures:
+        1: keyword.operator.query.from.apex
+        2: storage.type.apex
+  goto-statement:
+    - match: (?<!\.)\b(goto)\b
+      captures:
+        1: keyword.control.goto.apex
+      push:
+        - match: (?=;)
+          pop: true
+        - match: \b(case)\b
+          captures:
+            1: keyword.control.case.apex
+          push:
+            - match: (?=;)
+              pop: true
+            - include: expression
+        - match: \b(default)\b
+          captures:
+            1: keyword.control.default.apex
+        - match: "@?[_[:alpha:]][_[:alnum:]]*"
+          scope: entity.name.label.apex
+  identifier:
+    - match: "@?[_[:alpha:]][_[:alnum:]]*"
+      scope: variable.other.readwrite.apex
+  if-statement:
+    - match: (?<!\.)\b(if)\b\s*(?=\()
+      captures:
+        1: keyword.control.conditional.if.apex
+      push:
+        - match: '(?<=\})|(?=;)'
+          pop: true
+        - match: \(
+          captures:
+            0: punctuation.parenthesis.open.apex
+          push:
+            - match: \)
+              captures:
+                0: punctuation.parenthesis.close.apex
+              pop: true
+            - include: expression
+        - include: statement
+  implements-class:
+    - match: '(implements)\b\s+([_[:alpha:]][_[:alnum:]]*)'
+      captures:
+        1: keyword.other.implements.apex
+        2: entity.name.type.implements.apex
+      push:
+        - match: "(?={|extends)"
+          pop: true
+  indexer-declaration:
+    - match: |-
+        (?x)
+        (?<return-type>
+          (?<type-name>
+            (?:
+              (?:ref\s+)?   # ref return
+              (?:
+                (?:(?<identifier>@?[_[:alpha:]][_[:alnum:]]*)\s*\:\:\s*)? # alias-qualification
+                (?<name-and-type-args> # identifier + type arguments (if any)
+                  \g<identifier>\s*
+                  (?<type-args>\s*<(?:[^<>]|\g<type-args>)+>\s*)?
+                )
+                (?:\s*\.\s*\g<name-and-type-args>)*
+              )
+              (?:\s*\?\s*)? # nullable suffix?
+              (?:\s*\[(?:\s*,\s*)*\]\s*)* # array suffix?
+            )
+          )\s+
+        )
+        (?<interface-name>\g<type-name>\s*\.\s*)?
+        (?<indexer-name>this)\s*
+        (?=\[)
+      captures:
+        7: keyword.other.this.apex
+      push:
+        - match: '(?<=\})|(?=;)'
+          pop: true
+        - include: comment
+        - include: property-accessors
+        - include: expression-body
+        - include: variable-initializer
+  initializer-expression:
+    - match: '\{'
+      captures:
+        0: punctuation.curlybrace.open.apex
+      push:
+        - match: '\}'
+          captures:
+            0: punctuation.curlybrace.close.apex
+          pop: true
+        - include: expression
+        - include: punctuation-comma
+  interface-declaration:
+    - match: (?=\binterface\b)
+      push:
+        - match: '(?<=\})'
+          pop: true
+        - match: |-
+            (?x)
+            (interface)\b\s+
+            (@?[_[:alpha:]][_[:alnum:]]*)
+          captures:
+            1: keyword.other.interface.apex
+            2: entity.name.type.interface.apex
+          push:
+            - match: '(?=\{)'
+              pop: true
+            - include: javadoc-comment
+            - include: comment
+            - include: type-parameter-list
+            - include: extends-class
+        - match: '\{'
+          captures:
+            0: punctuation.curlybrace.open.apex
+          push:
+            - match: '\}'
+              captures:
+                0: punctuation.curlybrace.close.apex
+              pop: true
+            - include: interface-members
+        - include: javadoc-comment
+        - include: comment
+  interface-members:
+    - include: javadoc-comment
+    - include: comment
+    - include: property-declaration
+    - include: indexer-declaration
+    - include: method-declaration
+    - include: punctuation-semicolon
+  invocation-expression:
+    - match: |-
+        (?x)
+        (?:(\??\.)\s*)?                                  # safe navigator or accessor
+        (@?[_[:alpha:]][_[:alnum:]]*)\s*                 # method name
+        (?<type-args>\s*<([^<>]|\g<type-args>)+>\s*)?\s* # type arguments
+        (?=\()                                           # open paren of argument list
+      captures:
+        2: entity.name.function.apex
+      push:
+        - match: (?<=\))
+          pop: true
+        - include: argument-list
+  javadoc-comment:
+    - match: ^\s*(/\*\*)(?!/)
+      captures:
+        1: punctuation.definition.comment.apex
+      push:
+        - meta_scope: comment.block.javadoc.apex
+        - match: \*/
+          captures:
+            0: punctuation.definition.comment.apex
+          pop: true
+        - match: '@(deprecated|author|return|see|serial|since|version|usage|name|link)\b'
+          scope: keyword.other.documentation.javadoc.apex
+        - match: (@param)\s+(\S+)
+          captures:
+            1: keyword.other.documentation.javadoc.apex
+            2: entity.name.variable.parameter.apex
+        - match: (@(?:exception|throws))\s+(\S+)
+          captures:
+            1: keyword.other.documentation.javadoc.apex
+            2: entity.name.type.class.apex
+        - match: "(`([^`]+?)`)"
+          captures:
+            1: string.quoted.single.apex
+  literal:
+    - include: boolean-literal
+    - include: null-literal
+    - include: numeric-literal
+    - include: string-literal
+  local-constant-declaration:
+    - match: |-
+        (?x)
+        (?<const-keyword>\b(?:const)\b)\s*
+        (?<type-name>
+          (?:
+            (?:
+              (?:(?<identifier>@?[_[:alpha:]][_[:alnum:]]*)\s*\:\:\s*)? # alias-qualification
+              (?<name-and-type-args> # identifier + type arguments (if any)
+                \g<identifier>\s*
+                (?<type-args>\s*<(?:[^<>]|\g<type-args>)+>\s*)?
+              )
+              (?:\s*\.\s*\g<name-and-type-args>)*
+            )
+            (?:\s*\?\s*)? # nullable suffix?
+            (?:\s*\[(?:\s*,\s*)*\]\s*)* # array suffix?
+          )
+        )\s+
+        (\g<identifier>)\s*
+        (?=,|;|=)
+      captures:
+        1: storage.modifier.apex
+        6: entity.name.variable.local.apex
+      push:
+        - match: (?=;)
+          pop: true
+        - match: "@?[_[:alpha:]][_[:alnum:]]*"
+          scope: entity.name.variable.local.apex
+        - include: punctuation-comma
+        - include: comment
+        - include: variable-initializer
+  local-declaration:
+    - include: local-constant-declaration
+    - include: local-variable-declaration
+  local-variable-declaration:
+    - match: |-
+        (?x)
+        (?:
+          (?:(\bref)\s+)?(\bvar\b)| # ref local
+          (?<type-name>
+            (?:
+              (?:ref\s+)?   # ref local
+              (?:
+                (?:(?<identifier>@?[_[:alpha:]][_[:alnum:]]*)\s*\:\:\s*)? # alias-qualification
+                (?<name-and-type-args> # identifier + type arguments (if any)
+                  \g<identifier>\s*
+                  (?<type-args>\s*<(?:[^<>]|\g<type-args>)+>\s*)?
+                )
+                (?:\s*\.\s*\g<name-and-type-args>)*
+              )
+              (?:\s*\?\s*)? # nullable suffix?
+              (?:\s*\[(?:\s*,\s*)*\]\s*)* # array suffix?
+            )
+          )
+        )\s+
+        (\g<identifier>)\s*
+        (?=,|;|=|\))
+      captures:
+        1: storage.modifier.apex
+        2: keyword.other.var.apex
+        7: entity.name.variable.local.apex
+      push:
+        - match: (?=;|\))
+          pop: true
+        - match: "@?[_[:alpha:]][_[:alnum:]]*"
+          scope: entity.name.variable.local.apex
+        - include: punctuation-comma
+        - include: comment
+        - include: variable-initializer
+  member-access-expression:
+    - match: |-
+        (?x)
+        (\??\.)\s*                       # safe navigator or accessor
+        (@?[_[:alpha:]][_[:alnum:]]*)\s* # property name
+        (?![_[:alnum:]]|\(|(\?)?\[|<)    # next character is not alpha-numeric, nor a (, [, or <. Also, test for ?[
+      captures:
+        2: variable.other.object.property.apex
+    - match: |-
+        (?x)
+        (\??\.)?\s*
+        (@?[_[:alpha:]][_[:alnum:]]*)
+        (?<type-params>\s*<([^<>]|\g<type-params>)+>\s*)
+        (?=
+          (\s*\?)?
+          \s*\.\s*@?[_[:alpha:]][_[:alnum:]]*
+        )
+      captures:
+        2: variable.other.object.apex
+    - match: |-
+        (?x)
+        (@?[_[:alpha:]][_[:alnum:]]*)
+        (?=
+          (\s*\?)?
+          \s*\.\s*@?[_[:alpha:]][_[:alnum:]]*
+        )
+      captures:
+        1: variable.other.object.apex
+  merge-expression:
+    - match: (merge)\b\s+
+      captures:
+        1: support.function.apex
+      push:
+        - match: (?<=\;)
+          pop: true
+        - include: object-creation-expression
+        - include: merge-type-statement
+        - include: expression
+        - include: punctuation-semicolon
+  merge-type-statement:
+    - match: '([_[:alpha:]]*)\b\s+([_[:alpha:]]*)\b\s*(\;)'
+      captures:
+        1: variable.other.readwrite.apex
+        2: variable.other.readwrite.apex
+        3: punctuation.terminator.statement.apex
+  method-declaration:
+    - match: |-
+        (?x)
+        (?<return-type>
+          (?<type-name>
+            (?:
+              (?:ref\s+)?   # ref return
+              (?:
+                (?:(?<identifier>@?[_[:alpha:]][_[:alnum:]]*)\s*\:\:\s*)? # alias-qualification
+                (?<name-and-type-args> # identifier + type arguments (if any)
+                  \g<identifier>\s*
+                  (?<type-args>\s*<(?:[^<>]|\g<type-args>)+>\s*)?
+                )
+                (?:\s*\.\s*\g<name-and-type-args>)*
+              )
+              (?:\s*\?\s*)? # nullable suffix?
+              (?:\s*\[(?:\s*,\s*)*\]\s*)* # array suffix?
+            )
+          )\s+
+        )
+        (?<interface-name>\g<type-name>\s*\.\s*)?
+        (\g<identifier>)\s*
+        (<([^<>]+)>)?\s*
+        (?=\()
+      push:
+        - match: '(?<=\})|(?=;)'
+          pop: true
+        - include: comment
+        - include: parenthesized-parameter-list
+        - include: expression-body
+        - include: block
+  method-name-custom:
+    - match: "@?[_[:alpha:]][_[:alnum:]]*"
+      scope: entity.name.function.apex
+  named-argument:
+    - match: '(@?[_[:alpha:]][_[:alnum:]]*)\s*(:)'
+      captures:
+        1: entity.name.variable.parameter.apex
+        2: punctuation.separator.colon.apex
+      push:
+        - match: '(?=(,|\)|\]))'
+          pop: true
+        - include: expression
+  null-literal:
+    - match: (?<!\.)\bnull\b
+      scope: constant.language.null.apex
+  numeric-literal:
+    - match: '\b(\d{4}\-\d{2}\-\d{2}T\d{2}\:\d{2}\:\d{2}(\.\d{1,3})?(\-|\+)\d{2}\:\d{2})\b'
+      scope: constant.numeric.datetime.apex
+    - match: '\b(\d{4}\-\d{2}\-\d{2}T\d{2}\:\d{2}\:\d{2}(\.\d{1,3})?(Z)?)\b'
+      scope: constant.numeric.datetime.apex
+    - match: '\b(\d{4}\-\d{2}\-\d{2})\b'
+      scope: constant.numeric.date.apex
+    - match: '\b0(x|X)[0-9a-fA-F_]+(U|u|L|l|UL|Ul|uL|ul|LU|Lu|lU|lu)?\b'
+      scope: constant.numeric.hex.apex
+    - match: '\b0(b|B)[01_]+(U|u|L|l|UL|Ul|uL|ul|LU|Lu|lU|lu)?\b'
+      scope: constant.numeric.binary.apex
+    - match: '\b([0-9_]+)?\.[0-9_]+((e|E)[0-9]+)?(F|f|D|d|M|m)?\b'
+      scope: constant.numeric.decimal.apex
+    - match: '\b[0-9_]+(e|E)[0-9_]+(F|f|D|d|M|m)?\b'
+      scope: constant.numeric.decimal.apex
+    - match: '\b[0-9_]+(F|f|D|d|M|m)\b'
+      scope: constant.numeric.decimal.apex
+    - match: '\b[0-9_]+(U|u|L|l|UL|Ul|uL|ul|LU|Lu|lU|lu)?\b'
+      scope: constant.numeric.decimal.apex
+  object-creation-expression:
+    - include: object-creation-expression-with-parameters
+    - include: object-creation-expression-with-no-parameters
+    - include: punctuation-comma
+  object-creation-expression-with-no-parameters:
+    - match: |-
+        (?x)
+        (delete|insert|undelete|update|upsert)?
+        \s*(new)\s+
+        (?<type-name>
+          (?:
+            (?:
+              (?:(?<identifier>@?[_[:alpha:]][_[:alnum:]]*)\s*\:\:\s*)? # alias-qualification
+              (?<name-and-type-args> # identifier + type arguments (if any)
+                \g<identifier>\s*
+                (?<type-args>\s*<(?:[^<>]|\g<type-args>)+>\s*)?
+              )
+              (?:\s*\.\s*\g<name-and-type-args>)*
+            )
+            (?:\s*\?\s*)? # nullable suffix?
+            (?:\s*\[(?:\s*,\s*)*\]\s*)* # array suffix?
+          )
+        )\s*
+        (?=\{|$)
+      captures:
+        1: support.function.apex
+        2: keyword.control.new.apex
+  object-creation-expression-with-parameters:
+    - match: |-
+        (?x)
+        (delete|insert|undelete|update|upsert)?
+        \s*(new)\s+
+        (?<type-name>
+          (?:
+            (?:
+              (?:(?<identifier>@?[_[:alpha:]][_[:alnum:]]*)\s*\:\:\s*)? # alias-qualification
+              (?<name-and-type-args> # identifier + type arguments (if any)
+                \g<identifier>\s*
+                (?<type-args>\s*<(?:[^<>]|\g<type-args>)+>\s*)?
+              )
+              (?:\s*\.\s*\g<name-and-type-args>)*
+            )
+            (?:\s*\?\s*)? # nullable suffix?
+            (?:\s*\[(?:\s*,\s*)*\]\s*)* # array suffix?
+          )
+        )\s*
+        (?=\()
+      captures:
+        1: support.function.apex
+        2: keyword.control.new.apex
+      push:
+        - match: (?<=\))
+          pop: true
+        - include: argument-list
+  operator-assignment:
+    - match: (?<!=|!)(=)(?!=)
+      scope: keyword.operator.assignment.apex
+  operator-safe-navigation:
+    - match: \?\.
+      scope: keyword.operator.safe-navigation.apex
+  orderby-clause:
+    - match: \b(ORDER BY)\b\s*
+      captures:
+        1: keyword.operator.query.orderby.apex
+  ordering-direction:
+    - match: \b(?:(ASC)|(DESC))\b
+      captures:
+        1: keyword.operator.query.ascending.apex
+        2: keyword.operator.query.descending.apex
+  ordering-nulls:
+    - match: \b(?:(NULLS FIRST)|(NULLS LAST))\b
+      captures:
+        1: keyword.operator.query.nullsfirst.apex
+        2: keyword.operator.query.nullslast.apex
+  parameter:
+    - match: |-
+        (?x)
+        (?:(?:\b(this)\b)\s+)?
+        (?<type-name>
+          (?:
+            (?:ref\s+)?   # ref return
+            (?:
+              (?:(?<identifier>@?[_[:alpha:]][_[:alnum:]]*)\s*\:\:\s*)? # alias-qualification
+              (?<name-and-type-args> # identifier + type arguments (if any)
+                \g<identifier>\s*
+                (?<type-args>\s*<(?:[^<>]|\g<type-args>)+>\s*)?
+              )
+              (?:\s*\.\s*\g<name-and-type-args>)*
+            )
+            (?:\s*\?\s*)? # nullable suffix?
+            (?:\s*\[(?:\s*,\s*)*\]\s*)* # array suffix?
+          )
+        )\s+
+        (\g<identifier>)
+      captures:
+        1: storage.modifier.apex
+        6: entity.name.variable.parameter.apex
+  parenthesized-expression:
+    - match: \(
+      captures:
+        0: punctuation.parenthesis.open.apex
+      push:
+        - match: \)
+          captures:
+            0: punctuation.parenthesis.close.apex
+          pop: true
+        - include: expression
+  parenthesized-parameter-list:
+    - match: (\()
+      captures:
+        0: punctuation.parenthesis.open.apex
+      push:
+        - match: (\))
+          captures:
+            0: punctuation.parenthesis.close.apex
+          pop: true
+        - include: comment
+        - include: parameter
+        - include: punctuation-comma
+        - include: variable-initializer
+  property-accessors:
+    - match: '\{'
+      captures:
+        0: punctuation.curlybrace.open.apex
+      push:
+        - match: '\}'
+          captures:
+            0: punctuation.curlybrace.close.apex
+          pop: true
+        - match: \b(private|protected)\b
+          scope: storage.modifier.apex
+        - match: \b(get)\b
+          scope: keyword.other.get.apex
+        - match: \b(set)\b
+          scope: keyword.other.set.apex
+        - include: comment
+        - include: expression-body
+        - include: block
+        - include: punctuation-semicolon
+  property-declaration:
+    - match: |-
+        (?x)
+        (?!.*\b(?:class|interface|enum)\b)\s*
+        (?<return-type>
+          (?<type-name>
+            (?:
+              (?:ref\s+)?   # ref return
+              (?:
+                (?:(?<identifier>@?[_[:alpha:]][_[:alnum:]]*)\s*\:\:\s*)? # alias-qualification
+                (?<name-and-type-args> # identifier + type arguments (if any)
+                  \g<identifier>\s*
+                  (?<type-args>\s*<(?:[^<>]|\g<type-args>)+>\s*)?
+                )
+                (?:\s*\.\s*\g<name-and-type-args>)*
+              )
+              (?:\s*\?\s*)? # nullable suffix?
+              (?:\s*\[(?:\s*,\s*)*\]\s*)* # array suffix?
+            )
+          )\s+
+        )
+        (?<interface-name>\g<type-name>\s*\.\s*)?
+        (?<property-name>\g<identifier>)\s*
+        (?=\{|=>|$)
+      captures:
+        7: entity.name.variable.property.apex
+      push:
+        - match: '(?<=\})|(?=;)'
+          pop: true
+        - include: comment
+        - include: property-accessors
+        - include: expression-body
+        - include: variable-initializer
+        - include: class-or-trigger-members
+  punctuation-accessor:
+    - match: \.
+      scope: punctuation.accessor.apex
+  punctuation-comma:
+    - match: ","
+      scope: punctuation.separator.comma.apex
+  punctuation-semicolon:
+    - match: ;
+      scope: punctuation.terminator.statement.apex
+  query-operators:
+    - match: \b(ABOVE|AND|AT|FOR REFERENCE|FOR UPDATE|FOR VIEW|GROUP BY|HAVING|IN|LIKE|LIMIT|NOT IN|NOT|OFFSET|OR|TYPEOF|UPDATE TRACKING|UPDATE VIEWSTAT|WITH DATA CATEGORY|WITH)\b\s*
+      captures:
+        1: keyword.operator.query.apex
+  return-statement:
+    - match: (?<!\.)\b(return)\b
+      captures:
+        1: keyword.control.flow.return.apex
+      push:
+        - match: (?=;)
+          pop: true
+        - include: expression
+  script-top-level:
+    - include: method-declaration
+    - include: statement
+    - include: punctuation-semicolon
+  sharing-modifier:
+    - match: (?<!\.)\b(with sharing|without sharing|inherited sharing)\b
+      scope: sharing.modifier.apex
+  soql-colon-method-statement:
+    - match: '(:?\.)?([_[:alpha:]][_[:alnum:]]*)(?=\()'
+      captures:
+        1: punctuation.accessor.apex
+        2: entity.name.function.apex
+      push:
+        - match: (?<=\))
+          pop: true
+        - match: \(
+          captures:
+            0: punctuation.parenthesis.open.apex
+          push:
+            - match: \)
+              captures:
+                0: punctuation.parenthesis.close.apex
+              pop: true
+            - include: expression
+        - include: statement
+  soql-colon-vars:
+    - match: (\:)\s*
+      captures:
+        0: keyword.operator.conditional.colon.apex
+      push:
+        - match: '(?![_[:alnum:]]|\(|(\?)?\[|<)'
+          pop: true
+        - include: trigger-context-declaration
+        - match: '([_[:alpha:]][_[:alnum:]]*)(\??\.)'
+          captures:
+            1: variable.other.object.apex
+        - include: soql-colon-method-statement
+        - match: "[_[:alpha:]][_[:alnum:]]*"
+          scope: entity.name.variable.local.apex
+  soql-functions:
+    - match: \b(AVG|CALENDAR_MONTH|CALENDAR_QUARTER|CALENDAR_YEAR|convertCurrency|convertTimezone|COUNT|COUNT_DISTINCT|DAY_IN_MONTH|DAY_IN_WEEK|DAY_IN_YEAR|DAY_ONLY|toLabel|INCLUDES|EXCLUDES|FISCAL_MONTH|FISCAL_QUARTER|FISCAL_YEAR|FORMAT|GROUPING|GROUP BY CUBE|GROUP BY ROLLUP|HOUR_IN_DAY|MAX|MIN|SUM|WEEK_IN_MONTH|WEEK_IN_YEAR)\s*(\()
+      captures:
+        1: support.function.query.apex
+        2: punctuation.parenthesis.open.apex
+      push:
+        - match: \)
+          captures:
+            0: punctuation.parenthesis.close.apex
+          pop: true
+        - include: literal
+        - include: punctuation-comma
+        - include: soql-functions
+        - match: "[_.[:alpha:]][_.[:alnum:]]*"
+          scope: keyword.query.field.apex
+  soql-group-clauses:
+    - match: \(
+      captures:
+        0: punctuation.parenthesis.open.apex
+      push:
+        - match: \)
+          captures:
+            0: punctuation.parenthesis.close.apex
+          pop: true
+        - include: soql-query-expression
+        - include: soql-colon-vars
+        - include: soql-group-clauses
+        - include: punctuation-comma
+        - include: operator-assignment
+        - include: literal
+        - include: query-operators
+        - include: date-literals
+        - include: date-literal-with-params
+        - include: using-scope
+        - match: "[_.[:alpha:]][_.[:alnum:]]*"
+          scope: keyword.query.field.apex
+  soql-query-body:
+    - include: trigger-context-declaration
+    - include: soql-colon-vars
+    - include: soql-functions
+    - include: from-clause
+    - include: where-clause
+    - include: query-operators
+    - include: date-literals
+    - include: date-literal-with-params
+    - include: using-scope
+    - include: soql-group-clauses
+    - include: orderby-clause
+    - include: ordering-direction
+    - include: ordering-nulls
+  soql-query-expression:
+    - match: \b(SELECT)\b\s*
+      captures:
+        1: keyword.operator.query.select.apex
+      push:
+        - match: '(?=;)|(?=\])|(?=\))'
+          pop: true
+        - include: soql-query-body
+        - include: comment
+        - include: punctuation-comma
+        - include: operator-assignment
+        - include: parenthesized-expression
+        - include: expression-operators
+        - include: literal
+        - match: '([_.[:alpha:]][_.[:alnum:]]*)\s*(\,)?'
+          captures:
+            1: keyword.query.field.apex
+            2: punctuation.separator.comma.apex
+  statement:
+    - include: comment
+    - include: while-statement
+    - include: do-statement
+    - include: for-statement
+    - include: switch-statement
+    - include: when-else-statement
+    - include: when-sobject-statement
+    - include: when-statement
+    - include: when-multiple-statement
+    - include: if-statement
+    - include: else-part
+    - include: goto-statement
+    - include: return-statement
+    - include: break-or-continue-statement
+    - include: throw-statement
+    - include: try-statement
+    - include: soql-query-expression
+    - include: local-declaration
+    - include: block
+    - include: expression
+    - include: punctuation-semicolon
+  storage-modifier:
+    - match: (?<!\.)\b(new|public|protected|private|abstract|virtual|override|global|static|final|transient)\b
+      scope: storage.modifier.apex
+  string-character-escape:
+    - match: \\.
+      scope: constant.character.escape.apex
+  string-literal:
+    - match: "'"
+      captures:
+        0: punctuation.definition.string.begin.apex
+      push:
+        - meta_scope: string.quoted.single.apex
+        - match: '(\'')|((?:[^\\\n])$)'
+          captures:
+            1: punctuation.definition.string.end.apex
+            2: invalid.illegal.newline.apex
+          pop: true
+        - include: string-character-escape
+  support-arguments:
+    - match: <
+      captures:
+        0: punctuation.definition.typeparameters.begin.apex
+      push:
+        - match: ">"
+          captures:
+            0: punctuation.definition.typeparameters.end.apex
+          pop: true
+        - include: comment
+        - include: support-type
+        - include: punctuation-comma
+  support-class:
+    - match: \b(ApexPages|Database|DMLException|Exception|PageReference|Savepoint|SchedulableContext|Schema|SObject|System|Test)\b
+      captures:
+        1: support.class.apex
+  support-expression:
+    - match: |-
+        (?x)
+        (ApexPages|Database|DMLException|Exception|PageReference|Savepoint|SchedulableContext|Schema|SObject|System|Test)(?=\.|\s) # supported apex namespaces
+      captures:
+        1: support.class.apex
+      push:
+        - match: '(?<=\)|$)|(?=\})|(?=;)|(?=\)|(?=\]))|(?=\,)'
+          pop: true
+        - include: support-type
+        - match: '(?:(\.))([[:alpha:]]*)(?=\()'
+          captures:
+            1: punctuation.accessor.apex
+            2: support.function.apex
+        - match: '(?:(\.))([[:alpha:]]+)'
+          captures:
+            1: punctuation.accessor.apex
+            2: support.type.apex
+        - match: \(
+          captures:
+            0: punctuation.parenthesis.open.apex
+          push:
+            - match: \)
+              captures:
+                0: punctuation.parenthesis.close.apex
+              pop: true
+            - include: expression
+            - include: punctuation-comma
+        - include: comment
+        - include: statement
+  support-functions:
+    - match: \b(delete|execute|finish|insert|start|undelete|update|upsert)\b
+      captures:
+        1: support.function.apex
+  support-name:
+    - match: '(\.)\s*([[:alpha:]]*)(?=\()'
+      captures:
+        1: punctuation.accessor.apex
+        2: support.function.apex
+    - match: \(
+      captures:
+        0: punctuation.parenthesis.open.apex
+      push:
+        - match: \)
+          captures:
+            0: punctuation.parenthesis.close.apex
+          pop: true
+        - include: expression
+        - include: punctuation-comma
+    - match: '(\.)\s*([_[:alpha:]]*)'
+      captures:
+        1: punctuation.accessor.apex
+        2: support.type.apex
+  support-type:
+    - include: comment
+    - include: support-class
+    - include: support-functions
+    - include: support-name
+  switch-statement:
+    - match: |-
+        (?x)
+        (switch)\b\s+
+        (on)\b\s+
+        (?:([_.?\'\(\)[:alnum:]]+)\s*)?
+        (\{)
+      captures:
+        1: keyword.control.switch.apex
+        2: keyword.control.switch.on.apex
+        4: punctuation.curlybrace.open.apex
+      push:
+        - match: '(\})'
+          captures:
+            0: punctuation.curlybrace.close.apex
+          pop: true
+        - include: when-string
+        - include: when-else-statement
+        - include: when-sobject-statement
+        - include: when-statement
+        - include: when-multiple-statement
+        - include: expression
+        - include: punctuation-comma
+        - include: punctuation-semicolon
+  this-expression:
+    - match: \b(?:(this))\b
+      captures:
+        1: keyword.other.this.apex
+  throw-expression:
+    - match: (?<!\.)\b(throw)\b
+      captures:
+        1: keyword.control.flow.throw.apex
+  throw-statement:
+    - match: (?<!\.)\b(throw)\b
+      captures:
+        1: keyword.control.flow.throw.apex
+      push:
+        - match: (?=;)
+          pop: true
+        - include: expression
+  trigger-context-declaration:
+    - match: \b(?:(Trigger))\b(\.)\b
+      captures:
+        1: support.class.trigger.apex
+        2: punctuation.accessor.apex
+      push:
+        - match: '(?=\})|(?=;)|(?=\)|(?=\]))'
+          pop: true
+        - match: \b(isExecuting|isInsert|isUpdate|isDelete|isBefore|isAfter|isUndelete|new|newMap|old|oldMap|size)\b
+          scope: support.type.trigger.apex
+        - match: '(?:(\??\.))([[:alpha:]]+)(?=\()'
+          captures:
+            2: support.function.trigger.apex
+        - match: \(
+          captures:
+            0: punctuation.parenthesis.open.apex
+          push:
+            - match: \)
+              captures:
+                0: punctuation.parenthesis.close.apex
+              pop: true
+            - include: trigger-type-statement
+            - include: javadoc-comment
+            - include: comment
+            - include: expression
+        - include: expression
+  trigger-declaration:
+    - match: (?=\btrigger\b)
+      push:
+        - match: '(?<=\})'
+          pop: true
+        - match: |-
+            (?x)
+            \b(trigger)\b\s+
+            (@?[_[:alpha:]][_[:alnum:]]*)\s*
+            \b(on)\b\s+
+            ([_[:alpha:]][_[:alnum:]]*)\s*
+          captures:
+            1: keyword.other.trigger.apex
+            2: entity.name.type.trigger.apex
+            3: keyword.operator.trigger.on.apex
+            4: storage.type.apex
+          push:
+            - match: '(?=\{)'
+              pop: true
+            - match: \(
+              captures:
+                0: punctuation.parenthesis.open.apex
+              push:
+                - match: \)
+                  captures:
+                    0: punctuation.parenthesis.close.apex
+                  pop: true
+                - include: trigger-type-statement
+                - include: trigger-operator-statement
+                - include: punctuation-comma
+                - include: expression
+            - include: javadoc-comment
+            - include: comment
+            - include: type-parameter-list
+        - match: '\{'
+          captures:
+            0: punctuation.curlybrace.open.apex
+          push:
+            - match: '\}'
+              captures:
+                0: punctuation.curlybrace.close.apex
+              pop: true
+            - include: statement
+            - include: class-or-trigger-members
+        - include: javadoc-comment
+        - include: comment
+  trigger-operator-statement:
+    - match: \b(insert|update|delete|merge|upsert|undelete)\b
+      scope: keyword.operator.trigger.apex
+  trigger-type-statement:
+    - match: \b(?:(before)|(after))\b
+      captures:
+        1: keyword.control.trigger.before.apex
+        2: keyword.control.trigger.after.apex
+  try-block:
+    - match: (?<!\.)\b(try)\b
+      captures:
+        1: keyword.control.try.apex
+      push:
+        - match: '(?<=\})'
+          pop: true
+        - include: comment
+        - include: block
+  try-statement:
+    - include: try-block
+    - include: catch-clause
+    - include: finally-clause
+  type:
+    - include: comment
+    - include: type-builtin
+    - include: type-name
+    - include: type-arguments
+    - include: type-array-suffix
+    - include: type-nullable-suffix
+  type-arguments:
+    - match: <
+      captures:
+        0: punctuation.definition.typeparameters.begin.apex
+      push:
+        - match: ">"
+          captures:
+            0: punctuation.definition.typeparameters.end.apex
+          pop: true
+        - include: comment
+        - include: support-type
+        - include: type
+        - include: punctuation-comma
+  type-array-suffix:
+    - match: '\['
+      captures:
+        0: punctuation.squarebracket.open.apex
+      push:
+        - match: '\]'
+          captures:
+            0: punctuation.squarebracket.close.apex
+          pop: true
+        - include: punctuation-comma
+  type-builtin:
+    - match: \b(Blob|Boolean|byte|Date|Datetime|Decimal|Double|ID|Integer|Long|Object|String|Time|void)\b
+      captures:
+        1: keyword.type.apex
+  type-declarations:
+    - include: javadoc-comment
+    - include: comment
+    - include: annotation-declaration
+    - include: storage-modifier
+    - include: sharing-modifier
+    - include: class-declaration
+    - include: enum-declaration
+    - include: interface-declaration
+    - include: trigger-declaration
+    - include: punctuation-semicolon
+  type-name:
+    - match: '(@?[_[:alpha:]][_[:alnum:]]*)\s*(\.)'
+      captures:
+        1: storage.type.apex
+        2: punctuation.accessor.apex
+    - match: '(\.)\s*(@?[_[:alpha:]][_[:alnum:]]*)'
+      captures:
+        1: punctuation.accessor.apex
+        2: storage.type.apex
+    - match: "@?[_[:alpha:]][_[:alnum:]]*"
+      scope: storage.type.apex
+  type-nullable-suffix:
+    - match: \?
+      captures:
+        0: punctuation.separator.question-mark.apex
+  type-parameter-list:
+    - match: \<
+      captures:
+        0: punctuation.definition.typeparameters.begin.apex
+      push:
+        - match: \>
+          captures:
+            0: punctuation.definition.typeparameters.end.apex
+          pop: true
+        - match: '(@?[_[:alpha:]][_[:alnum:]]*)\b'
+          captures:
+            1: entity.name.type.type-parameter.apex
+        - include: comment
+        - include: punctuation-comma
+  using-scope:
+    - match: ((USING SCOPE)\b\s*(Delegated|Everything|Mine|My_Territory|My_Team_Territory|Team))\b\s*
+      captures:
+        1: keyword.operator.query.using.apex
+  variable-initializer:
+    - match: (?<!=|!)(=)(?!=|>)
+      captures:
+        1: keyword.operator.assignment.apex
+      push:
+        - match: '(?=[,\)\];}])'
+          pop: true
+        - include: expression
+  when-else-statement:
+    - match: (when)\b\s+(else)\b\s*
+      captures:
+        1: keyword.control.switch.when.apex
+        2: keyword.control.switch.else.apex
+      push:
+        - match: '(?<=\})'
+          pop: true
+        - include: block
+        - include: expression
+  when-multiple-statement:
+    - match: (when)\b\s*
+      captures:
+        1: keyword.control.switch.when.apex
+      push:
+        - match: '(?<=\})'
+          pop: true
+        - include: block
+        - include: expression
+  when-sobject-statement:
+    - match: '(when)\b\s+([_[:alnum:]]+)\s+([_[:alnum:]]+)\s*'
+      captures:
+        1: keyword.control.switch.when.apex
+        2: storage.type.apex
+        3: entity.name.variable.local.apex
+      push:
+        - match: '(?<=\})'
+          pop: true
+        - include: block
+        - include: expression
+  when-statement:
+    - match: '(when)\b\s+([\''_\-[:alnum:]]+)\s*'
+      captures:
+        1: keyword.control.switch.when.apex
+      push:
+        - match: '(?<=\})'
+          pop: true
+        - include: block
+        - include: expression
+  when-string:
+    - match: '(when)(\b\s*)((\'')[_.\,\''\s*[:alnum:]]+)'
+      captures:
+        1: keyword.control.switch.when.apex
+        2: punctuation.whitespace.apex
+      push:
+        - match: '(?<=\})'
+          pop: true
+        - include: block
+        - include: expression
+  when-string-statement:
+    - match: \'
+      captures:
+        0: punctuation.definition.string.begin.apex
+      push:
+        - meta_scope: string.quoted.single.apex
+        - match: \'
+          captures:
+            0: punctuation.definition.string.end.apex
+          pop: true
+  where-clause:
+    - match: \b(WHERE)\b\s*
+      captures:
+        1: keyword.operator.query.where.apex
+  while-statement:
+    - match: (?<!\.)\b(while)\b\s*(?=\()
+      captures:
+        1: keyword.control.loop.while.apex
+      push:
+        - match: '(?<=\})|(?=;)'
+          pop: true
+        - match: \(
+          captures:
+            0: punctuation.parenthesis.open.apex
+          push:
+            - match: \)
+              captures:
+                0: punctuation.parenthesis.close.apex
+              pop: true
+            - include: expression
+        - include: statement
+  xml-attribute:
+    - match: |-
+        (?x)
+        (?:^|\s+)
+        (
+          (?:
+            ([-_[:alnum:]]+)
+            (:)
+          )?
+          ([-_[:alnum:]]+)
+        )
+        (=)
+      captures:
+        1: entity.other.attribute-name.apex
+        2: entity.other.attribute-name.namespace.apex
+        3: punctuation.separator.colon.apex
+        4: entity.other.attribute-name.localname.apex
+        5: punctuation.separator.equals.apex
+    - include: xml-string
+  xml-cdata:
+    - match: '<!\[CDATA\['
+      captures:
+        0: punctuation.definition.string.begin.apex
+      push:
+        - meta_scope: string.unquoted.cdata.apex
+        - match: '\]\]>'
+          captures:
+            0: punctuation.definition.string.end.apex
+          pop: true
+  xml-character-entity:
+    - match: |-
+        (?x)
+        (&)
+        (
+          (?:[[:alpha:]:_][[:alnum:]:_.-]*)|
+          (?:\#[[:digit:]]+)|
+          (?:\#x[[:xdigit:]]+)
+        )
+        (;)
+      scope: constant.character.entity.apex
+      captures:
+        1: punctuation.definition.constant.apex
+        3: punctuation.definition.constant.apex
+    - match: "&"
+      scope: invalid.illegal.bad-ampersand.apex
+  xml-comment:
+    - match: <!--
+      captures:
+        0: punctuation.definition.comment.apex
+      push:
+        - meta_scope: comment.block.apex
+        - match: "-->"
+          captures:
+            0: punctuation.definition.comment.apex
+          pop: true
+  xml-doc-comment:
+    - include: xml-comment
+    - include: xml-character-entity
+    - include: xml-cdata
+    - include: xml-tag
+  xml-string:
+    - match: \'
+      captures:
+        0: punctuation.definition.string.begin.apex
+      push:
+        - meta_scope: string.quoted.single.apex
+        - match: \'
+          captures:
+            0: punctuation.definition.string.end.apex
+          pop: true
+        - include: xml-character-entity
+    - match: \"
+      captures:
+        0: punctuation.definition.stringdoublequote.begin.apex
+      push:
+        - meta_scope: string.quoted.double.apex
+        - match: \"
+          captures:
+            0: punctuation.definition.stringdoublequote.end.apex
+          pop: true
+        - include: xml-character-entity
+  xml-tag:
+    - match: |-
+        (?x)
+        (</?)
+        (
+          (?:
+            ([-_[:alnum:]]+)
+            (:)
+          )?
+          ([-_[:alnum:]]+)
+        )
+      captures:
+        1: punctuation.definition.tag.apex
+        2: entity.name.tag.apex
+        3: entity.name.tag.namespace.apex
+        4: punctuation.separator.colon.apex
+        5: entity.name.tag.localname.apex
+      push:
+        - meta_scope: meta.tag.apex
+        - match: (/?>)
+          captures:
+            1: punctuation.definition.tag.apex
+          pop: true
+        - include: xml-attribute

@@ -1,6 +1,7 @@
 {% extends "base" %}
 
 {% block title %}Sessions{% endblock title %}
+{% block description %}Manage your sessions{% endblock title %}
 
 {% block content%}
 {% set current_session=session %}
@@ -15,8 +16,7 @@
     <header>
       <hgroup>
         <h2>{{ session.source }}</h2>
-        <p>{{ session.creation | date(format="%d/%m/%Y %H:%M") }}</p>
-        <p>{{ session.id }}</p>
+        <p>{{ session.creation | humanize }}</p>
       </hgroup>
     </header>
     <p>

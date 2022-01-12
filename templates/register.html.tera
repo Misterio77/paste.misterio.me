@@ -1,6 +1,7 @@
 {% extends "base" %}
 
 {% block title %}Register{% endblock title %}
+{% block description %}Register to start pasting{% endblock title %}
 
 {% block content%}
 

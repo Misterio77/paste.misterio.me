@@ -16,7 +16,7 @@ in rustPlatform.buildRustPackage rec {
 
   postInstall = ''
     mkdir -p $out/etc
-    cp -r assets templates db $out/etc
+    cp -r templates db $out/etc
   '';
 
   meta = with lib; {

@@ -1,4 +1,6 @@
 pub mod account;
+pub mod paste;
+pub mod user;
 
 pub mod home {
     use crate::schema::Session;
@@ -7,7 +9,7 @@ pub mod home {
 
     #[get("/")]
     async fn home(flash: Option<FlashMessage<'_>>, session: Option<Session>) -> Template {
-        Template::render("base", context! {flash, session})
+        Template::render("home", context! {flash, session})
     }
 
     pub fn routes() -> Vec<Route> {
@@ -16,16 +18,16 @@ pub mod home {
 }
 
 pub mod assets {
-    use rocket::{get, routes, Route};
-    use rocket_assets_fairing::{Asset, Assets};
+    use rocket::{get, routes, Route, State};
+    use crate::style::StyleSheet;
 
     #[get("/style.css")]
-    async fn style(assets: &Assets) -> Option<Asset> {
-        assets.open("style.css").await.ok()
+    async fn assets(css: &State<StyleSheet>) -> &StyleSheet {
+        css
     }
 
     pub fn routes() -> Vec<Route> {
-        routes![style]
+        routes![assets]
     }
 }
 

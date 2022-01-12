@@ -4,8 +4,9 @@ CREATE TABLE pastes (
     creator varchar NOT NULL,
     creation timestamptz NOT NULL,
     content varchar NOT NULL,
-    name varchar,
-    language varchar,
+    unlisted boolean NOT NULL,
+    title varchar,
+    description varchar,
 
     CONSTRAINT pastes_pkey PRIMARY KEY (id),
     CONSTRAINT pastes_creator_fkey FOREIGN KEY (creator)

@@ -1,6 +1,7 @@
 {% extends "base" %}
 
 {% block title %}Log in{% endblock title %}
+{% block description %}Log in to start pasting{% endblock title %}
 
 {% block content%}
 

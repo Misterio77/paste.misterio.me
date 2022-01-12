@@ -1,0 +1,440 @@
+%YAML 1.2
+---
+# http://www.sublimetext.com/docs/3/syntax.html
+name: Starlark
+file_extensions:
+  - build_defs
+  - BUILD.in
+  - BUILD
+  - WORKSPACE
+  - bzl
+  - sky
+  - star
+  - BUILD.bazel
+  - WORKSPACE
+  - WORKSPACE.bazel
+scope: source.starlark
+contexts:
+  main:
+    - include: statement
+    - include: expression
+  assignment-operator:
+    - match: //=|\+=|-=|/=|\*=|%=|=(?!=)
+      scope: keyword.operator.assignment.starlark
+  builtin-constant:
+    - match: \b(True|False|None)\b
+      scope: keyword.illegal.name.starlark
+  builtin-function:
+    - match: (?<!\.)\b(all|any|bool|dict|dir|enumerate|getattr|hasattr|hash|int|len|list|load|max|min|print|range|repr|reversed|sorted|str|tuple|type|zip)\b
+      scope: support.function.starlark
+  code-tag:
+    - match: (?:\b(NOTE|XXX|HACK|FIXME|BUG|TODO)\b)
+      captures:
+        1: keyword.codetag.notation.starlark
+  constant-identifier:
+    - match: '\b_*[[:upper:]][[:upper:]\d]*(_\w*)?\b'
+      scope: variable.other.constant.starlark
+  dictionary-literal:
+    - match: '\{'
+      comment: This also currently covers comprehensions.
+      captures:
+        0: punctuation.definition.dict.begin.starlark
+      push:
+        - match: '\}'
+          captures:
+            0: punctuation.definition.dict.end.starlark
+          pop: true
+        - include: expression
+  discouraged-semicolon:
+    - match: \;$
+      scope: invalid.deprecated.semicolon.starlark
+  discouraged-string-line-continuation:
+    - match: \\$
+      scope: invalid.deprecated.language.starlark
+  docstring:
+    - match: ('''|""")
+      captures:
+        1: punctuation.definition.string.begin.starlark
+      push:
+        - meta_scope: comment.block.documentation.starlark
+        - match: (\1)
+          captures:
+            1: punctuation.definition.string.end.starlark
+          pop: true
+        - include: code-tag
+        - include: docstring-content
+    - match: (r)('''|""")
+      captures:
+        1: storage.type.string.starlark
+        2: punctuation.definition.string.begin.starlark
+      push:
+        - meta_scope: comment.block.documentation.starlark
+        - match: (\2)
+          captures:
+            1: punctuation.definition.string.end.starlark
+          pop: true
+        - include: string-consume-escape
+        - include: code-tag
+    - match: ('|")
+      captures:
+        1: punctuation.definition.string.begin.starlark
+      push:
+        - meta_scope: comment.line.documentation.starlark
+        - match: (\1)|((?<!\\)\n)
+          captures:
+            1: punctuation.definition.string.end.starlark
+            2: invalid.illegal.newline.starlark
+          pop: true
+        - include: code-tag
+        - include: docstring-content
+    - match: (r)('|")
+      captures:
+        1: storage.type.string.starlark
+        2: punctuation.definition.string.begin.starlark
+      push:
+        - meta_scope: comment.line.documentation.starlark
+        - match: (\2)|((?<!\\)\n)
+          captures:
+            1: punctuation.definition.string.end.starlark
+            2: invalid.illegal.newline.starlark
+          pop: true
+        - include: string-consume-escape
+        - include: code-tag
+  docstring-content:
+    - include: string-escape-sequence
+    - include: discouraged-string-line-continuation
+  docstring-statement:
+    - match: ^(?=\s*r?('''|"""|'|"))
+      push:
+        - match: (?<='''|"""|'|")
+          pop: true
+        - include: docstring
+  expression:
+    - include: expression-base
+    - include: member-access
+    - include: variable
+  expression-base:
+    - include: line-comment
+    - include: literal
+    - include: string
+    - include: illegal-operator
+    - include: operator
+    - include: dictionary-literal
+    - include: subscript-expression
+    - include: list-literal
+    - include: parenthesized-expression
+    - include: function-call
+    - include: builtin-function
+    - include: constant-identifier
+    - include: type-identifier
+    - include: illegal-name
+    - include: line-continuation
+  function-arguments:
+    - match: (?:(\()(?:\s*(\*\*|\*))?)
+      captures:
+        1: punctuation.definition.arguments.begin.starlark
+        2: keyword.operator.unpacking.arguments.starlark
+      push:
+        - meta_content_scope: meta.function-call.arguments.starlark
+        - match: (?=\))(?!\)\s*\()
+          pop: true
+        - match: (?:(,)(?:\s*(\*\*|\*))?)
+          captures:
+            1: punctuation.separator.arguments.starlark
+            2: keyword.operator.unpacking.arguments.starlark
+        - include: illegal-name
+        - match: '\b([[:alpha:]_]\w*)\s*(=)(?!=)'
+          captures:
+            1: meta.parameter.keyword.starlark
+            2: keyword.operator.assignment.starlark
+        - match: "=(?!=)"
+          scope: keyword.operator.assignment.starlark
+        - include: expression
+        - match: \s*(\))\s*(\()
+          captures:
+            1: punctuation.definition.arguments.end.starlark
+            2: punctuation.definition.arguments.begin.starlark
+  function-call:
+    - match: '\b(?=([[:alpha:]_]\w*)\s*(\())'
+      push:
+        - meta_scope: meta.function-call.starlark
+        - match: (\))
+          captures:
+            1: punctuation.definition.arguments.end.starlark
+          pop: true
+        - include: function-call-name
+        - include: function-arguments
+  function-call-name:
+    - include: type-identifier
+    - include: builtin-function
+    - match: '\b([[:alpha:]_]\w*)\b'
+      scope: entity.name.function.starlark
+  function-definition:
+    - match: '\s*\b(def)\s+(?=[[:alpha:]_][[:word:]]*\s*\()'
+      captures:
+        1: storage.type.function.starlark
+      push:
+        - meta_scope: meta.function.starlark
+        - match: '(:|(?=[#''"\n]))'
+          captures:
+            1: punctuation.section.function.begin.starlark
+          pop: true
+        - include: function-definition-name
+        - include: function-definition-parameters
+        - include: line-continuation
+  function-definition-name:
+    - include: builtin-constant
+    - include: illegal-name
+    - include: builtin-function
+    - match: '\b([[:alpha:]_]\w*)\b'
+      scope: entity.name.function.starlark
+  function-definition-parameter-default-value:
+    - match: (=)
+      captures:
+        1: keyword.operator.starlark
+      push:
+        - match: (,)|(?=\))
+          captures:
+            1: punctuation.separator.parameters.starlark
+          pop: true
+        - include: expression
+  function-definition-parameters:
+    - match: (\()
+      captures:
+        1: punctuation.definition.parameters.begin.starlark
+      push:
+        - meta_scope: meta.function.parameters.starlark
+        - match: (\))
+          captures:
+            1: punctuation.definition.parameters.end.starlark
+          pop: true
+        - match: (\*\*|\*)
+          scope: keyword.operator.unpacking.parameter.starlark
+        - include: illegal-name
+        - include: builtin-constant
+        - match: '([[:alpha:]_]\w*)\s*(?:(,)|(?=[)#\n=]))'
+          captures:
+            1: variable.parameter.starlark
+            2: punctuation.separator.parameters.starlark
+        - include: line-comment
+        - include: function-definition-parameter-default-value
+  illegal-name:
+    - match: \b(and|as|assert|break|class|continue|def|del|elif|else|except|finally|for|from|global|if|import|in|is|lambda|load|nonlocal|not|or|pass|raise|return|try|while|with|yield)\b
+      scope: keyword.control.flow.starlark
+  illegal-operator:
+    - match: '&&|\|\||--|\+\+'
+      scope: invalid.illegal.operator.starlark
+    - match: "[?$]"
+      scope: invalid.illegal.operator.starlark
+    - match: '!\b'
+      scope: invalid.illegal.operator.starlark
+  line-comment:
+    - match: (\#)
+      captures:
+        1: punctuation.definition.comment.starlark
+      push:
+        - meta_scope: comment.line.number-sign.starlark
+        - match: ($)
+          pop: true
+        - include: code-tag
+  line-continuation:
+    - match: (\\)\s*(\S.*$\n?)
+      captures:
+        1: invalid.deprecated.continuation.line.starlark
+        2: invalid.illegal.line.continuation.starlark
+    - match: (\\)\s*$\n?
+      captures:
+        1: invalid.deprecated.continuation.line.starlark
+      push:
+        - match: '(?=^\s*$)|(?!(\s*[rR]?(''''''|"""|''|"))|(\G$))'
+          pop: true
+        - include: string
+  list-literal:
+    - match: '\['
+      comment: This also currently covers comprehensions.
+      captures:
+        0: punctuation.definition.list.begin.starlark
+      push:
+        - match: '\]'
+          captures:
+            0: punctuation.definition.list.end.starlark
+          pop: true
+        - include: expression
+  literal:
+    - match: \b(True|False|None)\b
+      scope: constant.language.starlark
+    - include: number
+  member-access:
+    - match: (\.)\s*(?!\.)
+      captures:
+        1: punctuation.accessor.starlark
+      push:
+        - match: '(?# Stop when we read non-whitespace followed by non-word; i.e. when finished reading an identifier or function call)(?<=\S)(?=\W)|(?# Stop when seeing the start of something that''s not a word; e.g., a non-identifier)(^|(?<=\s))(?=[^\\\w\s])|$'
+          pop: true
+        - include: function-call
+        - include: member-access-base
+        - include: member-access-property
+  member-access-base:
+    - include: illegal-name
+    - include: builtin-constant
+    - include: constant-identifier
+    - include: type-identifier
+    - include: line-continuation
+    - include: subscript-expression
+  member-access-property:
+    - match: '\b([[:alpha:]_]\w*)\b'
+      scope: variable.other.property.starlark
+  number:
+    - include: number-decimal
+    - include: number-hexadecimal
+    - include: number-octal
+    - match: '\b[0-9]+\w+'
+      scope: invalid.illegal.name.starlark
+  number-decimal:
+    - match: '(?<![\w\.])(?:[1-9][0-9]*|0+)\b'
+      scope: constant.numeric.decimal.starlark
+  number-hexadecimal:
+    - match: '(?<![\w\.])0[xX][0-9a-fA-F]+\b'
+      scope: constant.numeric.hex.starlark
+  number-octal:
+    - match: '(?<![\w\.])0[oO][0-7]+\b'
+      scope: constant.numeric.octal.starlark
+  operator:
+    - match: '\b(?<!\.)(?:(and|or|not|in)(?# 1)|(for|if|else)(?# 2))(?!\s*:)\b|(\*|\+|-|%|//|/)(?# 3)|(!=|==|>=|<=|<|>)(?# 4)'
+      captures:
+        1: keyword.operator.logical.starlark
+        2: keyword.control.flow.starlark
+        3: keyword.operator.arithmetic.starlark
+        4: keyword.operator.comparison.starlark
+  parenthesized-expression:
+    - match: \(
+      comment: This covers tuples and parenthesized expressions.
+      captures:
+        0: punctuation.parenthesis.begin.starlark
+      push:
+        - match: \)
+          captures:
+            0: punctuation.parenthesis.end.starlark
+          pop: true
+        - include: expression
+  statement:
+    - include: function-definition
+    - include: statement-keyword
+    - include: assignment-operator
+    - include: docstring-statement
+    - include: discouraged-semicolon
+  statement-keyword:
+    - match: \b(\s*def)\b
+      scope: storage.type.function.starlark
+    - match: \b(?<!\.)(break|continue|elif|else|for|if|pass|return)\b
+      scope: keyword.control.flow.starlark
+    - match: \b(?<!\.)(as|assert|class|del|except|finally|from|global|import|is|lambda|nonlocal|raise|try|while|with|yield)\b
+      scope: invalid.illegal.keyword.starlark
+  string:
+    - include: string-raw-quoted-multi-line
+    - include: string-raw-quoted-single-line
+    - include: string-quoted-multi-line
+    - include: string-quoted-single-line
+  string-consume-escape:
+    - match: '\\[''"\n\\]'
+  string-content:
+    - include: string-escape-sequence
+    - include: string-illegal-escape-sequence
+    - include: discouraged-string-line-continuation
+    - include: string-format-placeholder-percent
+    - include: string-format-placeholder-braces
+  string-escape-sequence:
+    - match: '\\[\\"''nrt]'
+      scope: constant.character.escape.starlark
+  string-format-placeholder-braces:
+    - match: '\{(?:[0-9]+|[[:alpha:]_][[:alnum:]_]*)?\}'
+      scope: constant.character.format.placeholder.other.starlark
+  string-format-placeholder-percent:
+    - match: "%[drs%]"
+      scope: constant.character.format.placeholder.other.starlark
+  string-illegal-escape-sequence:
+    - match: '\\[^\\"''nrt]'
+      scope: invalid.illegal.character.escape.starlark
+  string-quoted-multi-line:
+    - match: ('''|""")
+      captures:
+        1: punctuation.definition.string.begin.starlark
+      push:
+        - meta_scope: string.quoted.multi.starlark
+        - match: (\1)
+          captures:
+            1: punctuation.definition.string.end.starlark
+          pop: true
+        - include: string-content
+  string-quoted-single-line:
+    - match: '([''"])'
+      captures:
+        1: punctuation.definition.string.begin.starlark
+      push:
+        - meta_scope: string.quoted.single.starlark
+        - match: (\1)|((?<!\\)\n)
+          captures:
+            1: punctuation.definition.string.end.starlark
+            2: invalid.illegal.newline.starlark
+          pop: true
+        - include: string-content
+  string-raw-content:
+    - include: string-consume-escape
+    - include: string-format-placeholder-percent
+    - include: string-format-placeholder-braces
+  string-raw-quoted-multi-line:
+    - match: \b(r)('''|""")
+      captures:
+        1: storage.type.string.starlark
+        2: punctuation.definition.string.begin.starlark
+      push:
+        - meta_scope: string.quoted.raw.multi.starlark
+        - match: (\2)
+          captures:
+            1: punctuation.definition.string.end.starlark
+          pop: true
+        - include: string-raw-content
+  string-raw-quoted-single-line:
+    - match: '\b(r)([''"])'
+      captures:
+        1: storage.type.string.starlark
+        2: punctuation.definition.string.begin.starlark
+      push:
+        - meta_scope: string.quoted.raw.single.starlark
+        - match: (\2)|((?<!\\)\n)
+          captures:
+            1: punctuation.definition.string.end.starlark
+            2: invalid.illegal.newline.starlark
+          pop: true
+        - include: string-raw-content
+  subscript-expression:
+    - match: '\b(?=[[:alpha:]_]\w*\s*\[)'
+      push:
+        - meta_scope: meta.item-access.starlark
+        - match: '(\])'
+          captures:
+            1: punctuation.definition.arguments.end.starlark
+          pop: true
+        - include: subscript-receiver
+        - include: subscript-index
+        - include: expression
+  subscript-index:
+    - match: '(\[)'
+      captures:
+        1: punctuation.definition.arguments.begin.starlark
+      push:
+        - meta_content_scope: meta.item-access.arguments.starlark
+        - match: '(?=\])'
+          pop: true
+        - include: expression
+  subscript-receiver:
+    - include: builtin-function
+    - include: constant-identifier
+    - match: '\b([[:alpha:]_]\w*)\b'
+      scope: variable.other.starlark
+  type-identifier:
+    - match: '\b_*[[:upper:]][[:alpha:]\d]*(_\w*)?\b'
+      scope: entity.name.type.starlark
+  variable:
+    - match: '\b([[:alpha:]_]\w*)\b'
+      scope: variable.other.starlark

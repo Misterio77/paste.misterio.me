@@ -1,21 +1,38 @@
 {% extends "base" %}
 
-{% block title %}
-  {% if paste.name %}
-    {{ paste.name }}
-  {% else %}
-    Untitled Paste
-  {% endif %}
-{% endblock title %}
+{% block title %}{{ paste.title | default(value="Untitled Paste") }}{% endblock title %}
+{% block description %}Paste {{ paste.title | default(value="Untitled") }}, created by {{ paste.creator }}{% endblock description %}
 
 {% block content%}
 
-<h1>
-  {% if paste.name %}
-    {{ paste.name }}
-  {% else %}
-    Untitled Paste
+<article>
+  <hgroup>
+    <h1>{{ paste.title | default(value="Untitled") }}</h1>
+    <p>
+    {{ paste.description }}
+    <br />
+    by <a href="/u/{{ paste.creator }}">u/{{ paste.creator }}</a>,
+    <span data-tooltip="{{ paste.creation | date(format="%Y-%m-%d %H:%M:%S") }}">
+      {{ paste.creation | humanize }}
+    </span>
+    - {% if paste.unlisted %}Unlisted{% else %}Public{% endif %}
+  </hgroup>
+
+  <p>
+    <a role="button" class="outline" href="/p/{{ paste.id }}" disabled>Open</a>
+    <a role="button" class="outline" href="/p/{{ paste.id }}/raw">Raw</a>
+  </p>
+
+  {% if session and paste.creator == session.creator %}
+  <form method="post" action="/p/{{ paste.id }}/delete">
+    <button class="small delete">Delete</button>
+  </form>
   {% endif %}
-</h1>
+
+  <footer>
+    <pre><code>{{ highlighted | safe }}</code></pre>
+  <footer>
+
+</article>
 
 {% endblock content %}

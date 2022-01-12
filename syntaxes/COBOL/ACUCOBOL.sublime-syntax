@@ -1,0 +1,11 @@
+%YAML 1.2
+---
+# http://www.sublimetext.com/docs/3/syntax.html
+name: ACUCOBOL
+file_extensions: []
+scope: source.acucobol
+contexts:
+  main:
+    - match: '(^......[ a-zA-Z0-9\-]...................................................................*$)'
+      scope: invalid.illegal.cobol
+    - include: scope:source.cobol

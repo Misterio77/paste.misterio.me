@@ -91,14 +91,24 @@
   --table-row-stripped-background-color: #{mix($grey-50, $white)};
 
   // Code
+  --code-pink-color: #{hsl(330, 40%, 50%)};
+  --code-cyan-color: #{hsl(185, 40%, 40%)};
+  --code-blue-color: #{hsl(202, 50%, 50%)};
+  --code-purple-color: #{hsl(262, 50%, 40%)};
+  --code-red-color: #{$red-900};
+  --code-green-color: #{$green-800};
+  --code-amber-color: #{$amber-800};
+  --code-brown-color: #{hsl(40, 20%, 50%)};;
+  --code-grey-color: #{$grey-300};
+
   --code-background-color: #{$grey-50};
-  --code-color: var(--muted-color);
+  --code-color: var(--color);
   --code-kbd-background-color: var(--contrast);
   --code-kbd-color: var(--contrast-inverse);
-  --code-tag-color: #{hsl(330, 40%, 50%)};
-  --code-property-color: #{hsl(185, 40%, 40%)};
-  --code-value-color: #{hsl(40, 20%, 50%)};
-  --code-comment-color: #{$grey-300};
+  --code-tag-color: var(--code-pink-color);
+  --code-property-color: var(--code-cyan-color);
+  --code-value-color: var(--code-brown-color);
+  --code-comment-color: var(--muted-color);
 
   // Accordion (<details>)
   --accordion-border-color: var(--muted-border-color);

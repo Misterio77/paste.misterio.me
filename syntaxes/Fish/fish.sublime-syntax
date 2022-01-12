@@ -1,0 +1,772 @@
+%YAML 1.2
+---
+# http://www.sublimetext.com/docs/3/syntax.html
+name: friendly interactive shell (fish)
+file_extensions:
+  - fish
+first_line_match: '^#!.*\b(fish)|^#\s*-\*-[^*]*mode:\s*shell-script[^*]*-\*-'
+scope: source.shell.fish
+contexts:
+  main:
+    - include: comment-external
+    - include: line-continuation
+    - match: \)
+      push:
+        - meta_scope: meta.function-call.fish invalid.illegal.function-call.fish
+        - match: '(?=[\s;&)|<>])'
+          pop: true
+    - match: (?=\S)
+      push:
+        - match: \n|(;)|(?=\))
+          captures:
+            1: meta.function-call.operator.fish keyword.operator.fish
+          pop: true
+        - match: '(?:[&|]|(?:[0-9]+)?(?:<|>>?|\^\^?))'
+          scope: invalid.illegal.operator.fish
+        - match: (?=\S)
+          push:
+            - match: '(?=[\n;)])|(&)'
+              captures:
+                1: meta.function-call.operator.fish keyword.operator.fish
+              pop: true
+            - include: command-chain
+  argument:
+    - match: '(?![\s;&)|<>^])'
+      push:
+        - match: '(?=[\s;&)|<>])'
+          pop: true
+        - match: '(?=--[^\s;&)|<>])'
+          push:
+            - meta_scope: meta.argument.fish
+            - match: '(?=[\s;&)|<>])'
+              pop: true
+            - match: (?:--)
+              captures:
+                0: punctuation.definition.parameter.fish meta.string.unquoted.fish
+              push:
+                - meta_scope: variable.parameter.fish
+                - match: '(?=[\s;&)|<>]|=)'
+                  pop: true
+                - include: command-substitution
+                - match: (?=\$)
+                  push:
+                    - meta_scope: meta.string.unquoted.fish
+                    - match: (?!\$)
+                      pop: true
+                    - include: variable-expansion
+                - include: string-quoted
+                - match: '(?![''"])'
+                  push:
+                    - meta_scope: meta.string.unquoted.fish
+                    - match: '(?=[\s;&()|<>''"$]|\=)'
+                      pop: true
+                    - include: string-unquoted-patterns
+            - match: (?:=)
+              captures:
+                0: variable.parameter.fish punctuation.definition.parameter.separator.fish meta.string.unquoted.fish
+              push:
+                - match: '(?=[\s;&)|<>])'
+                  pop: true
+                - match: '(?:[+-]?)(?:[0-9]+\.?[0-9]*|[0-9]*\.?[0-9]+)(?=[\s;&)|<>])'
+                  scope: meta.string.unquoted.fish constant.numeric.fish
+                - include: argument-patterns
+        - match: '(?:-)(?=[^\s;&)|<>])'
+          captures:
+            0: punctuation.definition.parameter.fish meta.string.unquoted.fish
+          push:
+            - meta_scope: meta.argument.fish variable.parameter.fish
+            - match: '(?=[\s;&)|<>])'
+              pop: true
+            - include: argument-patterns
+        - include: argument-nonoption
+  argument-nonoption:
+    - match: '(?![\s;&)|<>^])'
+      push:
+        - meta_scope: meta.argument.fish
+        - match: '(?=[\s;&)|<>])'
+          pop: true
+        - match: \~
+          scope: meta.string.unquoted.fish meta.home-directory-expansion.fish keyword.operator.tilde.fish
+        - match: \%
+          captures:
+            0: meta.string.unquoted.fish punctuation.definition.process.fish
+          push:
+            - meta_scope: meta.process-expansion.fish
+            - match: '(?=[\s;&)|<>])'
+              pop: true
+            - match: '(?:self|last)(?=[\s;&)|<>])'
+              scope: variable.language.fish meta.string.unquoted.fish
+            - include: argument-patterns
+        - match: '(?:[+-]?)(?:[0-9]+\.?[0-9]*|[0-9]*\.?[0-9]+)(?=[\s;&)|<>])'
+          scope: meta.string.unquoted.fish constant.numeric.fish
+        - match: (?!\s)
+          push:
+            - match: '(?=[\s;&)|<>])'
+              pop: true
+            - include: argument-patterns
+  argument-patterns:
+    - include: command-substitution
+    - match: (?=\$)
+      push:
+        - meta_scope: meta.string.unquoted.fish
+        - match: (?!\$)
+          pop: true
+        - include: variable-expansion
+    - include: string
+  command-call-meta:
+    - match: '(builtin|command|exec)\b(?!\s+[-&|])'
+      captures:
+        1: support.function.fish
+      push:
+        - match: '(?=[\n;&)|])'
+          pop: true
+        - include: line-continuation
+        - include: command-call-standard
+  command-call-standard:
+    - match: '\#'
+      push:
+        - meta_scope: invalid.illegal.function-call.fish
+        - match: '(?=[\n)])'
+          pop: true
+    - match: "(?:[&|<>^])"
+      scope: invalid.illegal.operator.fish
+    - match: (?=\S)
+      push:
+        - match: |-
+            (?x)
+            (?# Look ahead for control operations)
+            (?=
+              (?:
+                (?# Find control operations)
+                [\n;&)]
+              |
+                (?# Find piping)
+                (?:(?:[0-9]+)?(?:<|>>?|\^\^?))?\|
+              )
+            )
+          pop: true
+        - match: '(?![\s<>^%])'
+          push:
+            - match: '(?=[\s;&)|<>])'
+              pop: true
+            - include: command-call-standard-block
+            - match: '(?:break|continue|return)(?=[\s;&)|<>])'
+              captures:
+                0: keyword.control.conditional.fish
+            - match: (?!\s)
+              push:
+                - match: '(?=[\s;&)|<>])'
+                  pop: true
+                - match: (?=\()
+                  push:
+                    - meta_scope: invalid.illegal.function-call.fish
+                    - match: '(?=[\s;&)|<>])'
+                      pop: true
+                    - match: \(
+                      push:
+                        - match: '\)|(?=[\n;&)|<>])'
+                          pop: true
+                - match: (?!\s)
+                  push:
+                    - meta_scope: variable.function.fish
+                    - match: '(?=[\s;&()|<>])'
+                      pop: true
+                    - match: \$
+                      scope: meta.string.unquoted.fish
+                    - include: string
+        - match: \%
+          push:
+            - meta_scope: invalid.illegal.function-call.fish
+            - match: '(?=[\s;&)|<>])'
+              pop: true
+            - include: string
+        - include: redirection
+        - match: '(?:[^\n\S]+)'
+          push:
+            - match: |-
+                (?x)
+                (?# Look ahead for control operations)
+                (?=
+                  (?:
+                    (?# Find simple control operations)
+                    [\n;&)]
+                  |
+                    (?# Find piping)
+                    (?:(?:[0-9]+)?(?:<|>>?|\^\^?))?\|
+                  )
+                )
+              pop: true
+            - match: '(?!--[\s;&)|<>])'
+              push:
+                - match: |-
+                    (?x)
+                    (?# Look ahead for control operations or the end of options)
+                    (?=
+                      (?:
+                        (?# Find simple control operations)
+                        [\n;&)]
+                      |
+                        (?# Find piping)
+                        (?:(?:[0-9]+)?(?:<|>>?|\^\^?))?\|
+                      |
+                        (?# Find a double dash)
+                        --[\s;&)|<>]
+                      )
+                    )
+                  pop: true
+                - include: line-continuation
+                - include: comment-internal-end
+                - include: redirection
+                - include: argument
+            - match: '(?=--[\s;&)|<>])'
+              push:
+                - match: |-
+                    (?x)
+                    (?# Look ahead for control operations)
+                    (?=
+                      (?:
+                        (?# Find simple control operations)
+                        [\n;&)]
+                      |
+                        (?# Find piping)
+                        (?:(?:[0-9]+)?(?:<|>>?|\^\^?))?\|
+                      )
+                    )
+                  pop: true
+                - match: '(?=--[\s;&)|<>])'
+                  push:
+                    - match: '(?=[\s;&)|<>])'
+                      pop: true
+                    - include: argument
+                - match: (?=\s)
+                  push:
+                    - match: |-
+                        (?x)
+                        (?# Look ahead for control operations)
+                        (?=
+                          (?:
+                            (?# Find simple control operations)
+                            [\n;&)]
+                          |
+                            (?# Find piping)
+                            (?:(?:[0-9]+)?(?:<|>>?|\^\^?))?\|
+                          )
+                        )
+                      pop: true
+                    - include: line-continuation
+                    - include: comment-internal-end
+                    - include: redirection
+                    - include: argument-nonoption
+  command-call-standard-block:
+    - match: '(begin|while|if|for|switch|function)\s*([&|<>])'
+      captures:
+        1: variable.function.fish
+        2: invalid.illegal.operator.fish
+    - match: (begin)\s*(\))
+      captures:
+        1: variable.function.fish
+        2: invalid.illegal.operator.fish
+    - match: 'begin(?=\s*[\n;]|\s+[^\s-])'
+      captures:
+        0: keyword.control.conditional.fish
+      push:
+        - meta_scope: meta.block.begin.fish
+        - match: 'end(?=[\s;&)|<>])'
+          captures:
+            0: keyword.control.conditional.fish
+          pop: true
+        - include: main
+    - match: '(?=while\s+[^\s;)-])'
+      push:
+        - meta_scope: meta.block.while.fish
+        - match: 'end(?=[\s;&)|<>])'
+          captures:
+            0: keyword.control.conditional.fish
+          pop: true
+        - match: while
+          captures:
+            0: keyword.control.conditional.fish
+          push:
+            - match: '\s*(?=[\n;&)])'
+              pop: true
+            - include: line-continuation
+            - include: command-chain
+        - match: '\n|(;)|([&)])'
+          captures:
+            1: keyword.operator.fish
+            2: invalid.illegal.operator.fish
+          push:
+            - match: '(?=end[\s;&)|<>])'
+              pop: true
+            - include: main
+    - match: '(?=if\s+[^\s;)-])'
+      push:
+        - meta_scope: meta.block.if.fish
+        - match: 'end(?=[\s;&)|<>])'
+          captures:
+            0: keyword.control.conditional.fish
+          pop: true
+        - include: command-call-standard-block-if-internal
+    - match: '(?=for\s+[^\s;)-])'
+      push:
+        - meta_scope: meta.block.for-in.fish
+        - match: 'end(?=[\s;&)|<>])'
+          captures:
+            0: keyword.control.conditional.fish
+          pop: true
+        - match: (for)(?:\s+)
+          captures:
+            1: keyword.control.conditional.fish
+          push:
+            - match: \s+
+              pop: true
+            - include: line-continuation
+            - include: argument
+            - match: \S+
+              scope: invalid.illegal.operator.fish
+        - include: line-continuation
+        - match: in(?=\s)
+          captures:
+            0: keyword.control.conditional.fish
+          push:
+            - match: '\s*(?=[\n;&)])'
+              pop: true
+            - include: line-continuation
+            - include: comment-internal-end
+            - include: argument-nonoption
+        - match: '\n|(;)|([&)])'
+          captures:
+            1: keyword.operator.fish
+            2: invalid.illegal.operator.fish
+          push:
+            - match: '(?=end[\s;&)|<>])'
+              pop: true
+            - include: main
+        - match: '\S+?(?=[\s;&)])'
+          scope: invalid.illegal.function-call.fish
+    - match: '(?=switch\s+[^\s;)-])'
+      push:
+        - meta_scope: meta.block.switch.fish
+        - match: 'end(?=[\s;&)|<>])'
+          captures:
+            0: keyword.control.conditional.fish
+          pop: true
+        - match: (?=switch)
+          push:
+            - match: '\s*(?=[\n;&)])'
+              pop: true
+            - match: (switch)(?:\s+)
+              captures:
+                1: keyword.control.conditional.fish
+              push:
+                - match: '(?=[\s;&)])'
+                  pop: true
+                - include: line-continuation
+                - include: argument
+                - match: \S+
+                  scope: invalid.illegal.operator.fish
+            - match: \s+
+              push:
+                - match: '(?=[\n;&)])'
+                  pop: true
+                - match: '\S+?(?=[\s;&)])'
+                  scope: invalid.illegal.string.fish
+        - match: '\n|(;)|([&)])'
+          captures:
+            1: keyword.operator.fish
+            2: invalid.illegal.operator.fish
+          push:
+            - match: '(?=end[\s;&)|<>])'
+              pop: true
+            - match: 'case(?=[\s;&)])'
+              captures:
+                0: keyword.control.conditional.fish
+              push:
+                - match: '\n|(;)|([&)])'
+                  captures:
+                    1: keyword.operator.fish
+                    2: invalid.illegal.operator.fish
+                  pop: true
+                - include: line-continuation
+                - include: comment-internal-end
+                - include: argument-nonoption
+                - match: '\S+?(?=[\s;&)])'
+                  scope: invalid.illegal.operator.fish
+            - include: main
+    - match: '(?=function\s+[^\s;)-])'
+      push:
+        - meta_scope: meta.block.function.fish
+        - match: 'end(?=[\s;&)|<>])'
+          captures:
+            0: keyword.control.conditional.fish
+          pop: true
+        - match: (?=function)
+          push:
+            - match: '\s*(?=[\n;&)])'
+              pop: true
+            - match: (function)(?:\s+)
+              captures:
+                1: keyword.control.conditional.fish
+              push:
+                - match: '(?=[\s;&)])'
+                  pop: true
+                - include: line-continuation
+                - match: "(?:[()|<>])"
+                  push:
+                    - meta_scope: invalid.illegal.string.fish
+                    - match: '(?=[\s;&)])'
+                      pop: true
+                - match: (?!\\\n)
+                  push:
+                    - match: '(?=[\s;&()|<>])'
+                      pop: true
+                    - match: (?!\s)
+                      push:
+                        - meta_scope: entity.name.function.fish
+                        - match: '(?=[\s;&()|<>])'
+                          pop: true
+                        - include: argument
+            - match: \s+
+              push:
+                - match: '(?=[\n;&)])'
+                  pop: true
+                - include: line-continuation
+                - include: comment-internal-end
+                - include: redirection
+                - include: argument
+        - match: '\n|(;)|([&)])'
+          captures:
+            1: keyword.operator.fish
+            2: invalid.illegal.operator.fish
+          push:
+            - match: '(?=end[\s;&)|<>])'
+              pop: true
+            - include: main
+  command-call-standard-block-if-internal:
+    - match: '(?=if(?:\s*\n|\s+[^\s;]))'
+      push:
+        - match: '(?=end[\s;&)|<>])'
+          pop: true
+        - match: if
+          captures:
+            0: keyword.control.conditional.fish
+          push:
+            - match: '\s*(?=[\n;&])'
+              pop: true
+            - include: line-continuation
+            - include: command-chain
+        - match: \n|(;)|(&)
+          captures:
+            1: keyword.operator.fish
+            2: invalid.illegal.operator.fish
+          push:
+            - match: '(?=end[\s;&)|<>])'
+              pop: true
+            - match: '(?=else\s*[\s;])'
+              push:
+                - match: '(?=end[\s;&)|<>])'
+                  pop: true
+                - match: 'else(?=\s*[\s;])'
+                  captures:
+                    0: keyword.control.conditional.fish
+                  push:
+                    - match: '\s*(?=[\n;&]|if(?:\s*\n|\s+[^\s;]))'
+                      captures:
+                        1: keyword.operator.fish
+                        2: invalid.illegal.operator.fish
+                      pop: true
+                    - include: line-continuation
+                    - include: comment-internal-end
+                    - match: '\S+?(?=[\s;&])'
+                      scope: invalid.illegal.string.fish
+                - match: \n|(;)|(&)
+                  captures:
+                    1: keyword.operator.fish
+                    2: invalid.illegal.operator.fish
+                  push:
+                    - match: '(?=end[\s;&)|<>])'
+                      pop: true
+                    - include: main
+                - include: command-call-standard-block-if-internal
+            - include: main
+  command-chain:
+    - match: '(?:[&|]|(?:[0-9]+)?(?:<|>>?|\^\^?))'
+      scope: invalid.illegal.operator.fish
+    - match: '(and|not|or)(?=\s+(?!-h|--help)|[;&)|<>])'
+      scope: meta.function-call.fish keyword.operator.word.fish
+    - match: '(?:case|else|end)(?=[\s;&)|<>])'
+      scope: invalid.illegal.function-call.fish
+    - match: '(?=[^\s#])'
+      push:
+        - match: '(\s*)(?=[\n;&)])'
+          captures:
+            1: meta.function-call.fish
+          pop: true
+        - match: (?=\S)
+          push:
+            - meta_scope: meta.function-call.fish
+            - match: |-
+                (?x)
+                (?# Look ahead for control operations after whitespace)
+                (?=\s*
+                  (?:
+                    (?# Find simple control operations)
+                    [\n;&)]
+                  |
+                    (?# Find piping)
+                    (?:(?:[0-9]+)?(?:<|>>?|\^\^?))?\|
+                  )
+                )
+              pop: true
+            - match: '(?:(?:[0-9]+)?(?:<|>|>>))?\|(?=\s*\n)'
+              scope: invalid.illegal.operator.fish
+            - match: |-
+                (?x)
+                (?# Consume valid piping; groups 1 2 3)
+                (?:([0-9]+)?(<|>>?|\^\^?))?(\|)
+                (?# Consume whitespace)
+                \s*
+                (?# Look ahead for control operations)
+                (?=
+                  (?:
+                    (?# Find simple control operations)
+                    [;&]
+                  |
+                    (?# Find piping)
+                    (?:(?:[0-9]+)?(?:<|>>?|\^\^?))?\|
+                  )
+                )
+                (?# Consume control operations and beyond; group 4)
+                (.*)$
+              captures:
+                1: meta.pipe.fish constant.numeric.file-descriptor.fish
+                2: meta.pipe.fish keyword.operator.redirect.fish
+                3: meta.pipe.fish keyword.operator.pipe.fish
+                4: invalid.illegal.function-call.fish
+            - match: '(?:([0-9]+)?(<|>>?|\^\^?))?(\|)'
+              scope: meta.pipe.fish
+              captures:
+                1: constant.numeric.file-descriptor.fish
+                2: keyword.operator.redirect.fish
+                3: keyword.operator.pipe.fish
+            - include: line-continuation
+            - include: command-call-meta
+            - include: command-call-standard
+    - include: comment-internal-end
+  command-substitution:
+    - match: (?=\()
+      push:
+        - match: '(?<=\))(?!\[)|(?<=\])'
+          pop: true
+        - match: \(
+          captures:
+            0: punctuation.section.parens.begin.fish
+          push:
+            - meta_scope: meta.parens.command-substitution.fish
+            - match: \)
+              captures:
+                0: punctuation.section.parens.end.fish
+              pop: true
+            - include: main
+        - include: index-expansion
+  comment-external:
+    - match: '\#'
+      captures:
+        0: punctuation.definition.comment.fish
+      push:
+        - meta_scope: comment.line.external.fish
+        - match: \n
+          pop: true
+  comment-internal-end:
+    - match: '\#'
+      captures:
+        0: punctuation.definition.comment.fish
+      push:
+        - meta_scope: comment.line.internal.end.fish
+        - match: (?=\n)
+          pop: true
+  index-expansion:
+    - match: '\['
+      captures:
+        0: punctuation.section.brackets.begin.fish
+      push:
+        - meta_scope: meta.brackets.index-expansion.fish
+        - match: '\]'
+          captures:
+            0: punctuation.section.brackets.end.fish
+          pop: true
+        - match: \.\.
+          scope: keyword.operator.fish
+        - include: command-substitution
+        - include: variable-expansion
+        - include: string-quoted
+        - match: '(?:[+-]?[0-9]+)(?=[\s;&)|<>]|\]|\.\.)'
+          scope: constant.numeric.fish
+        - match: '(?![\s''"]|\.\.)'
+          push:
+            - match: '(?=[\s;&)|<>''"]|\]|\.\.)'
+              pop: true
+            - include: string-unquoted-patterns
+  line-continuation:
+    - match: (?=\\\n)
+      push:
+        - match: '^(?![\s\#])|\s(?![\s\#])'
+          pop: true
+        - match: \\\n
+          scope: constant.character.escape
+        - match: '\#'
+          captures:
+            0: punctuation.definition.comment.fish
+          push:
+            - meta_scope: comment.line.continuation.fish
+            - match: \n
+              pop: true
+  redirection:
+    - match: '(?:([0-9]+)(<|>|>>)|(>>|\^\^|[<>]|(?<=^|\s)\^))(\&)'
+      captures:
+        1: constant.numeric.file-descriptor.fish
+        2: keyword.operator.redirect.fish
+        3: keyword.operator.redirect.fish
+        4: keyword.operator.redirect.dereference.fish
+      push:
+        - meta_scope: meta.redirection.fish
+        - match: '(?<=[^&\s]|\n)(?=[\s);&|<>])'
+          pop: true
+        - include: line-continuation
+        - include: command-substitution
+        - include: variable-expansion
+        - match: '(?:[0-9]+)(?=[\s);&|<>])'
+          scope: constant.numeric.file-descriptor.fish
+        - match: '(?:-)(?=[\s);&|<>])'
+          scope: keyword.operator.redirect.close.fish
+        - match: (?:\S+.*)$
+          scope: invalid.illegal.file-descriptor.fish
+    - match: '(?:([0-9]+)(<|>|>>)|(>>|\^\^|[<>]|(?<=^|\s)\^))(\?)?'
+      captures:
+        1: constant.numeric.file-descriptor.fish
+        2: keyword.operator.redirect.fish
+        3: keyword.operator.redirect.fish
+        4: keyword.operator.redirect.clobber-test.fish
+      push:
+        - meta_scope: meta.redirection.fish
+        - match: '(?<=[^<>^?\s]|\n)(?=[\s);&|<>])|(?=\n)'
+          pop: true
+        - include: line-continuation
+        - include: command-substitution
+        - include: variable-expansion
+        - match: "(?:(?:[&?]|[0-9]*[<>^]).*)$"
+          scope: invalid.illegal.path.fish
+        - match: '(?:\''(?:\\[\''\\]|[^\''\\])*\''|\"(?:\\[\"$\n\\]|[^\"$\n\\])*\"|(?:\\[abefnrtv $\\*?#(){}\[\]<>^&;|"'']|(?<=^|\s)\\[~%]|\\[xX][0-9A-Fa-f]{1,2}|\\[0-7]{1,3}|\\u[0-9A-Fa-f]{1,4}|\\U[0-9A-Fa-f]{1,8}|\\c[?-~]|[^\s$\\*?~%#()<>&|;"'']|\\(?=[^abefnrtv\s$\\*?#(){}\[\]<>^&;|"''xXuUc])|(?<=\S|\\ )\\\n|(?<=\S|\\ )[~%#])+)+'
+          scope: meta.path.fish
+  string:
+    - include: string-quoted
+    - include: string-unquoted
+  string-quoted:
+    - match: \'
+      captures:
+        0: punctuation.definition.string.begin.fish
+      push:
+        - meta_scope: string.quoted.single.fish
+        - match: \'
+          captures:
+            0: punctuation.definition.string.end.fish
+          pop: true
+        - match: '\\[\''\\]'
+          scope: constant.character.escape.fish
+    - match: \"
+      captures:
+        0: punctuation.definition.string.begin.fish
+      push:
+        - meta_scope: string.quoted.double.fish
+        - match: \"
+          captures:
+            0: punctuation.definition.string.end.fish
+          pop: true
+        - match: '\\[\n\"\\$]'
+          scope: constant.character.escape.fish
+        - include: variable-expansion
+  string-unquoted:
+    - match: '(?![''"])'
+      push:
+        - meta_scope: meta.string.unquoted.fish
+        - match: '(?=[\s;&()|<>''"$])'
+          pop: true
+        - include: string-unquoted-patterns
+  string-unquoted-patterns:
+    - match: |-
+        (?x)
+        \\[abefnrtv $\\*?#(){}\[\]<>^&|;"']
+        |
+        (?<=^|\s)\\[~%]
+        |
+        \\[xX][0-9A-Fa-f]{1,2}
+        |
+        \\[0-7]{1,3}
+        |
+        \\u[0-9A-Fa-f]{1,4}
+        |
+        \\U[0-9A-Fa-f]{1,8}
+        |
+        \\c[?-~]
+      scope: constant.character.escape.fish
+    - match: \\\n
+      scope: constant.character.escape.fish
+    - match: '\{'
+      captures:
+        0: punctuation.section.braces.begin.fish
+      push:
+        - meta_scope: meta.braces.brace-expansion.fish
+        - match: '\}'
+          captures:
+            0: punctuation.section.braces.end.fish
+          pop: true
+        - match: \,
+          scope: punctuation.section.braces.separator.fish
+        - include: command-substitution
+        - include: variable-expansion
+        - include: string-quoted
+        - match: '(?:[+-]?)(?:[0-9]+\.?[0-9]*|[0-9]*\.?[0-9]+)(?=[\s;&)|<>]|\}|\,)'
+          scope: constant.numeric.fish
+        - match: '(?![\s''"])'
+          push:
+            - match: '(?=[\s;&)|<>''"]|\}|\,)'
+              pop: true
+            - match: \\\,
+              scope: constant.character.escape.fish
+            - include: string-unquoted-patterns
+    - match: (\*\*)|(\*)|(\?)
+      scope: meta.wildcard-expansion.fish
+      captures:
+        1: keyword.operator.double-star.fish
+        2: keyword.operator.single-star.fish
+        3: keyword.operator.question-mark.fish
+  variable-expansion:
+    - include: variable-expansion-illegal
+    - match: (?=\$)
+      push:
+        - meta_scope: meta.variable-expansion.fish
+        - match: '(?<=[\$\w])(?=[^\$\w\[])|(?<=\])(?!\[)'
+          pop: true
+        - match: \$
+          captures:
+            0: punctuation.definition.variable.fish
+          push:
+            - meta_scope: variable.other.fish
+            - match: '(?<=[\$\w])(?=[^\$\w])'
+              pop: true
+            - include: variable-expansion-illegal
+            - include: variable-expansion-simple
+        - include: index-expansion
+  variable-expansion-illegal:
+    - match: '\$(?:(?=[,''"\]}\s);&|])|[^\w\$][^$,''"\]}\s);&|]*)'
+      scope: invalid.illegal.variable-expansion.fish
+  variable-expansion-simple:
+    - match: \$
+      captures:
+        0: punctuation.definition.variable.fish
+      push:
+        - meta_scope: variable.other.fish
+        - match: '(?<=[\$\w])(?=[^\$\w])'
+          pop: true
+        - include: variable-expansion-illegal
+        - include: variable-expansion-simple

@@ -1,0 +1,233 @@
+%YAML 1.2
+---
+# http://www.sublimetext.com/docs/3/syntax.html
+
+name: HLSL
+
+file_extensions:
+  - fx
+  - fxh
+  - hlsl
+  - hlsli
+  - usf
+
+scope: source.hlsl
+
+variables:
+  valid_variable: '[A-Za-z_][A-Za-z_0-9]*'
+  reusable_value_types: (?:bool|double|float|half|int|uint)
+  texture_dimensions: (?:1D|2D(?:MS)?|3D|Cube)
+  scalar_types: \b(?:{{reusable_value_types}}|dword|min10float|min16float|min12int|min16int|min16uint|void)\b
+  vector_types: \b(?:{{reusable_value_types}}(?:[1-4]))\b
+  matrix_types: \b(?:{{reusable_value_types}}(?:[1-4])(?:x)(?:[1-4])|(?:matrix))\b
+  texture_types: \b(?:texture|(?:Texture{{texture_dimensions}}(?:Array)?))\b
+
+contexts:
+  prototype:
+    - include: string
+    - include: comments
+    - include: modifiers
+    - include: register
+    - include: buffers
+    - include: control_keywords
+    - include: intrinsics
+    - include: functions
+    - include: preprocessor_tokens
+    - include: preprocessor_keywords
+    - include: basic_built_in_types
+    - include: misc
+
+
+  main:
+    - match: (\bstruct\b)(?:\s+)({{valid_variable}})
+      captures:
+        1: storage.type.struct.hlsl
+        2: entity.name.type.struct.hlsl
+      set:
+        - match: \{
+          set:
+            - match: \}
+              pop: true
+
+    - match: (\bnamespace)(?:\s+)({{valid_variable}})
+      captures:
+        1: keyword.control.namespace.hlsl
+        2: storage.type.namespace.hlsl
+
+    - match: \btypedef\b
+      scope: keyword.control.hlsl
+      set: [typedef_after_typename, typename]
+
+
+  basic_built_in_types:
+    - match: '{{scalar_types}}'
+      scope: storage.type.scalar.hlsl
+
+    - match: '{{vector_types}}'
+      scope: storage.type.vector.hlsl
+
+    - match: '{{matrix_types}}'
+      scope: storage.type.matrix.hlsl
+
+    - match: '{{texture_types}}'
+      scope: storage.type.texture.hlsl
+
+
+  buffers:
+    - match: \b(AppendStructuredBuffer|Buffer|ByteAddressBuffer|cbuffer|ConsumeStructuredBuffer|RWBuffer|RWByteAddressBuffer|RWStructuredBuffer|StructuredBuffer|tbuffer)\b
+      scope: storage.type.buffer.hlsl
+
+
+  comments:
+    - match: \/\*
+      push:
+        - meta_scope: comment.block.hlsl
+        - match: \*\/
+          pop: true
+
+    - match: //
+      push:
+        - meta_scope: comment.line.double-slash.hlsl
+        - match: $
+          pop: true
+
+
+  control_keywords:
+    - match: \b(break|continue|discard|do|else|for|if|return|switch|while)\b
+      scope: keyword.control.hlsl
+
+    - match: \[(branch|flatten|loop|unroll)\]
+      scope: keyword.control.hint.hlsl
+
+
+  functions:
+    - match: (?:(?:({{scalar_types}})|({{vector_types}})|({{matrix_types}})|({{texture_types}})|(\b{{valid_variable}})|(#define))\b)(?:\s+)(\b{{valid_variable}})(?:\s*)(?:\()
+      captures:
+        1: storage.type.scalar.hlsl
+        2: storage.type.vector.hlsl
+        3: storage.type.matrix.hlsl
+        4: storage.type.texture.hlsl
+        5: storage.type.hlsl
+        6: keyword.control.preprocessor.hlsl
+        7: entity.name.function.hlsl
+
+
+  intrinsics:
+    - match: \b(abort|abs|acos|all|AllMemoryBarrier|AllMemoryBarrierWithGroupSync|any|asdouble|asfloat|asin|asint|asuint|atan|atan2|ceil|clamp|clip|cos|cosh|countbits|cross|D3DCOLORtoUBYTE4|ddx|ddx_coarse|ddx_fine|ddy|ddy_coarse|ddy_fine|degrees|determinant|DeviceMemoryBarrier|DeviceMemoryBarrierWithGroupSync|distance|dot|dst|errorf|EvaluateAttributeAtCentroid|EvaluateAttributeAtSample|EvaluateAttributeSnapped|exp|exp2|f16tof32|f32tof16|faceforward|firstbithigh|firstbitlow|floor|fma|fmod|frac|frexp|fwidth|GetRenderTargetSampleCount|GetRenderTargetSamplePosition|GroupMemoryBarrier|GroupMemoryBarrierWithGroupSync|InterlockedAdd|InterlockedAnd|InterlockedCompareExchange|InterlockedCompareStore|InterlockedExchange|InterlockedMax|InterlockedMin|InterlockedOr|InterlockedXor|isfinite|isinf|isnan|ldexp|length|lerp|lit|log|log10|log2|mad|max|min|modf|msad4|mul|noise|normalize|pow|printf|Process2DQuadTessFactorsAvg|Process2DQuadTessFactorsMax|Process2DQuadTessFactorsMin|ProcessIsolineTessFactors|ProcessQuadTessFactorsAvg|ProcessQuadTessFactorsMax|ProcessQuadTessFactorsMin|ProcessTriTessFactorsAvg|ProcessTriTessFactorsMax|ProcessTriTessFactorsMin|radians|rcp|reflect|refract|reversebits|round|rsqrt|saturate|sign|sin|sincos|sinh|smoothstep|sqrt|step|tan|tanh|tex1D|tex1Dbias|tex1Dgrad|tex1Dlod|tex1Dproj|tex2D|tex2Dbias|tex2Dgrad|tex2Dlod|tex2Dproj|tex3D|tex3Dbias|tex3Dgrad|tex3Dlod|tex3Dproj|texCUBE|texCUBEbias|texCUBEgrad|texCUBElod|texCUBEproj|transpose|trunc)\b
+      scope: keyword.function.intrinsic.hlsl
+
+
+  misc:
+    - match: \b((0(x|X)[0-9a-fA-F]*)|(([0-9]+\.?[0-9]*)|(\.[0-9]+))((e|E)(\+|-)?[0-9]+)?)(d|f|u)?\b
+      scope: constant.numeric.hlsl
+
+    - match: \b(false|FALSE|NULL|true|TRUE)\b
+      scope: constant.language.hlsl
+
+    - match: (\+|\-|\*|\/|=|<<|>>|\^|!)
+      scope: keyword.operator.hlsl
+
+    - match: \b(sampler|sampler1D|sampler2D|sampler3D|SamplerComparisonState|samplerCUBE|sampler_state|SamplerState)\b
+      scope: storage.type.sampler.hlsl
+
+    - match: \b(Texture)\b
+      comment: Direct3D 9 Texture keyword
+      scope: keyword.sampler.texture.hlsl
+
+    - match: \b(AddressU|AddressV|AddressW|BorderColor|Filter|MaxAnisotropy|MaxLOD|MinLOD|MipLODBias)\b
+      scope: variable.other.sampler.state.hlsl
+
+    - match: \b(ComparisonFunc|ComparisonFilter)\b
+      scope: variable.other.sampler-comparison.state.hlsl
+
+    - match: ({{valid_variable}})(\:\:)
+      captures:
+        1: entity.name.scope.hlsl
+        2: keyword.operator.scope.hlsl
+
+    - match: (\b{{valid_variable}})(?:\s*)(?:\()
+      captures:
+        1: entity.name.function-call.hlsl
+
+
+  modifiers:
+    - match: \.[xyzwrgba]+\b
+      scope: variable.other.dot-access.hlsl
+
+    - match: \b(in|out|inout)\b
+      scope: variable.other.copy-modifier.hlsl
+
+    - match: \b(centroid|column_major|const|extern|groupshared|inline|nointerpolation|noperspective|precise|row_major|shared|static|uniform|volatile)\b
+      scope: storage.modifier.hlsl
+
+    - match: \b(snorm|unorm)\b
+      scope: storage.type.float.modifier.hlsl
+
+
+  preprocessor_keywords:
+    - match: ^\s*#\s*(elif|else|endif|error|if|ifdef|ifndef|include|line|pragma|undef)\b
+      scope: keyword.control.preprocessor.hlsl
+
+
+  preprocessor_tokens:
+    - match: \b(?:(defined)\s*\(\s*)\b
+      captures:
+        1: keyword.control.preprocessor.hlsl
+      push:
+        - meta_content_scope: constant.other.hlsl
+        - match: \s*\)
+          pop: true
+
+    - match: (#define)(?:\s+)({{valid_variable}})(?:\()
+      captures:
+        1: keyword.control.preprocessor.hlsl
+        2: constant.other.hlsl
+
+    - match: (#define)(?:\s+)({{valid_variable}})
+      captures:
+        1: keyword.control.preprocessor.hlsl
+        2: constant.other.hlsl
+
+
+  register:
+    - match: \b(register|packoffset)\b
+      scope: keyword.register.hlsl
+      set:
+        - match: \(
+          set:
+            - match: \)
+              pop: true
+
+
+  string:
+    - meta_include_prototype: false
+
+    - match: '"'
+      push:
+        - meta_scope: string.quoted.double.hlsl
+        - match: '"'
+          pop: true
+
+
+  typedef_after_typename:
+    - match: (\b{{valid_variable}}\b)(?:(?:(?:\s*)(?:,)(?:\s*)(\b{{valid_variable}}\b))*)(?:\s*)
+      captures:
+        1: entity.name.type.struct.hlsl
+        2: entity.name.type.struct.hlsl
+
+    - match: ;
+      scope: punctuation.terminator.hlsl
+      pop: true
+
+
+  typename:
+    - match: \bstruct\b
+      scope: storage.type.struct.hlsl
+      set:
+        - match: \{
+          set:
+            - match: \}
+              pop: true
+
+    - match: \b{{valid_variable}}\b
+      pop: true

@@ -1,81 +1,315 @@
-.hljs {
-  background: var(--code-background-color);
+.code {
+  color: var(--code-color);
+  background-color: var(--code-background-color);
+}
+
+.comment, .meta.documentation {
+  color: var(--code-grey-color);
+}
+.string {
+  color: var(--code-cyan-color);
+}
+.string.regexp {
+  color: var(--code-cyan-color);
+}
+.constant.character.escape {
+  color: var(--code-red-color);
+}
+.constant.numeric {
+  color: var(--code-purple-color);
+}
+.variable {
+  color: var(--code-blue-color);
+}
+.variable.function {
+  color: var(--code-amber-color);
+}
+.variable.language {
+  color: var(--code-pink-color);
+}
+.keyword {
+  color: var(--code-green-color);
+}
+.meta.import .keyword, .keyword.control.import, .keyword.control.import.from, .keyword.other.import, .keyword.control.at-rule.include, .keyword.control.at-rule.import {
+  color: var(--code-brown-color);
+}
+.keyword.operator.comparison, .keyword.operator.assignment, .keyword.operator.arithmetic {
+  color: var(--code-light-grey-color);
+}
+.storage {
+  color: var(--code-green-color);
+}
+.storage.modifier {
+  color: var(--code-purple-color);
+}
+.keyword.control.class, .entity.name, .entity.name.class, .entity.name.type.class {
+  color: var(--code-amber-color);
+}
+.entity.other.inherited-class {
+  color: var(--code-blue-color);
+}
+.entity.other.attribute-name {
+  color: var(--code-amber-color);
+}
+.support, .support.type, .support.class {
+  color: var(--code-green-color);
+}
+.entity.name.function {
+  color: var(--code-amber-color);
+}
+.punctuation.definition.variable {
+  color: var(--code-green-color);
+}
+.constant, .constant.language, .meta.preprocessor {
+  color: var(--code-amber-color);
+}
+.entity.name.section {
+  color: var(--code-brown-color);
+}
+.support.function.construct, .keyword.other.new {
+  color: var(--code-red-color);
+}
+.constant.character, .constant.other {
+  color: var(--code-brown-color);
+}
+.entity.name.tag {
+  color: var(--code-blue-color);
+}
+.punctuation.definition.tag.html, .punctuation.definition.tag.begin, .punctuation.definition.tag.end {
+  color: var(--code-grey-color);
+}
+.support.function {
+  color: var(--code-purple-color);
+}
+.punctuation.separator.continuation {
+  color: var(--code-red-color);
+}
+.storage.type {
+  color: var(--code-purple-color);
+}
+.support.type.exception {
+  color: var(--code-brown-color);
+}
+.keyword.other.special-method {
+  color: var(--code-brown-color);
+}
+.invalid {
+  background-color: var(--code-brown-color);
+}
+.string.quoted.double, .string.quoted.single {
+  color: var(--code-cyan-color);
+}
+.punctuation.definition.string {
   color: var(--code-color);
 }
-
-/* Comment */
-.hljs-comment,
-.hljs-quote {
-  color: var(--code-comment-color);
+.meta.brace.square, .punctuation.section.brackets {
+  color: var(--code-blue-color);
 }
-
-.hljs-variable,
-.hljs-template-variable,
-.hljs-tag,
-.hljs-name,
-.hljs-selector-id,
-.hljs-selector-class,
-.hljs-regexp,
-.hljs-deletion {
-  color: var(--del-color);
+.meta.brace.round, .meta.brace.curly, .punctuation.section, .punctuation.section.block, .punctuation.definition.parameters, .punctuation.section.group {
+  color: var(--code-light-grey-color);
 }
-
-.hljs-number,
-.hljs-built_in,
-.hljs-literal,
-.hljs-type,
-.hljs-params,
-.hljs-meta,
-.hljs-link {
-  color: var(--code-value-color);
+.support.constant.color, .invalid.deprecated.color.w3c-non-standard-color-name.scss {
+  color: var(--code-amber-color);
 }
-
-.hljs-string,
-.hljs-symbol,
-.hljs-bullet,
-.hljs-addition {
-  color: var(--ins-color);
+.meta.selector.css {
+  color: var(--code-light-grey-color);
 }
-
-.hljs-attribute,
-.hljs-title,
-.hljs-section {
-  color: var(--code-property-color);
+.entity.name.tag.css, .entity.name.tag.scss, .source.less .keyword.control.html.elements, .source.sass .keyword.control.untitled {
+  color: var(--code-amber-color);
 }
-
-.hljs-keyword,
-.hljs-selector-tag {
-  color: var(--code-tag-color);
+.entity.other.attribute-name.class {
+  color: var(--code-amber-color);
 }
-
-.hljs-emphasis {
-  font-style: italic;
+.entity.other.attribute-name.id {
+  color: var(--code-amber-color);
 }
-
-.hljs-strong {
-  font-weight: bold;
+.entity.other.attribute-name.pseudo-element, .entity.other.attribute-name.tag.pseudo-element, .entity.other.attribute-name.pseudo-class, .entity.other.attribute-name.tag.pseudo-class {
+  color: var(--code-blue-color);
 }
-
-@media screen and (-ms-high-contrast: active) {
-  .hljs-addition,
-  .hljs-attribute,
-  .hljs-built_in,
-  .hljs-bullet,
-  .hljs-comment,
-  .hljs-link,
-  .hljs-literal,
-  .hljs-meta,
-  .hljs-number,
-  .hljs-params,
-  .hljs-string,
-  .hljs-symbol,
-  .hljs-type,
-  .hljs-quote {
-        color: highlight;
-    }
-
-    .hljs-keyword,
-    .hljs-selector-tag {
-        font-weight: bold;
-    }
+.text.html.basic .meta.tag.other.html, .text.html.basic .meta.tag.any.html, .text.html.basic .meta.tag.block.any, .text.html.basic .meta.tag.inline.any, .text.html.basic .meta.tag.structure.any.html, .text.html.basic .source.js.embedded.html, .punctuation.separator.key-value.html {
+  color: var(--code-light-grey-color);
+}
+.text.html.basic .entity.other.attribute-name.html, .meta.tag.xml .entity.other.attribute-name {
+  color: var(--code-amber-color);
+}
+.keyword.other.special-method.ruby {
+  color: var(--code-green-color);
+}
+.variable.other.constant.ruby {
+  color: var(--code-amber-color);
+}
+.constant.other.symbol.ruby {
+  color: var(--code-cyan-color);
+}
+.keyword.other.special-method.ruby {
+  color: var(--code-brown-color);
+}
+.meta.array .support.function.construct.php {
+  color: var(--code-amber-color);
+}
+.entity.name.function.preprocessor.c, .meta.preprocessor.c.include, .meta.preprocessor.macro.c {
+  color: var(--code-brown-color);
+}
+.meta.preprocessor.c.include .string.quoted.other.lt-gt.include.c, .meta.preprocessor.c.include .punctuation.definition.string.begin.c, .meta.preprocessor.c.include .punctuation.definition.string.end.c {
+  color: var(--code-cyan-color);
+}
+.other.package.exclude, .other.remove {
+  color: var(--code-red-color);
+}
+.other.add {
+  color: var(--code-cyan-color);
+}
+.punctuation.section.group.tex, .punctuation.definition.arguments.begin.latex, .punctuation.definition.arguments.end.latex, .punctuation.definition.arguments.latex {
+  color: var(--code-red-color);
+}
+.meta.group.braces.tex {
+  color: var(--code-amber-color);
+}
+.string.other.math.tex {
+  color: var(--code-amber-color);
+}
+.variable.parameter.function.latex {
+  color: var(--code-brown-color);
+}
+.punctuation.definition.constant.math.tex {
+  color: var(--code-red-color);
+}
+.text.tex.latex .constant.other.math.tex, .constant.other.general.math.tex, .constant.other.general.math.tex, .constant.character.math.tex {
+  color: var(--code-cyan-color);
+}
+.string.other.math.tex {
+  color: var(--code-amber-color);
+}
+.punctuation.definition.string.begin.tex, .punctuation.definition.string.end.tex {
+  color: var(--code-red-color);
+}
+.keyword.control.label.latex, .text.tex.latex .constant.other.general.math.tex {
+  color: var(--code-cyan-color);
+}
+.variable.parameter.definition.label.latex {
+  color: var(--code-red-color);
+}
+.support.function.be.latex {
+  color: var(--code-green-color);
+}
+.support.function.section.latex {
+  color: var(--code-brown-color);
+}
+.support.function.general.tex {
+  color: var(--code-cyan-color);
+}
+.keyword.control.ref.latex {
+  color: var(--code-cyan-color);
+}
+.storage.type.class.python, .storage.type.function.python, .storage.modifier.global.python {
+  color: var(--code-green-color);
+}
+.support.type.exception.python {
+  color: var(--code-amber-color);
+}
+.meta.scope.for-in-loop.shell, .variable.other.loop.shell {
+  color: var(--code-grey-color);
+}
+.meta.scope.case-block.shell, .meta.scope.case-body.shell {
+  color: var(--code-grey-color);
+}
+.punctuation.definition.logical-expression.shell {
+  color: var(--code-red-color);
+}
+.storage.modifier.c++ {
+  color: var(--code-green-color);
+}
+.support.function.perl {
+  color: var(--code-blue-color);
+}
+.meta.diff, .meta.diff.header {
+  color: var(--code-grey-color);
+}
+.meta.diff.range {
+  color: var(--code-blue-color);
+}
+.markup.deleted {
+  color: var(--code-red-color);
+}
+.markup.changed {
+  color: var(--code-cyan-color);
+}
+.markup.inserted {
+  color: var(--code-green-color);
+}
+.markup.heading, .punctuation.definition.heading.markdown {
+  color: var(--code-amber-color);
+}
+.markup.quote {
+  color: var(--code-green-color);
+}
+.markup.italic {
+font-style: italic;
+}
+.markup.bold {
+font-weight: bold;
+}
+.markup.underline.link.markdown, .meta.link.reference .constant.other.reference.link.markdown {
+  color: var(--code-cyan-color);
+}
+.constant.other.reference.link.markdown {
+  color: var(--code-purple-color);
+}
+.meta.paragraph.markdown .meta.dummy.line-break {
+  background-color: var(--code-grey-color);
+}
+.sublimelinter.notes {
+  color: var(--code-grey-color);
+  background-color: var(--code-grey-color);
+}
+.sublimelinter.outline.illegal {
+  color: var(--code-grey-color);
+  background-color: var(--code-grey-color);
+}
+.sublimelinter.underline.illegal {
+  background-color: var(--code-red-color);
+}
+.sublimelinter.outline.warning {
+  color: var(--code-color);
+  background-color: var(--code-color);
+}
+.sublimelinter.underline.warning {
+  background-color: var(--code-amber-color);
+}
+.sublimelinter.outline.violation {
+  color: var(--code-light-grey-color);
+  background-color: var(--code-light-grey-color);
+}
+.sublimelinter.underline.violation {
+  background-color: var(--code-brown-color);
+}
+.sublimelinter.mark.warning {
+  color: var(--code-amber-color);
+}
+.sublimelinter.mark.error {
+  color: var(--code-red-color);
+}
+.sublimelinter.gutter-mark {
+  color: var(--code-light-grey-color);
+}
+.brackethighlighter.all {
+  color: var(--code-grey-color);
+}
+.entity.name.filename.find-in-files {
+  color: var(--code-cyan-color);
+}
+.constant.numeric.line-number.find-in-files {
+  color: var(--code-grey-color);
+}
+.markup.deleted.git_gutter {
+  color: var(--code-red-color);
+}
+.markup.inserted.git_gutter {
+  color: var(--code-green-color);
+}
+.markup.changed.git_gutter {
+  color: var(--code-amber-color);
+}
+.variable.other.readwrite.js, .variable.other.object.js, .variable.other.constant.js {
+  color: var(--code-color);
 }

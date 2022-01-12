@@ -1,6 +1,7 @@
 {% extends "base" %}
 
 {% block title %}Log out{% endblock title %}
+{% block description %}Log out from your account{% endblock title %}
 
 {% block content%}
 

@@ -1,0 +1,60 @@
+%YAML 1.2
+---
+# http://www.sublimetext.com/docs/3/syntax.html
+name: Forth
+file_extensions:
+  - frt
+  - fs
+scope: source.forth
+contexts:
+  main:
+    - match: (?i:(?<=^|\s)(TRUE|FALSE|BL|PI|CELL|C/L|R/O|W/O|R/W)(?=\s))
+      scope: constant.language.forth
+    - match: '(?<=^|\s)([$#%]?[-+]?[0-9]+(\.[0-9]*e(-?[0-9]+)|\.?[0-9a-fA-F]*))(?=\s)'
+      scope: constant.numeric.forth
+    - match: '(?<=^|\s)(([&^]\S)|(("|'')\S("|'')))(?=\s)'
+      scope: constant.character.forth
+    - match: (?<=^|\s)(-- .*$)
+      comment: line comments for iForth
+      scope: comment.line.double-dash.forth
+    - match: (?<=^|\s)(\\ .*$)
+      comment: ANSI line comment
+      scope: comment.line.backslash.forth
+    - match: '(?<=^|\s)(\\[Gg] .*$)'
+      comment: gForth line comment
+      scope: comment.line.backslash-g.forth
+    - match: (?<=^|\s)(\(\*)(?=\s)
+      comment: multiline comments for iForth
+      push:
+        - meta_scope: comment.block.forth
+        - match: (?<=^|\s)(\*\))(?=\s)
+          pop: true
+    - match: \b(?i:DOC)\b
+      comment: documentation comments for iForth
+      push:
+        - meta_scope: comment.block.documentation.forth
+        - match: \b(?i:ENDDOC)\b
+          pop: true
+    - match: '(?<=^|\s)(\.?\( [^)]*\))'
+      comment: ANSI line comment
+      scope: comment.line.parentheses.forth
+    - match: '(?i:((?<=ABORT" )|(?<=BREAK" )|(?<=\." )|(C" )|(S\\?" )))[^"]+"'
+      scope: string.quoted.double.forth
+    - match: '(?i:((?<=INCLUDE)|(?<=NEEDS)|(?<=REQUIRE)|(?<=USE)))[ ]\S+(?=\s)'
+      scope: string.unquoted.forth
+    - match: '(?<=^|\s)\[(?i:(\?DO|\+LOOP|AGAIN|BEGIN|DO|ELSE|ENDIF|FOR|IF|IFDEF|IFUNDEF|LOOP|NEXT|REPEAT|THEN|UNTIL|WHILE))\](?=\s)'
+      scope: keyword.control.immediate.forth
+    - match: (?<=^|\s)(?i:(COMPILE-ONLY|IMMEDIATE|IS|RESTRICT|TO|WHAT'S))(?=\s)
+      scope: keyword.other.immediate.forth
+    - match: (?<=^|\s)(?i:(-DO|\-LOOP|\?DO|\?LEAVE|\+DO|\+LOOP|ABORT\"|AGAIN|AHEAD|BEGIN|CASE|DO|ELSE|ENDCASE|ENDIF|ENDOF|ENDTRY\-IFERROR|ENDTRY|FOR|IF|IFERROR|LEAVE|LOOP|NEXT|RECOVER|REPEAT|RESTORE|THEN|TRY|U\-DO|U\+DO|UNTIL|WHILE))(?=\s)
+      scope: keyword.control.compile-only.forth
+    - match: '(?<=^|\s)(?i:(\?DUP-0=-IF|\?DUP-IF|\)|\[''\]|\[CHAR\]|\[COMPILE\]|\[IS\]|\[TO\]|<COMPILATION|<INTERPRETATION|ASSERT\(|ASSERT0\(|ASSERT1\(|ASSERT2\(|ASSERT3\(|COMPILATION>|DEFERS|DOES>|INTERPRETATION>|OF|POSTPONE))(?=\s)'
+      scope: keyword.other.compile-only.forth
+    - match: '(?<=^|\s)(?i:(''|<IS>|<TO>|CHAR|END-STRUCT|INCLUDE[D]?|LOAD|NEEDS|REQUIRE[D]?|REVISION|SEE|STRUCT|THRU|USE))(?=\s)'
+      scope: keyword.other.non-immediate.forth
+    - match: (?<=^|\s)(?i:(~~|BREAK:|BREAK"|DBG))(?=\s)
+      scope: keyword.other.warning.forth
+    - match: \b(?i:I|J)\b
+      scope: variable.language.forth
+    - match: '(?<=^|\s)(?i:(2CONSTANT|2VARIABLE|ALIAS|CONSTANT|CREATE-INTERPRET/COMPILE[:]?|CREATE|DEFER|FCONSTANT|FIELD|FVARIABLE|USER|VALUE|VARIABLE|VOCABULARY))(?=\s)'
+      scope: storage.type.forth

@@ -1,0 +1,329 @@
+%YAML 1.2
+---
+# http://www.sublimetext.com/docs/3/syntax.html
+name: Maven POM
+file_extensions:
+  - pom.xml
+scope: text.xml.pom
+contexts:
+  main:
+    - include: profiles
+    - include: pom-body
+    - include: maven-xml
+  build:
+    - match: (<)(build)\s*(>)(?!<\s*/\2\s*>)
+      captures:
+        0: meta.tag.build.begin.xml.pom
+        1: punctuation.definition.tag.xml.pom
+        2: entity.name.tag.xml.pom
+        3: punctuation.definition.tag.xml.pom
+      push:
+        - meta_scope: meta.build.xml.pom
+        - match: (</)(build)\s*(>)(?!<\s*/\2\s*>)
+          captures:
+            0: meta.tag.build.end.xml.pom
+            1: punctuation.definition.tag.xml.pom
+            2: entity.name.tag.xml.pom
+            3: punctuation.definition.tag.xml.pom
+          pop: true
+        - include: plugins
+        - include: extensions
+        - include: maven-xml
+  dependencies:
+    - match: (<)(dependencies)\s*(>)(?!<\s*/\2\s*>)
+      captures:
+        0: meta.tag.dependencies.begin.xml.pom
+        1: punctuation.definition.tag.xml.pom
+        2: entity.name.tag.xml.pom
+        3: punctuation.definition.tag.xml.pom
+      push:
+        - meta_scope: meta.dependencies.xml.pom
+        - match: (</)(dependencies)\s*(>)(?!<\s*/\2\s*>)
+          captures:
+            0: meta.tag.dependencies.end.xml.pom
+            1: punctuation.definition.tag.xml.pom
+            2: entity.name.tag.xml.pom
+            3: punctuation.definition.tag.xml.pom
+          pop: true
+        - include: dependency
+        - include: maven-xml
+  dependency:
+    - match: (<)(dependency)\s*(>)(?!<\s*/\2\s*>)
+      captures:
+        0: meta.tag.dependency.begin.xml.pom
+        1: punctuation.definition.tag.xml.pom
+        2: entity.name.tag.xml.pom
+        3: punctuation.definition.tag.xml.pom
+      push:
+        - meta_scope: meta.dependency.xml.pom
+        - match: (</)(dependency)\s*(>)(?!<\s*/\2\s*>)
+          captures:
+            0: meta.tag.dependency.end.xml.pom
+            1: punctuation.definition.tag.xml.pom
+            2: entity.name.tag.xml.pom
+            3: punctuation.definition.tag.xml.pom
+          pop: true
+        - match: (?<=<artifactId>)
+          push:
+            - meta_scope: meta.dependency-id.xml.pom
+            - match: (?=</artifactId>)
+              pop: true
+        - include: maven-xml
+  distributionManagement:
+    - match: (<)(distributionManagement)\s*(>)(?!<\s*/\2\s*>)
+      captures:
+        0: meta.tag.distributionManagement.begin.xml.pom
+        1: punctuation.definition.tag.xml.pom
+        2: entity.name.tag.xml.pom
+        3: punctuation.definition.tag.xml.pom
+      push:
+        - meta_scope: meta.distributionManagement.xml.pom
+        - match: (</)(distributionManagement)\s*(>)(?!<\s*/\2\s*>)
+          captures:
+            0: meta.tag.distributionManagement.end.xml.pom
+            1: punctuation.definition.tag.xml.pom
+            2: entity.name.tag.xml.pom
+            3: punctuation.definition.tag.xml.pom
+          pop: true
+        - include: maven-xml
+  extension:
+    - match: (<)(extension)\s*(>)(?!<\s*/\2\s*>)
+      captures:
+        0: meta.tag.extension.begin.xml.pom
+        1: punctuation.definition.tag.xml.pom
+        2: entity.name.tag.xml.pom
+        3: punctuation.definition.tag.xml.pom
+      push:
+        - meta_scope: meta.extension.xml.pom
+        - match: (</)(extension)\s*(>)(?!<\s*/\2\s*>)
+          captures:
+            0: meta.tag.extension.end.xml.pom
+            1: punctuation.definition.tag.xml.pom
+            2: entity.name.tag.xml.pom
+            3: punctuation.definition.tag.xml.pom
+          pop: true
+        - match: (?<=<artifactId>)
+          push:
+            - meta_scope: meta.extension-id.xml.pom
+            - match: (?=</artifactId>)
+              pop: true
+        - include: maven-xml
+  extensions:
+    - match: (<)(extensions)\s*(>)(?!<\s*/\2\s*>)
+      captures:
+        0: meta.tag.extensions.begin.xml.pom
+        1: punctuation.definition.tag.xml.pom
+        2: entity.name.tag.xml.pom
+        3: punctuation.definition.tag.xml.pom
+      push:
+        - meta_scope: meta.extensions.xml.pom
+        - match: (</)(extensions)\s*(>)(?!<\s*/\2\s*>)
+          captures:
+            0: meta.tag.extensions.end.xml.pom
+            1: punctuation.definition.tag.xml.pom
+            2: entity.name.tag.xml.pom
+            3: punctuation.definition.tag.xml.pom
+          pop: true
+        - include: extension
+        - include: maven-xml
+  groovy-plugin:
+    - match: ((<)(artifactId)\s*(>)(?!<\s*/\2\s*>))(groovy-maven-plugin)((</)(artifactId)\s*(>)(?!<\s*/\2\s*>))
+      captures:
+        0: meta.groovy-plugin.identifier.xml.pom
+        1: meta.tag.artifactId.begin.xml.pom
+        2: punctuation.definition.tag.xml.pom
+        3: entity.name.tag.xml.pom
+        4: punctuation.definition.tag.xml.pom
+        5: meta.plugin-id.xml.pom
+        6: meta.tag.artifactId.begin.xml.pom
+        7: punctuation.definition.tag.xml.pom
+        8: entity.name.tag.xml.pom
+        9: punctuation.definition.tag.xml.pom
+      push:
+        - meta_scope: meta.plugin.groovy-plugin.xml.pom
+        - match: (?=</plugin>)
+          pop: true
+        - match: (<)(source)\s*(>)(?!<\s*/\2\s*>)
+          captures:
+            0: meta.tag.plugin.begin.xml.pom
+            1: punctuation.definition.tag.xml.pom
+            2: entity.name.tag.xml.pom
+            3: punctuation.definition.tag.xml.pom
+          push:
+            - meta_scope: meta.source.groovy.xml.pom
+            - meta_content_scope: source.groovy
+            - match: (</)(source)\s*(>)(?!<\s*/\2\s*>)
+              captures:
+                0: meta.tag.plugin.end.xml.pom
+                1: punctuation.definition.tag.xml.pom
+                2: entity.name.tag.xml.pom
+                3: punctuation.definition.tag.xml.pom
+              pop: true
+            - include: scope:source.groovy
+        - include: maven-xml
+  maven-xml:
+    - match: '\${'
+      captures:
+        0: punctuation.definition.variable.begin.xml.pom
+      push:
+        - meta_scope: variable.other.expression.xml.pom
+        - match: "}"
+          captures:
+            0: punctuation.definition.variable.begin.xml.pom
+          pop: true
+    - include: scope:text.xml
+  plugin:
+    - match: (<)(plugin)\s*(>)(?!<\s*/\2\s*>)
+      captures:
+        0: meta.tag.plugin.begin.xml.pom
+        1: punctuation.definition.tag.xml.pom
+        2: entity.name.tag.xml.pom
+        3: punctuation.definition.tag.xml.pom
+      push:
+        - meta_scope: meta.plugin.xml.pom
+        - match: (</)(plugin)\s*(>)(?!<\s*/\2\s*>)
+          captures:
+            0: meta.tag.plugin.end.xml.pom
+            1: punctuation.definition.tag.xml.pom
+            2: entity.name.tag.xml.pom
+            3: punctuation.definition.tag.xml.pom
+          pop: true
+        - include: groovy-plugin
+        - match: (?<=<artifactId>)
+          push:
+            - meta_scope: meta.plugin-id.xml.pom
+            - match: (?=</artifactId>)
+              pop: true
+        - include: maven-xml
+  plugins:
+    - match: (<)(plugins)\s*(>)(?!<\s*/\2\s*>)
+      captures:
+        0: meta.tag.plugins.begin.xml.pom
+        1: punctuation.definition.tag.xml.pom
+        2: entity.name.tag.xml.pom
+        3: punctuation.definition.tag.xml.pom
+      push:
+        - meta_scope: meta.plugins.xml.pom
+        - match: (</)(plugins)\s*(>)(?!<\s*/\2\s*>)
+          captures:
+            0: meta.tag.plugins.end.xml.pom
+            1: punctuation.definition.tag.xml.pom
+            2: entity.name.tag.xml.pom
+            3: punctuation.definition.tag.xml.pom
+          pop: true
+        - include: plugin
+        - include: maven-xml
+  pom-body:
+    - include: dependencies
+    - include: repositories
+    - include: build
+    - include: reporting
+    - include: distributionManagement
+    - include: properties
+    - include: maven-xml
+  profile:
+    - match: (<)(profile)\s*(>)(?!<\s*/\2\s*>)
+      captures:
+        0: meta.tag.profile.begin.xml.pom
+        1: punctuation.definition.tag.xml.pom
+        2: entity.name.tag.xml.pom
+        3: punctuation.definition.tag.xml.pom
+      push:
+        - meta_scope: meta.profile.xml.pom
+        - match: (</)(profile)\s*(>)(?!<\s*/\2\s*>)
+          captures:
+            0: meta.tag.profile.end.xml.pom
+            1: punctuation.definition.tag.xml.pom
+            2: entity.name.tag.xml.pom
+            3: punctuation.definition.tag.xml.pom
+          pop: true
+        - match: (?<=<id>)
+          push:
+            - meta_scope: meta.profile-id.xml.pom
+            - match: (?=</id>)
+              pop: true
+        - include: pom-body
+  profiles:
+    - match: (<)(profiles)\s*(>)(?!<\s*/\2\s*>)
+      captures:
+        0: meta.tag.profiles.begin.xml.pom
+        1: punctuation.definition.tag.xml.pom
+        2: entity.name.tag.xml.pom
+        3: punctuation.definition.tag.xml.pom
+      push:
+        - meta_scope: meta.profiles.xml.pom
+        - match: (</)(profiles)\s*(>)(?!<\s*/\2\s*>)
+          captures:
+            0: meta.tag.profiles.end.xml.pom
+            1: punctuation.definition.tag.xml.pom
+            2: entity.name.tag.xml.pom
+            3: punctuation.definition.tag.xml.pom
+          pop: true
+        - include: profile
+  properties:
+    - match: (<)(properties)\s*(>)(?!<\s*/\2\s*>)
+      captures:
+        0: meta.tag.properties.begin.xml.pom
+        1: punctuation.definition.tag.xml.pom
+        2: entity.name.tag.xml.pom
+        3: punctuation.definition.tag.xml.pom
+      push:
+        - meta_scope: meta.properties.xml.pom
+        - match: (</)(properties)\s*(>)(?!<\s*/\2\s*>)
+          captures:
+            0: meta.tag.properties.end.xml.pom
+            1: punctuation.definition.tag.xml.pom
+            2: entity.name.tag.xml.pom
+            3: punctuation.definition.tag.xml.pom
+          pop: true
+        - match: (<)(\w+)\s*(>)(?!<\s*/\2\s*>)
+          captures:
+            0: meta.tag.property.begin.xml.pom
+            1: punctuation.definition.tag.xml.pom
+            2: entity.name.tag.xml.pom
+            3: punctuation.definition.tag.xml.pom
+          push:
+            - meta_scope: meta.property.xml.pom
+            - match: (</)(\w+)\s*(>)(?!<\s*/\2\s*>)
+              captures:
+                0: meta.tag.property.end.xml.pom
+                1: punctuation.definition.tag.xml.pom
+                2: entity.name.tag.xml.pom
+                3: punctuation.definition.tag.xml.pom
+              pop: true
+        - include: maven-xml
+  reporting:
+    - match: (<)(reporting)\s*(>)(?!<\s*/\2\s*>)
+      captures:
+        0: meta.tag.reporting.begin.xml.pom
+        1: punctuation.definition.tag.xml.pom
+        2: entity.name.tag.xml.pom
+        3: punctuation.definition.tag.xml.pom
+      push:
+        - meta_scope: meta.reporting.xml.pom
+        - match: (</)(reporting)\s*(>)(?!<\s*/\2\s*>)
+          captures:
+            0: meta.tag.reporting.end.xml.pom
+            1: punctuation.definition.tag.xml.pom
+            2: entity.name.tag.xml.pom
+            3: punctuation.definition.tag.xml.pom
+          pop: true
+        - include: plugins
+        - include: maven-xml
+  repositories:
+    - match: (<)(repositories)\s*(>)(?!<\s*/\2\s*>)
+      captures:
+        0: meta.tag.repositories.begin.xml.pom
+        1: punctuation.definition.tag.xml.pom
+        2: entity.name.tag.xml.pom
+        3: punctuation.definition.tag.xml.pom
+      push:
+        - meta_scope: meta.repositories.xml.pom
+        - match: (</)(repositories)\s*(>)(?!<\s*/\2\s*>)
+          captures:
+            0: meta.tag.repositories.end.xml.pom
+            1: punctuation.definition.tag.xml.pom
+            2: entity.name.tag.xml.pom
+            3: punctuation.definition.tag.xml.pom
+          pop: true
+        - include: maven-xml

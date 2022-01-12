@@ -1,0 +1,69 @@
+{% extends "base" %}
+
+{% block title %}Home{% endblock title %}
+
+{% block content %}
+
+{% if session %}
+<article>
+  <header>
+    <h1>New paste</h1>
+  </header>
+  <form method="post" action="/p">
+    <div class="grid">
+      <label>
+        Title <small>(optional)</small>
+        <input name="title" type="text" placeholder="stalin_sort.rs"/>
+      </label>
+      <label>
+        Description <small>(optional)</small>
+        <input name="description" type="text" placeholder="Stalin Sort, sorts any array in O(n)"/>
+      </label>
+    </div>
+
+    <fieldset>
+      <label>
+        <input name="unlisted" type="checkbox" role="switch"/>
+        Unlisted
+      </label>
+    </fieldset>
+
+    <label>
+      Content
+      <div id="content-code">
+      </div>
+      <textarea id="content-field" name="content" rows="10" required autofocus></textarea>
+    </label>
+    <script>
+      let field = document.getElementById("content-field");
+      field.hidden = true;
+
+      let code = document.getElementById("content-code");
+      code.innerHTML = `
+        <pre name="content"><code contentEditable=true id="content-code-inner" oninput="updateField()"></code></pre>
+      `;
+
+      let inner = document.getElementById("content-code-inner");
+      inner.focus();
+      function updateField() {
+        field.value = inner.innerText;
+      }
+    </script>
+
+    <button>
+      Create
+    </button>
+  </form>
+</article>
+{% else %}
+<article class="slim">
+  <header>
+    <h1>Welcome!</h1>
+  </header>
+  <p>Welcome to my paste hosting service.</p>
+  <p>Please <a href="/login">login</a> or <a href="/register">register</a> to start pasting (no need to you're just here to browse).</p>
+  <p>Let <a href="mailto:eu@misterio.me">me</a> know if you encounter any bugs or have feedback. Enjoy your stay!</p>
+</article>
+{% endif %}
+
+{% endblock content %}

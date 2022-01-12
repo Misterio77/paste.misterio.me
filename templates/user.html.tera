@@ -1,0 +1,46 @@
+{% extends "base" %}
+
+{% block title %}{{ user.username }}{% endblock title %}
+{% block description %}{{ user.username }}'s pastes{% endblock title %}
+
+{% block content%}
+
+<hgroup>
+  <h1>u/{{ user.username }}</h1>
+  <h2>Pastes</h2>
+</hgroup>
+
+{% set is_owner = session and session.creator == user.username %}
+
+{% for paste in pastes %}
+{% if is_owner or not paste.unlisted %}
+<article>
+  <hgroup>
+    <h3><a href="/p/{{ paste.id }}">{{ paste.title | default(value="Untitled") }}</a></h3>
+    <p>
+      {{ paste.description }}
+      <br />
+      by {{ paste.creator }},
+      <span data-tooltip="{{ paste.creation | date(format="%Y-%m-%d %H:%M:%S") }}">
+        {{ paste.creation | humanize }}
+      </span>
+    - {% if paste.unlisted %}Unlisted{% else %}Public{% endif %}
+    </p>
+  </hgroup>
+
+  <p>
+    <a role="button" class="outline" href="/p/{{ paste.id }}">Open</a>
+    <a role="button" class="outline" href="/p/{{ paste.id }}/raw">Raw</a>
+  </p>
+
+  {% if session and paste.creator == session.creator %}
+  <form method="post" action="/p/{{ paste.id }}/delete">
+    <button class="small delete">Delete</button>
+  </form>
+  {% endif %}
+
+</article>
+{% endif %}
+{% endfor %}
+
+{% endblock content %}
