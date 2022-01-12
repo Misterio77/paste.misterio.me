@@ -31,7 +31,7 @@
 
   <footer>
     <pre><code>{{ highlighted | safe }}</code></pre>
-  <footer>
+  </footer>
 
 </article>
 

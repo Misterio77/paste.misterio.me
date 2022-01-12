@@ -13,11 +13,11 @@
     <div class="grid">
       <label>
         Title <small>(optional)</small>
-        <input name="title" type="text" placeholder="stalin_sort.rs"/>
+        <input name="title" type="url" spellcheck="false" autocomplete="off" placeholder="stalin_sort.rs"/>
       </label>
       <label>
         Description <small>(optional)</small>
-        <input name="description" type="text" placeholder="Stalin Sort, sorts any array in O(n)"/>
+        <input name="description" type="text" autocomplete="off" placeholder="Stalin Sort, sorts any array in O(n)"/>
       </label>
     </div>
 
@@ -36,7 +36,7 @@
     </script>
     <label>
       Content
-      <textarea class="code" oninput="auto_grow(this)" rows="10" name="content" required autofocus></textarea>
+      <textarea name="content" class="code" oninput="auto_grow(this)" spellcheck="false" autocomplete="off" rows="10" required autofocus></textarea>
     </label>
 
     <button>
