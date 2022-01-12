@@ -1,0 +1,9 @@
+image: nixos/unstable
+packages:
+  - nixos.nixUnstable
+environment:
+  NIX_CONFIG: "experimental-features = nix-command flakes"
+tasks:
+- build: |
+    cd paste.misterio.me
+    nix --quiet build
