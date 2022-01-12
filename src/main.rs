@@ -11,8 +11,8 @@ use rocket_dyn_templates::Template;
 use rocket_post_as_delete::PostAsDelete;
 use syntect::parsing::SyntaxSet;
 
-static SYNTAXES: &'static [u8] = include_bytes!(concat!(env!("OUT_DIR"), "/syntaxes.bin"));
-static CSS: &'static str = include_str!(concat!(env!("OUT_DIR"), "/style.css"));
+static SYNTAXES: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/syntaxes.bin"));
+static CSS: &str = include_str!(concat!(env!("OUT_DIR"), "/style.css"));
 
 #[rocket::main]
 async fn main() -> Result<(), ServerError> {

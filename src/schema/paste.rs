@@ -107,17 +107,17 @@ impl Paste {
     pub fn extension(&self) -> Option<String> {
         self.title
             .as_ref()
-            .and_then(|n| n.split(".").last().map(String::from))
+            .and_then(|n| n.split('.').last().map(String::from))
     }
     pub fn highlight(&self, ss: &SyntaxSet) -> String {
-        let ext = self.extension().unwrap_or("txt".into());
+        let ext = self.extension().unwrap_or_else(|| "txt".into());
 
         let syntax = ss
             .find_syntax_by_extension(&ext)
-            .unwrap_or(ss.find_syntax_plain_text());
+            .unwrap_or_else(|| ss.find_syntax_plain_text());
 
         let mut generator =
-            ClassedHTMLGenerator::new_with_class_style(syntax, &ss, ClassStyle::Spaced);
+            ClassedHTMLGenerator::new_with_class_style(syntax, ss, ClassStyle::Spaced);
 
         for line in LinesWithEndings::from(&self.content) {
             generator.parse_html_for_line_which_includes_newline(line);

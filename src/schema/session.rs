@@ -110,7 +110,9 @@ impl TryFrom<Row> for Session {
 use rocket::http::Cookie;
 impl From<Session> for Cookie<'_> {
     fn from(session: Session) -> Self {
-        Cookie::build("session", session.id.to_string()).permanent().finish()
+        Cookie::build("session", session.id.to_string())
+            .permanent()
+            .finish()
     }
 }
 

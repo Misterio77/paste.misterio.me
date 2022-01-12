@@ -1,7 +1,7 @@
 [package]
 name = "paste-misterio-me"
 description = "Paste service"
-version = "0.2.4"
+version = "0.3.0"
 authors = [ "Gabriel Fontes <eu@misterio.me>" ]
 readme = "README.md"
 repository = "https://sr.ht/~misterio/paste.misterio.me"

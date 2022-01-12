@@ -17,10 +17,11 @@ use rocket_db_pools::Connection;
 use rocket_dyn_templates::{context, Template};
 use std::net::IpAddr;
 
-#[get("/")]
-fn login(
+#[get("/?<redir>")]
+pub fn get(
     flash: Option<FlashMessage<'_>>,
     session: Option<Session>,
+    redir: Option<String>,
 ) -> Result<Template, Flash<Redirect>> {
     if session.is_some() {
         return Err(ServerError::builder()
@@ -29,7 +30,7 @@ fn login(
             .flash_redirect("/"));
     }
 
-    Ok(Template::render("login", context! {flash, session}))
+    Ok(Template::render("login", context! {flash, session, redir}))
 }
 
 #[derive(FromForm)]
@@ -38,13 +39,14 @@ struct LoginForm {
     password: String,
 }
 
-#[post("/", data = "<form>")]
+#[post("/?<redir>", data = "<form>")]
 async fn post(
     db: Connection<Database>,
     form: Form<LoginForm>,
     source: IpAddr,
     cookies: &CookieJar<'_>,
     session: Option<Session>,
+    redir: Option<String>,
 ) -> Result<Redirect, Flash<Redirect>> {
     if session.is_some() {
         return Err(ServerError::builder()
@@ -61,18 +63,9 @@ async fn post(
 
     cookies.add_private(new_session.into());
 
-    // Redirection cookie
-    let redir: String = if let Some(after_login) = cookies.get("after_login") {
-        cookies.remove(after_login.to_owned());
-        after_login.value()
-    } else {
-        "/"
-    }
-    .into();
-
-    Ok(Redirect::to(redir))
+    Ok(Redirect::to(redir.unwrap_or_else(|| "/".into())))
 }
 
 pub fn routes() -> Vec<Route> {
-    routes![login, post]
+    routes![get, post]
 }

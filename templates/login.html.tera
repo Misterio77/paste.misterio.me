@@ -12,7 +12,7 @@
       <h2>Need an account? <a href="/register">Register</a></h2>
     </hgroup>
   </header>
-  <form method="post">
+  <form method="post" action="/login{% if redir %}?redir={{ redir | urlencode_strict }}{% endif %}">
     <label>
       Username
       <input type="text" name="username" autocomplete="username" required autofocus />

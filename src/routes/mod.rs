@@ -18,8 +18,8 @@ pub mod home {
 }
 
 pub mod assets {
-    use rocket::{get, routes, Route, State};
     use crate::style::StyleSheet;
+    use rocket::{get, routes, Route, State};
 
     #[get("/style.css")]
     async fn assets(css: &State<StyleSheet>) -> &StyleSheet {
@@ -35,22 +35,20 @@ pub mod errors {
     use crate::error::ServerError;
     use rocket::{
         catch, catchers,
-        http::Cookie,
         http::Status,
         response::{Flash, Redirect},
         Catcher, Request,
     };
     #[catch(401)]
     fn unauthorized(req: &Request) -> Flash<Redirect> {
-        // Uri to redirect to after logging in
-        req.cookies()
-            .add(Cookie::new("after_login", req.uri().to_string()));
+        let redir = req.uri().to_string();
+        let uri = format!("/login?redir={}", redir);
 
         ServerError::builder()
             .code(Status::Unauthorized)
             .message("Please login first")
             .build()
-            .flash_redirect("/login")
+            .flash_redirect(&uri)
     }
 
     #[catch(404)]

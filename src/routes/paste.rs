@@ -1,4 +1,4 @@
-use crate::{database::Database, schema::Paste, schema::Session, error::ServerError};
+use crate::{database::Database, error::ServerError, schema::Paste, schema::Session};
 
 use rocket::{
     delete,
@@ -62,9 +62,16 @@ async fn post(
 ) -> Result<Redirect, Flash<Redirect>> {
     let form = form.into_inner();
 
-    let paste = Paste::create(&db, &session.creator, form.content, form.unlisted, form.title, form.description)
-        .await
-        .map_err(|e| e.flash_redirect("/"))?;
+    let paste = Paste::create(
+        &db,
+        &session.creator,
+        form.content,
+        form.unlisted,
+        form.title,
+        form.description,
+    )
+    .await
+    .map_err(|e| e.flash_redirect("/"))?;
 
     Ok(Redirect::to(format!("/p/{}", paste.id)))
 }
