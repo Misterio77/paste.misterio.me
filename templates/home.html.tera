@@ -13,11 +13,11 @@
     <div class="grid">
       <label>
         Title <small>(optional)</small>
-        <input name="title" type="url" spellcheck="false" autocomplete="off" autocapitalize="none" autocorrect="off" placeholder="stalin_sort.rs"/>
+        <input name="title" type="text" spellcheck="false" autocomplete="off" autocapitalize="none" autocorrect="off" placeholder="stalin_sort.rs"/>
       </label>
       <label>
         Description <small>(optional)</small>
-        <input name="description" type="text" autocomplete="off" placeholder="Stalin Sort, sorts any array in O(n)"/>
+        <input name="description" type="text" autocomplete="off" spellcheck="true" placeholder="Stalin Sort, sorts any array in O(n)"/>
       </label>
     </div>
 
