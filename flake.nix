@@ -17,7 +17,7 @@
     rec {
       inherit overlay overlays;
 
-      nixosModules."${name}" = import ./module.nix {};
+      nixosModules."${name}" = import ./module.nix;
       nixosModule = nixosModules."${name}";
     } //
     (utils.lib.eachDefaultSystem (system:
