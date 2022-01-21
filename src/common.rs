@@ -1,5 +1,5 @@
 use rocket::{
-    http::{Header, hyper::http::header::LOCATION},
+    http::{hyper::http::header::LOCATION, Header},
     Responder,
 };
 

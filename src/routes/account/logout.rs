@@ -1,4 +1,4 @@
-use crate::{database::Database, schema::Session, error::ServerError};
+use crate::{database::Database, error::ServerError, schema::Session};
 
 use rocket::{
     form::{Form, FromForm},
