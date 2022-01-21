@@ -1,21 +1,21 @@
 /**
- * Theme: default
+ * Theme: misterio
  */
 
 // Variables
 @import "../variables";
-@import "default/colors";
+@import "misterio/colors";
 
 // Commons styles
-@import "default/styles";
+@import "misterio/styles";
 
 // Light theme (Default)
 // Can be forced with data-theme="light"
-@import "default/light";
+@import "misterio/light";
 
 // Dark theme (Auto)
 // Automatically enabled if user has Dark mode enabled
-@import "default/dark";
+@import "misterio/dark";
 @media only screen and (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     @include dark;

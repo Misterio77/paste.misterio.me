@@ -26,8 +26,7 @@
   </hgroup>
 
   <p>
-    <a role="button" class="outline" href="/p/{{ paste.id }}">Open</a>
-    <a role="button" class="outline" href="/p/{{ paste.id }}/raw">Raw</a>
+    <a role="button" class="outline" href="/p/{{ paste.id }}/raw">See Raw</a>
   </p>
 
   {% if session and paste.creator == session.creator %}

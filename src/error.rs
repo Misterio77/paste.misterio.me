@@ -141,7 +141,12 @@ impl From<rocket_db_pools::deadpool_postgres::tokio_postgres::Error> for ServerE
                     (db_e.to_string(), Status::InternalServerError)
                 }
             }
-            None => (e.to_string(), Status::InternalServerError),
+            None => match e.to_string().as_str() {
+                "query returned an unexpected number of rows" => {
+                    ("Resource not found".into(), Status::NotFound)
+                }
+                e => (e.into(), Status::InternalServerError),
+            },
         };
 
         ServerError::builder()

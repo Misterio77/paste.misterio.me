@@ -127,7 +127,7 @@ async fn delete(
         .await
         .map_err(|e| e.flash_redirect("/p/{{ id }}"))?;
 
-    Ok(Flash::success(Redirect::to("/"), "Paste deleted"))
+    Ok(Flash::success(Redirect::to("/u"), "Paste deleted"))
 }
 
 #[delete("/<id>", format = "json")]
