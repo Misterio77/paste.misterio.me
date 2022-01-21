@@ -9,10 +9,13 @@ use rocket::{
     get, post,
     request::FlashMessage,
     response::{Flash, Redirect},
-    routes, Route,
+    routes,
+    serde::json::Json,
+    Route,
 };
 use rocket_db_pools::Connection;
 use rocket_dyn_templates::{context, Template};
+use serde::Deserialize;
 
 #[get("/")]
 fn get(
@@ -29,14 +32,14 @@ fn get(
     Ok(Template::render("register", context! {flash, session}))
 }
 
-#[derive(FromForm)]
+#[derive(FromForm, Deserialize)]
 struct RegisterForm {
     username: String,
     email: String,
     password: String,
 }
 
-#[post("/", data = "<form>")]
+#[post("/", data = "<form>", rank = 1)]
 async fn post(
     db: Connection<Database>,
     form: Form<RegisterForm>,
@@ -65,6 +68,29 @@ async fn post(
     ))
 }
 
+#[post("/", data = "<body>", format = "json")]
+async fn post_json(
+    db: Connection<Database>,
+    body: Form<RegisterForm>,
+    session: Option<Session>,
+) -> Result<Json<()>, ServerError> {
+    if session.is_some() {
+        return Err(ServerError::builder()
+            .message("You're already logged in")
+            .build());
+    }
+
+    let RegisterForm {
+        username,
+        email,
+        password,
+    } = body.into_inner();
+
+    let _user = User::register(&db, username, email, password).await?;
+
+    Ok(Json(()))
+}
+
 pub fn routes() -> Vec<Route> {
-    routes![get, post]
+    routes![get, post, post_json]
 }

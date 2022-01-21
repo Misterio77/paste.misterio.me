@@ -11,7 +11,8 @@ use std::net::IpAddr;
 #[derive(Debug, Serialize)]
 pub struct User {
     pub username: String,
-    pub email: String,
+    #[serde(skip_serializing)]
+    email: String,
     #[serde(skip_serializing)]
     password: String,
 }

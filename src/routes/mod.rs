@@ -4,22 +4,27 @@ pub mod user;
 
 pub mod home {
     use crate::schema::Session;
-    use rocket::{get, request::FlashMessage, routes, Route};
+    use rocket::{get, request::FlashMessage, routes, serde::json::Json, Route};
     use rocket_dyn_templates::{context, Template};
 
-    #[get("/")]
+    #[get("/", rank = 1)]
     async fn home(flash: Option<FlashMessage<'_>>, session: Option<Session>) -> Template {
         Template::render("home", context! {flash, session})
     }
 
+    #[get("/", format = "json")]
+    async fn home_json() -> Json<()> {
+        Json(())
+    }
+
     pub fn routes() -> Vec<Route> {
-        routes![home]
+        routes![home, home_json]
     }
 }
 
 pub mod assets {
     use crate::style::StyleSheet;
-    use rocket::{get, routes, Route, State, response::Redirect};
+    use rocket::{get, response::Redirect, routes, Route, State};
 
     #[get("/style.css")]
     fn style() -> Redirect {
@@ -40,20 +45,27 @@ pub mod errors {
     use crate::error::ServerError;
     use rocket::{
         catch, catchers,
-        http::Status,
+        http::{MediaType, Status},
         response::{Flash, Redirect},
         Catcher, Request,
     };
-    #[catch(401)]
-    fn unauthorized(req: &Request) -> Flash<Redirect> {
-        let redir = req.uri().to_string();
-        let uri = format!("/login?redir={}", redir);
 
-        ServerError::builder()
+    #[catch(401)]
+    fn unauthorized(req: &Request) -> Result<Flash<Redirect>, ServerError> {
+        let error = ServerError::builder()
             .code(Status::Unauthorized)
             .message("Please login first")
-            .build()
-            .flash_redirect(&uri)
+            .build();
+
+        // If JSON, just return the error
+        if req.format() == Some(&MediaType::JSON) {
+            Err(error)
+        // Else, redirect to login with error as flash messge
+        } else {
+            let redir = req.uri().to_string();
+            let uri = format!("/login?redir={}", redir);
+            Ok(error.flash_redirect(&uri))
+        }
     }
 
     #[catch(404)]

@@ -106,12 +106,32 @@ impl Paste {
     pub fn highlight(&self, ss: &SyntaxSet) -> String {
         ss.highlight(self.extension(), &self.content)
     }
-    pub async fn show_all(db: &Client, creator: &str) -> Result<Vec<Paste>, ServerError> {
-        Paste::list(db, creator).await
+    pub async fn show_all(
+        db: &Client,
+        creator: &str,
+        requester: Option<&str>,
+    ) -> Result<Vec<Paste>, ServerError> {
+        Ok(Paste::list(db, creator)
+            .await?
+            .into_iter()
+            .filter(|p| !p.unlisted || requester == Some(&p.creator))
+            .collect())
     }
-    pub async fn remove(&self, db: &Client, id: Option<Uuid>) -> Result<(), ServerError> {
-        Paste::delete(db, &self.creator, id).await?;
-        Ok(())
+    pub async fn remove(
+        &self,
+        db: &Client,
+        id: Option<Uuid>,
+        requester: &str,
+    ) -> Result<(), ServerError> {
+        if self.creator == requester {
+            Paste::delete(db, &self.creator, id).await?;
+            Ok(())
+        } else {
+            Err(ServerError::builder()
+                .code(Status::Forbidden)
+                .message("This paste isn't yours")
+                .into())
+        }
     }
 }
 

@@ -1,4 +1,6 @@
-use crate::{database::Database, error::ServerError, schema::Paste, schema::Session, syntax::SyntaxSet};
+use crate::{
+    database::Database, error::ServerError, schema::Paste, schema::Session, syntax::SyntaxSet,
+};
 
 use rocket::{
     delete,
@@ -6,10 +8,13 @@ use rocket::{
     get, post,
     request::FlashMessage,
     response::{Flash, Redirect},
-    routes, Route, State,
+    routes,
+    serde::json::Json,
+    Route, State,
 };
 use rocket_db_pools::Connection;
 use rocket_dyn_templates::{context, Template};
+use serde::Deserialize;
 
 use uuid::Uuid;
 
@@ -18,7 +23,7 @@ async fn root() -> Redirect {
     Redirect::to("/")
 }
 
-#[get("/<id>")]
+#[get("/<id>", rank = 1)]
 async fn get(
     db: Connection<Database>,
     session: Option<Session>,
@@ -38,6 +43,13 @@ async fn get(
     ))
 }
 
+#[get("/<id>", format = "json")]
+async fn get_json(db: Connection<Database>, id: Uuid) -> Result<Json<Paste>, ServerError> {
+    let paste = Paste::get(&db, id).await?;
+
+    Ok(Json(paste))
+}
+
 #[get("/<id>/raw")]
 async fn get_raw(db: Connection<Database>, id: Uuid) -> Result<String, ServerError> {
     let paste = Paste::get(&db, id).await?;
@@ -45,7 +57,7 @@ async fn get_raw(db: Connection<Database>, id: Uuid) -> Result<String, ServerErr
     Ok(paste.content)
 }
 
-#[derive(FromForm)]
+#[derive(FromForm, Deserialize)]
 struct CreateForm {
     title: Option<String>,
     description: Option<String>,
@@ -53,7 +65,7 @@ struct CreateForm {
     unlisted: bool,
 }
 
-#[post("/", data = "<form>")]
+#[post("/", data = "<form>", rank = 1)]
 async fn post(
     db: Connection<Database>,
     session: Session,
@@ -75,7 +87,28 @@ async fn post(
     Ok(Redirect::to(format!("/p/{}", paste.id)))
 }
 
-#[delete("/<id>")]
+#[post("/", data = "<body>", format = "json")]
+async fn post_json(
+    db: Connection<Database>,
+    session: Session,
+    body: Form<CreateForm>,
+) -> Result<Json<Paste>, ServerError> {
+    let body = body.into_inner();
+
+    let paste = Paste::create(
+        &db,
+        &session.creator,
+        body.content,
+        body.unlisted,
+        body.title,
+        body.description,
+    )
+    .await?;
+
+    Ok(Json(paste))
+}
+
+#[delete("/<id>", rank = 1)]
 async fn delete(
     db: Connection<Database>,
     session: Session,
@@ -85,21 +118,35 @@ async fn delete(
         .await
         .map_err(|e| e.flash_redirect("/"))?;
 
-    if paste.creator != session.creator {
-        return Err(Flash::error(
-            Redirect::to("/p/{{ id }}"),
-            "This paste isn't yours",
-        ));
-    }
-
     paste
-        .remove(&db, Some(id))
+        .remove(&db, Some(id), &session.creator)
         .await
         .map_err(|e| e.flash_redirect("/p/{{ id }}"))?;
 
     Ok(Flash::success(Redirect::to("/"), "Paste deleted"))
 }
 
+#[delete("/<id>", format = "json")]
+async fn delete_json(
+    db: Connection<Database>,
+    session: Session,
+    id: Uuid,
+) -> Result<Json<()>, ServerError> {
+    let paste = Paste::get(&db, id).await?;
+    paste.remove(&db, Some(id), &session.creator).await?;
+
+    Ok(Json(()))
+}
+
 pub fn routes() -> Vec<Route> {
-    routes![root, get, delete, post, get_raw]
+    routes![
+        root,
+        get,
+        get_json,
+        delete,
+        delete_json,
+        post,
+        post_json,
+        get_raw
+    ]
 }
