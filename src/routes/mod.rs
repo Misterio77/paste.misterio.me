@@ -4,7 +4,7 @@ pub mod user;
 
 pub mod home {
     use crate::schema::Session;
-    use rocket::{get, request::FlashMessage, routes, serde::json::Json, Route};
+    use rocket::{get, request::FlashMessage, routes, Route};
     use rocket_dyn_templates::{context, Template};
 
     #[get("/", rank = 1)]
@@ -13,9 +13,7 @@ pub mod home {
     }
 
     #[get("/", format = "json")]
-    async fn home_json() -> Json<()> {
-        Json(())
-    }
+    async fn home_json() {}
 
     pub fn routes() -> Vec<Route> {
         routes![home, home_json]

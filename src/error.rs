@@ -1,6 +1,8 @@
 pub use rocket::{
-    http::Status,
+    http::{MediaType, Status},
     outcome::{IntoOutcome, Outcome},
+    response::{Responder, Response},
+    serde::json::Json,
 };
 
 use std::error::Error as StdError;
@@ -150,14 +152,22 @@ impl From<rocket_db_pools::deadpool_postgres::tokio_postgres::Error> for ServerE
     }
 }
 
-impl<'r> rocket::response::Responder<'r, 'static> for ServerError {
+impl<'r> Responder<'r, 'static> for ServerError {
     fn respond_to(
         self,
         req: &'r rocket::request::Request<'_>,
     ) -> rocket::response::Result<'static> {
+        let code = self.code;
+
+        let response = if req.format() == Some(&MediaType::JSON) {
+            Json(self).respond_to(req)
+        } else {
+            Template::render("error", self).respond_to(req)
+        }?;
+
         rocket::response::Response::build()
-            .status(self.code)
-            .join(Template::render("error", self).respond_to(req)?)
+            .status(code)
+            .join(response)
             .ok()
     }
 }

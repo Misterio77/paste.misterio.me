@@ -75,14 +75,14 @@ async fn post_json(
     body: Json<LoginForm>,
     source: IpAddr,
     cookies: &CookieJar<'_>,
-) -> Result<Json<()>, ServerError> {
+) -> Result<(), ServerError> {
     let LoginForm { username, password } = body.into_inner();
 
     let new_session = User::login(&db, username, password, source).await?;
 
     cookies.add_private(new_session.into());
 
-    Ok(Json(()))
+    Ok(())
 }
 
 pub fn routes() -> Vec<Route> {

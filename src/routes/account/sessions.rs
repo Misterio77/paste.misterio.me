@@ -63,10 +63,10 @@ async fn delete_json(
     db: Connection<Database>,
     session: Session,
     id: Uuid,
-) -> Result<Json<()>, ServerError> {
+) -> Result<(), ServerError> {
     session.revoke(&db, Some(id)).await?;
 
-    Ok(Json(()))
+    Ok(())
 }
 
 pub fn routes() -> Vec<Route> {

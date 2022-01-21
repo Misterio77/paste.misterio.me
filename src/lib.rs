@@ -7,3 +7,6 @@ pub mod schema;
 pub mod style;
 pub mod syntax;
 pub mod tera;
+pub mod common;
+
+pub use common::Created;

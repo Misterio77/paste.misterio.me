@@ -50,7 +50,7 @@ async fn post_json(
     body: Json<LogoutForm>,
     cookies: &CookieJar<'_>,
     session: Session,
-) -> Result<Json<()>, ServerError> {
+) -> Result<(), ServerError> {
     if body.all {
         session.revoke_all(&db).await
     } else {
@@ -59,7 +59,7 @@ async fn post_json(
 
     cookies.remove_private(Cookie::named("session"));
 
-    Ok(Json(()))
+    Ok(())
 }
 
 pub fn routes() -> Vec<Route> {

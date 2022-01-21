@@ -71,9 +71,9 @@ async fn post(
 #[post("/", data = "<body>", format = "json")]
 async fn post_json(
     db: Connection<Database>,
-    body: Form<RegisterForm>,
+    body: Json<RegisterForm>,
     session: Option<Session>,
-) -> Result<Json<()>, ServerError> {
+) -> Result<(), ServerError> {
     if session.is_some() {
         return Err(ServerError::builder()
             .message("You're already logged in")
@@ -88,7 +88,7 @@ async fn post_json(
 
     let _user = User::register(&db, username, email, password).await?;
 
-    Ok(Json(()))
+    Ok(())
 }
 
 pub fn routes() -> Vec<Route> {

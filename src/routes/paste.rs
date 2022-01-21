@@ -1,5 +1,6 @@
 use crate::{
-    database::Database, error::ServerError, schema::Paste, schema::Session, syntax::SyntaxSet,
+    common::Created, database::Database, error::ServerError, schema::Paste, schema::Session,
+    syntax::SyntaxSet,
 };
 
 use rocket::{
@@ -62,6 +63,7 @@ struct CreateForm {
     title: Option<String>,
     description: Option<String>,
     content: String,
+    #[serde(default)]
     unlisted: bool,
 }
 
@@ -91,8 +93,8 @@ async fn post(
 async fn post_json(
     db: Connection<Database>,
     session: Session,
-    body: Form<CreateForm>,
-) -> Result<Json<Paste>, ServerError> {
+    body: Json<CreateForm>,
+) -> Result<Created<Json<Paste>>, ServerError> {
     let body = body.into_inner();
 
     let paste = Paste::create(
@@ -105,7 +107,9 @@ async fn post_json(
     )
     .await?;
 
-    Ok(Json(paste))
+    let location = format!("/p/{}", paste.id);
+
+    Ok(Created::new(Json(paste), &location))
 }
 
 #[delete("/<id>", rank = 1)]
@@ -131,11 +135,11 @@ async fn delete_json(
     db: Connection<Database>,
     session: Session,
     id: Uuid,
-) -> Result<Json<()>, ServerError> {
+) -> Result<(), ServerError> {
     let paste = Paste::get(&db, id).await?;
     paste.remove(&db, Some(id), &session.creator).await?;
 
-    Ok(Json(()))
+    Ok(())
 }
 
 pub fn routes() -> Vec<Route> {
