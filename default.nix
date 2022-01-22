@@ -20,7 +20,7 @@ in rustPlatform.buildRustPackage rec {
   '';
 
   meta = with lib; {
-    description = manifest.desciption;
+    description = manifest.description;
     homepage = manifest.homepage;
     license = licenses.agpl3Plus;
     platforms = platforms.all;
