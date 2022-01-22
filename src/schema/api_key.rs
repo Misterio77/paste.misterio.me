@@ -143,7 +143,7 @@ impl<'r> FromRequest<'r> for ApiKey {
             .headers()
             .get("Authorization")
             .next()
-            .map(|k| k.to_string())
+            .and_then(|h| h.split_whitespace().last().map(|k| k.to_string()))
             .into_outcome(
                 ServerError::builder()
                     .code(Status::Unauthorized)
