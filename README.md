@@ -11,7 +11,7 @@ This is a simple pasting service, designed to be quick and easy to use. It also 
 
 All the routes can also receive and return JSON. Just pass a JSON payload and/or put JSON into your `Accept` header. You can use `httpie`, for examploe.
 
-Lastly, we have a [work in progress CLI](https://git.sr.ht/~misterio/pmis) for interacting with the service.
+Lastly, we have a [nice CLI](https://git.sr.ht/~misterio/pmis) for interacting with the service.
 
 ### Where
 
