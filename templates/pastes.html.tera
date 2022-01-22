@@ -24,14 +24,17 @@
 <article>
   <hgroup>
     <h3><a href="/p/{{ paste.id }}">{{ paste.title | default(value="Untitled") }}</a></h3>
+    <p><code>{{ paste.id }}</code></p>
     <p>
-      {{ paste.description }}
-      <br />
-      by {{ paste.creator }},
+      {% if paste.description %}
+        {{ paste.description }}
+        <br />
+      {% endif %}
+      by <a href="/u/{{ paste.creator }}">u/{{ paste.creator }}</a>,
       <span data-tooltip="{{ paste.creation | date(format="%Y-%m-%d %H:%M:%S") }}">
         {{ paste.creation | humanize }}
       </span>
-    - {% if paste.unlisted %}Unlisted{% else %}Public{% endif %}
+      - {% if paste.unlisted %}Unlisted{% else %}Public{% endif %}
     </p>
   </hgroup>
 
