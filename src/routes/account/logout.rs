@@ -1,4 +1,4 @@
-use crate::{database::Database, error::ServerError, schema::Session};
+use crate::{database::Database, schema::Session};
 
 use rocket::{
     form::{Form, FromForm},
@@ -7,9 +7,7 @@ use rocket::{
     post,
     request::FlashMessage,
     response::{Flash, Redirect},
-    routes,
-    serde::json::Json,
-    Route,
+    routes, Route,
 };
 use rocket_db_pools::Connection;
 use rocket_dyn_templates::{context, Template};
@@ -44,24 +42,6 @@ async fn post(
     Ok(Redirect::to("/"))
 }
 
-#[post("/", data = "<body>", format = "json")]
-async fn post_json(
-    db: Connection<Database>,
-    body: Json<LogoutForm>,
-    cookies: &CookieJar<'_>,
-    session: Session,
-) -> Result<(), ServerError> {
-    if body.all {
-        session.revoke_all(&db).await
-    } else {
-        session.revoke_self(&db).await
-    }?;
-
-    cookies.remove_private(Cookie::named("session"));
-
-    Ok(())
-}
-
 pub fn routes() -> Vec<Route> {
-    routes![get, post, post_json]
+    routes![get, post]
 }

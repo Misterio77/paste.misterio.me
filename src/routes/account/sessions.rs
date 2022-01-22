@@ -1,12 +1,10 @@
-use crate::{database::Database, error::ServerError, schema::Session};
+use crate::{database::Database, schema::Session};
 
 use rocket::{
     delete, get,
     request::FlashMessage,
     response::{Flash, Redirect},
-    routes,
-    serde::json::Json,
-    Route,
+    routes, Route,
 };
 use rocket_db_pools::Connection;
 use rocket_dyn_templates::{context, Template};
@@ -29,15 +27,6 @@ async fn list(
     ))
 }
 
-#[get("/", format = "json")]
-async fn list_json(
-    db: Connection<Database>,
-    session: Session,
-) -> Result<Json<Vec<Session>>, ServerError> {
-    let sessions = session.show_all(&db).await?;
-    Ok(Json(sessions))
-}
-
 #[delete("/<id>", rank = 1)]
 async fn delete(
     db: Connection<Database>,
@@ -58,17 +47,6 @@ async fn delete(
     Ok(Flash::success(Redirect::to(redir), "Session revoked"))
 }
 
-#[delete("/<id>", format = "json")]
-async fn delete_json(
-    db: Connection<Database>,
-    session: Session,
-    id: Uuid,
-) -> Result<(), ServerError> {
-    session.revoke(&db, Some(id)).await?;
-
-    Ok(())
-}
-
 pub fn routes() -> Vec<Route> {
-    routes![list, list_json, delete, delete_json]
+    routes![list, delete]
 }

@@ -11,9 +11,7 @@ use rocket::{
     post,
     request::FlashMessage,
     response::{Flash, Redirect},
-    routes,
-    serde::json::Json,
-    Route,
+    routes, Route,
 };
 use rocket_db_pools::Connection;
 use rocket_dyn_templates::{context, Template};
@@ -69,22 +67,6 @@ async fn post(
     Ok(Redirect::to(redir.unwrap_or_else(|| "/".into())))
 }
 
-#[post("/", data = "<body>", format = "json")]
-async fn post_json(
-    db: Connection<Database>,
-    body: Json<LoginForm>,
-    source: IpAddr,
-    cookies: &CookieJar<'_>,
-) -> Result<(), ServerError> {
-    let LoginForm { username, password } = body.into_inner();
-
-    let new_session = User::login(&db, username, password, source).await?;
-
-    cookies.add_private(new_session.into());
-
-    Ok(())
-}
-
 pub fn routes() -> Vec<Route> {
-    routes![get, post, post_json]
+    routes![get, post]
 }

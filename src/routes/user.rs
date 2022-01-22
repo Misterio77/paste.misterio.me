@@ -1,7 +1,7 @@
 use crate::{
     database::Database,
     error::ServerError,
-    schema::{Paste, Session, User},
+    schema::{ApiKey, Paste, Session, User},
 };
 
 use rocket::{
@@ -20,8 +20,13 @@ async fn root(session: Session) -> Redirect {
     Redirect::to(format!("/u/{}", session.creator))
 }
 
-#[get("/<username>", rank = 1)]
-async fn get(
+#[get("/<username>")]
+async fn get(username: String) -> Redirect {
+    Redirect::to(format!("/u/{}/pastes", username))
+}
+
+#[get("/<username>/pastes", rank = 1)]
+async fn get_pastes(
     db: Connection<Database>,
     session: Option<Session>,
     username: String,
@@ -40,24 +45,18 @@ async fn get(
     pastes.sort_unstable_by(|a, b| b.creation.partial_cmp(&a.creation).unwrap());
 
     Ok(Template::render(
-        "user",
+        "pastes",
         context! {session, user, flash, pastes},
     ))
 }
 
-#[get("/<username>", format = "json")]
-async fn get_json(db: Connection<Database>, username: String) -> Result<Json<User>, ServerError> {
-    let user = User::get(&db, &username).await?;
-    Ok(Json(user))
-}
-
 #[get("/<username>/pastes", format = "json")]
-async fn get_pastes_json(
+async fn api_get_pastes(
     db: Connection<Database>,
-    session: Option<Session>,
+    key: Option<ApiKey>,
     username: String,
 ) -> Result<Json<Vec<Paste>>, ServerError> {
-    let requester = session.as_ref().map(|s| &*s.creator);
+    let requester = key.as_ref().map(|k| &*k.creator);
     let mut pastes = Paste::show_all(&db, &username, requester).await?;
     pastes.sort_unstable_by(|a, b| b.creation.partial_cmp(&a.creation).unwrap());
 
@@ -65,5 +64,5 @@ async fn get_pastes_json(
 }
 
 pub fn routes() -> Vec<Route> {
-    routes![root, get, get_json, get_pastes_json]
+    routes![root, get, get_pastes, api_get_pastes]
 }

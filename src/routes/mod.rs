@@ -13,10 +13,10 @@ pub mod home {
     }
 
     #[get("/", format = "json")]
-    async fn home_json() {}
+    async fn api_home() {}
 
     pub fn routes() -> Vec<Route> {
-        routes![home, home_json]
+        routes![home, api_home]
     }
 }
 

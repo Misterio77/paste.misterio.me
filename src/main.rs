@@ -37,6 +37,7 @@ async fn main() -> Result<(), ServerError> {
         .mount("/logout", account::logout::routes())
         .mount("/register", account::register::routes())
         .mount("/sessions", account::sessions::routes())
+        .mount("/keys", account::keys::routes())
         // Pastes
         .mount("/p", paste::routes())
         // Users

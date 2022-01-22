@@ -1,5 +1,8 @@
 use crate::{
-    common::Created, database::Database, error::ServerError, schema::Paste, schema::Session,
+    common::Created,
+    database::Database,
+    error::ServerError,
+    schema::{ApiKey, Paste, Session},
     syntax::SyntaxSet,
 };
 
@@ -45,7 +48,7 @@ async fn get(
 }
 
 #[get("/<id>", format = "json")]
-async fn get_json(db: Connection<Database>, id: Uuid) -> Result<Json<Paste>, ServerError> {
+async fn api_get(db: Connection<Database>, id: Uuid) -> Result<Json<Paste>, ServerError> {
     let paste = Paste::get(&db, id).await?;
 
     Ok(Json(paste))
@@ -90,16 +93,16 @@ async fn post(
 }
 
 #[post("/", data = "<body>", format = "json")]
-async fn post_json(
+async fn api_post(
     db: Connection<Database>,
-    session: Session,
+    key: ApiKey,
     body: Json<CreateForm>,
 ) -> Result<Created<Json<Paste>>, ServerError> {
     let body = body.into_inner();
 
     let paste = Paste::create(
         &db,
-        &session.creator,
+        &key.creator,
         body.content,
         body.unlisted,
         body.title,
@@ -131,26 +134,13 @@ async fn delete(
 }
 
 #[delete("/<id>", format = "json")]
-async fn delete_json(
-    db: Connection<Database>,
-    session: Session,
-    id: Uuid,
-) -> Result<(), ServerError> {
+async fn api_delete(db: Connection<Database>, key: ApiKey, id: Uuid) -> Result<(), ServerError> {
     let paste = Paste::get(&db, id).await?;
-    paste.remove(&db, Some(id), &session.creator).await?;
+    paste.remove(&db, Some(id), &key.creator).await?;
 
     Ok(())
 }
 
 pub fn routes() -> Vec<Route> {
-    routes![
-        root,
-        get,
-        get_json,
-        delete,
-        delete_json,
-        post,
-        post_json,
-        get_raw
-    ]
+    routes![root, get, get_raw, delete, post, api_get, api_delete, api_post]
 }

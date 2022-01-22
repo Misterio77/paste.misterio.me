@@ -1,0 +1,60 @@
+{% extends "base" %}
+
+{% block title %}Keys{% endblock title %}
+{% block description %}Manage your API keys{% endblock title %}
+
+{% block content%}
+
+<hgroup>
+  <h1>u/{{ session.creator }}</h1>
+  <h2>API Keys</h2>
+</hgroup>
+
+<nav>
+  <ul>
+    <li><a href="/u/{{ session.creator }}/pastes">Pastes</a></li>
+    <li><a href="/sessions">Sessions</a></li>
+    <li><a href="/keys" aria-current="page">API Keys</a></li>
+  </ul>
+</nav>
+
+<article>
+  {% if new_key %}
+  <p>This is your new key, make sure to copy it now (you won't see it again):</p>
+  <code>{{ new_key }}</code>
+  {% else %}
+  <form method="post">
+    <label>
+      Key name <small>(optional)</small>
+      <input name="name" type="text" placeholder="To automate world domination"/>
+    </label>
+    <button>Generate new key</button>
+  </form>
+  {% endif %}
+</article>
+
+<hr />
+
+{% for key in keys %}
+  {% if ((loop.index - 1) % 3) == 0 %}
+    <div class="grid">
+  {% endif %}
+  <article class="tiled">
+    <header>
+      <hgroup>
+        <h2>{{ key.name | default(value="Untitled key") }}</h2>
+        <span data-tooltip="{{ key.creation | date(format="%Y-%m-%d %H:%M:%S") }}">
+          {{ key.creation | humanize }}
+        </span>
+      </hgroup>
+    </header>
+    <form method="post" action="/keys/{{ key.id }}/delete">
+      <button>Revoke</button>
+    </form>
+  </article>
+  {% if (loop.index % 3) == 0 %}
+    </div>
+  {% endif %}
+{% endfor %}
+
+{% endblock content %}

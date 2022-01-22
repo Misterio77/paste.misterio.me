@@ -9,9 +9,7 @@ use rocket::{
     get, post,
     request::FlashMessage,
     response::{Flash, Redirect},
-    routes,
-    serde::json::Json,
-    Route,
+    routes, Route,
 };
 use rocket_db_pools::Connection;
 use rocket_dyn_templates::{context, Template};
@@ -68,29 +66,6 @@ async fn post(
     ))
 }
 
-#[post("/", data = "<body>", format = "json")]
-async fn post_json(
-    db: Connection<Database>,
-    body: Json<RegisterForm>,
-    session: Option<Session>,
-) -> Result<(), ServerError> {
-    if session.is_some() {
-        return Err(ServerError::builder()
-            .message("You're already logged in")
-            .build());
-    }
-
-    let RegisterForm {
-        username,
-        email,
-        password,
-    } = body.into_inner();
-
-    let _user = User::register(&db, username, email, password).await?;
-
-    Ok(())
-}
-
 pub fn routes() -> Vec<Route> {
-    routes![get, post, post_json]
+    routes![get, post]
 }
