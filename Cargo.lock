@@ -1374,7 +1374,7 @@ dependencies = [
 
 [[package]]
 name = "paste-misterio-me"
-version = "1.0.0-pre.9"
+version = "1.0.0"
 dependencies = [
  "chrono",
  "chrono-humanize",
