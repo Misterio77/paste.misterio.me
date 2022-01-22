@@ -15,9 +15,24 @@ use rocket::{
 use rocket_db_pools::Connection;
 use rocket_dyn_templates::{context, Template};
 
-#[get("/")]
+#[get("/", rank = 1)]
 async fn root(session: Session) -> Redirect {
     Redirect::to(format!("/u/{}", session.creator))
+}
+
+#[get("/", format = "json")]
+async fn api_root(key: ApiKey) -> Redirect {
+    Redirect::to(format!("/u/{}", key.creator))
+}
+
+#[get("/pastes", rank = 1)]
+async fn root_pastes(session: Session) -> Redirect {
+    Redirect::to(format!("/u/{}/pastes", session.creator))
+}
+
+#[get("/pastes", format = "json")]
+async fn api_root_pastes(key: ApiKey) -> Redirect {
+    Redirect::to(format!("/u/{}/pastes", key.creator))
 }
 
 #[get("/<username>")]
@@ -64,5 +79,13 @@ async fn api_get_pastes(
 }
 
 pub fn routes() -> Vec<Route> {
-    routes![root, get, get_pastes, api_get_pastes]
+    routes![
+        root,
+        root_pastes,
+        get,
+        get_pastes,
+        api_root,
+        api_root_pastes,
+        api_get_pastes
+    ]
 }
