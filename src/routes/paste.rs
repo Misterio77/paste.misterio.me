@@ -128,7 +128,7 @@ async fn delete(
     paste
         .remove(&db, Some(id), &session.creator)
         .await
-        .map_err(|e| e.flash_redirect("/p/{{ id }}"))?;
+        .map_err(|e| e.flash_redirect("/u"))?;
 
     Ok(Flash::success(Redirect::to("/u"), "Paste deleted"))
 }
