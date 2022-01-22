@@ -24,7 +24,7 @@
 <article>
   <hgroup>
     <h3><a href="/p/{{ paste.id }}">{{ paste.title | default(value="Untitled") }}</a></h3>
-    <p><code>{{ paste.id }}</code></p>
+    <pre><code>{{ paste.id }}</code></pre>
     <p>
       {% if paste.description %}
         {{ paste.description }}

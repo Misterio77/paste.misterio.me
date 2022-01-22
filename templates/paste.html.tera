@@ -8,7 +8,7 @@
 <article>
   <hgroup>
     <h1>{{ paste.title | default(value="Untitled") }}</h1>
-    <p><code>{{ paste.id }}</code></p>
+    <pre><code>{{ paste.id }}</code></pre>
     <p>
       {% if paste.description %}
         {{ paste.description }}
