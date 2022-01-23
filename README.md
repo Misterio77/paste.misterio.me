@@ -7,7 +7,7 @@
 
 ### What
 
-This is a simple pasting service, designed to be quick and easy to use. It also doesn't rely on _any_ javascript to work properly. Should work perfectly on slower devices, TUI browsers, or anything of the sort.
+This is a simple pasting service, designed to be quick and easy to use. It's fully serverside rendered, and does not include a _single_ line of javascript. Should work perfectly on slower devices, TUI browsers, or anything of the sort.
 
 All the routes can also receive and return JSON. Just pass a JSON payload and/or put JSON into your `Accept` header. You can use `httpie`, for examploe.
 

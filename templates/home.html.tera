@@ -28,15 +28,9 @@
       </label>
     </fieldset>
 
-    <script>
-      function auto_grow(element) {
-          element.style.height = "auto";
-          element.style.height = (element.scrollHeight+2)+"px";
-      }
-    </script>
     <label>
       Content
-      <textarea name="content" class="code" oninput="auto_grow(this)" spellcheck="false" autocomplete="off" autocapitalize="none" autocorrect="off" rows="10" required autofocus></textarea>
+      <textarea name="content" class="code" spellcheck="false" autocomplete="off" autocapitalize="none" autocorrect="off" rows="10" required autofocus></textarea>
     </label>
 
     <button>
