@@ -12,6 +12,10 @@
 // Light theme (Default)
 // Can be forced with data-theme="light"
 @import "misterio/light";
+[data-theme="light"],
+:root:not([data-theme="dark"]) {
+  @include light;
+}
 
 // Dark theme (Auto)
 // Automatically enabled if user has Dark mode enabled
