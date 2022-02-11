@@ -32,15 +32,21 @@ impl Paste {
         .try_into()
     }
     async fn fetch_partial(db: &Client, partial_id: &str) -> Result<Uuid, ServerError> {
-        let id = db
-            .query_one(
+        let partial_id = format!("{}%", partial_id);
+        let rows = db
+            .query(
                 "SELECT id
                 FROM pastes
-                WHERE id::text ILIKE $1",
+                WHERE id::text ILIKE $1
+                ORDER BY creation",
                 &[&partial_id],
             )
-            .await?
-            .try_get("id")?;
+            .await?;
+        // Get first (oldest) result
+        let row = rows
+            .first()
+            .ok_or_else(|| ServerError::builder().code(Status::NotFound))?;
+        let id = row.try_get("id")?;
         Ok(id)
     }
     async fn list(db: &Client, creator: &str) -> Result<Vec<Paste>, ServerError> {
@@ -113,7 +119,14 @@ impl Paste {
         })
     }
     pub async fn locate(db: &Client, partial_id: &str) -> Result<Uuid, ServerError> {
-        let partial_id = format!("{}%", partial_id);
+        // Forbid length < 8, as it threatens the pastes secrecy
+        if partial_id.len() < 8 {
+            return Err(ServerError::builder()
+                .code(Status::NotFound)
+                .message("Partial IDs must be at least 8 chars wide")
+                .build());
+        }
+
         Paste::fetch_partial(db, &partial_id).await.map_err(|e| {
             ServerError::builder_from(e)
                 .code(Status::NotFound)
