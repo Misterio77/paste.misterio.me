@@ -31,6 +31,18 @@ impl Paste {
         .await?
         .try_into()
     }
+    async fn fetch_partial(db: &Client, partial_id: &str) -> Result<Uuid, ServerError> {
+        let id = db
+            .query_one(
+                "SELECT id
+                FROM pastes
+                WHERE id::text ILIKE $1",
+                &[&partial_id],
+            )
+            .await?
+            .try_get("id")?;
+        Ok(id)
+    }
     async fn list(db: &Client, creator: &str) -> Result<Vec<Paste>, ServerError> {
         db.query(
             "SELECT id, creator, creation, content, unlisted, title, description
@@ -94,6 +106,15 @@ impl Paste {
 
     pub async fn get(db: &Client, id: Uuid) -> Result<Paste, ServerError> {
         Paste::fetch(db, id).await.map_err(|e| {
+            ServerError::builder_from(e)
+                .code(Status::NotFound)
+                .message("Paste not found")
+                .into()
+        })
+    }
+    pub async fn locate(db: &Client, partial_id: &str) -> Result<Uuid, ServerError> {
+        let partial_id = format!("{}%", partial_id);
+        Paste::fetch_partial(db, &partial_id).await.map_err(|e| {
             ServerError::builder_from(e)
                 .code(Status::NotFound)
                 .message("Paste not found")

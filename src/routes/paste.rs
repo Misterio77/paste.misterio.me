@@ -47,6 +47,15 @@ async fn get(
     ))
 }
 
+#[get("/<partial_id>", rank = 2)]
+async fn find(db: Connection<Database>, partial_id: &str) -> Result<Redirect, Flash<Redirect>> {
+    let id = Paste::locate(&db, partial_id)
+        .await
+        .map_err(|e| e.flash_redirect("/"))?;
+
+    Ok(Redirect::to(format!("/p/{}", id)))
+}
+
 #[get("/<id>", format = "json")]
 async fn api_get(db: Connection<Database>, id: Uuid) -> Result<Json<Paste>, ServerError> {
     let paste = Paste::get(&db, id).await?;
@@ -142,5 +151,5 @@ async fn api_delete(db: Connection<Database>, key: ApiKey, id: Uuid) -> Result<(
 }
 
 pub fn routes() -> Vec<Route> {
-    routes![root, get, get_raw, delete, post, api_get, api_delete, api_post]
+    routes![root, get, find, get_raw, delete, post, api_get, api_delete, api_post]
 }
