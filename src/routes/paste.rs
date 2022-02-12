@@ -22,9 +22,23 @@ use serde::Deserialize;
 
 use uuid::Uuid;
 
-#[get("/")]
-async fn root() -> Redirect {
-    Redirect::to("/")
+#[get("/?<existing>")]
+async fn create(
+    db: Connection<Database>,
+    flash: Option<FlashMessage<'_>>,
+    session: Session,
+    existing: Option<Uuid>,
+) -> Result<Template, Flash<Redirect>> {
+    let existing = if let Some(e) = existing {
+        Paste::get(&db, e).await.ok()
+    } else {
+        None
+    };
+
+    Ok(Template::render(
+        "create",
+        context! {flash, session, existing},
+    ))
 }
 
 #[get("/<id>", rank = 1)]
@@ -151,5 +165,5 @@ async fn api_delete(db: Connection<Database>, key: ApiKey, id: Uuid) -> Result<(
 }
 
 pub fn routes() -> Vec<Route> {
-    routes![root, get, find, get_raw, delete, post, api_get, api_delete, api_post]
+    routes![create, get, find, get_raw, delete, post, api_get, api_delete, api_post]
 }

@@ -39,6 +39,7 @@
   </hgroup>
 
   <p>
+    <a role="button" href="/p?existing={{ paste.id }}">Edit</a>
     <a role="button" class="outline" href="/p/{{ paste.id }}/raw">See Raw</a>
   </p>
 

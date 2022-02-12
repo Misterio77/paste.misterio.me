@@ -4,58 +4,18 @@
 
 {% block content %}
 
-{% if session %}
-<article>
-  <header>
-    <h1>New paste</h1>
-  </header>
-  <form method="post" action="/p">
-    <div class="grid">
-      <label>
-        Title <small>(optional)</small>
-        <input name="title" type="text" spellcheck="false" autocomplete="off" autocapitalize="none" autocorrect="off" placeholder="stalin_sort.rs"/>
-      </label>
-      <label>
-        Description <small>(optional)</small>
-        <input name="description" type="text" autocomplete="off" spellcheck="true" placeholder="Stalin Sort, sorts any array in O(n)"/>
-      </label>
-    </div>
-
-    <fieldset>
-      <label>
-        <input name="unlisted" type="checkbox" role="switch"/>
-        Unlisted
-      </label>
-    </fieldset>
-
-    <label>
-      Content
-      <textarea name="content" class="code" spellcheck="false" autocomplete="off" autocapitalize="none" autocorrect="off" rows="10" required autofocus></textarea>
-    </label>
-
-    <button>
-      Create
-    </button>
-  </form>
-</article>
-{% else %}
 <article class="slim">
   <header>
     <h1>Welcome!</h1>
   </header>
   <p>Welcome to my paste hosting service.</p>
+  {% if session %}
+  <p><a href="/p">Click here to create a new paste!</a></p>
+  {% else %}
   <p>Please <a href="/login">login</a> or <a href="/register">register</a> to start pasting (no need to if you're just here to browse).</p>
+  {%  endif %}
   <p>Check out our <a href="https://git.sr.ht/~misterio/pmis">CLI tool</a> if you like working from the terminal</p>
   <p>Let <a href="mailto:eu@misterio.me">me</a> know if you encounter any bugs or have feedback. Enjoy your stay!</p>
-  <footer>
-    <h2>Roadmap</h2>
-    <ul>
-      <li>Password resets</li>
-      <li>Starring others' pastes</li>
-      <li>Forking/cloning</li>
-    </ul>
-  </footer>
 </article>
-{% endif %}
 
 {% endblock content %}

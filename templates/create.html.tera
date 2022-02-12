@@ -1,0 +1,46 @@
+{% extends "base" %}
+
+{% block title %}Create new paste{% endblock title %}
+
+{% block content %}
+
+{% set title = existing.title | default(value="") %}
+{% set description = existing.description | default(value="") %}
+{% set unlisted = existing.unlisted | default(value="") %}
+{% set content = existing.content | default(value="") %}
+
+<article>
+  <header>
+    <h1>New paste</h1>
+  </header>
+  <form method="post" action="/p">
+    <div class="grid">
+      <label>
+        Title <small>(optional)</small>
+        <input name="title" type="text" spellcheck="false" autocomplete="off" autocapitalize="none" autocorrect="off" placeholder="stalin_sort.rs" value="{{ title }}"/>
+      </label>
+      <label>
+        Description <small>(optional)</small>
+        <input name="description" type="text" autocomplete="off" spellcheck="true" placeholder="Stalin Sort, sorts any array in O(n)" value="{{ description }}"/>
+      </label>
+    </div>
+
+    <fieldset>
+      <label>
+        <input name="unlisted" type="checkbox" role="switch" value="{{ unlisted }}"/>
+        Unlisted
+      </label>
+    </fieldset>
+
+    <label>
+      Content
+      <textarea name="content" class="code" spellcheck="false" autocomplete="off" autocapitalize="none" autocorrect="off" rows="10" required autofocus>{{ content }}</textarea>
+    </label>
+
+    <button>
+      Create
+    </button>
+  </form>
+</article>
+
+{% endblock content %}

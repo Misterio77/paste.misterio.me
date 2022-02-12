@@ -28,7 +28,7 @@ pub fn get(
         return Err(ServerError::builder()
             .message("You're already logged in")
             .build()
-            .flash_redirect("/"));
+            .flash_redirect(redir.as_deref().unwrap_or_else(|| "/")));
     }
 
     Ok(Template::render("login", context! {flash, session, redir}))
@@ -53,14 +53,21 @@ async fn post(
         return Err(ServerError::builder()
             .message("You're already logged in")
             .build()
-            .flash_redirect("/"));
+            .flash_redirect(redir.as_deref().unwrap_or_else(|| "/")));
     }
 
     let LoginForm { username, password } = form.into_inner();
 
+    // Preserve redir if password is invalid
+    let err_redir = if let Some(r) = redir.as_ref() {
+        format!("/login?redir={}", r)
+    } else {
+        "/login".into()
+    };
+
     let new_session = User::login(&db, username, password, source)
         .await
-        .map_err(|e| e.flash_redirect("/login"))?;
+        .map_err(|e| e.flash_redirect(&err_redir))?;
 
     cookies.add_private(new_session.into());
 
