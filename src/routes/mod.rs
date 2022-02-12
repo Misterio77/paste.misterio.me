@@ -68,7 +68,7 @@ pub mod errors {
         // Else, redirect to login with error as flash messge
         } else {
             let redir = req.uri().to_string();
-            let uri = format!("/login?redir={}", redir);
+            let uri = format!("/login?redir={}", urlencode(&redir));
             Ok(error.flash_redirect(&uri))
         }
     }
@@ -99,5 +99,10 @@ pub mod errors {
 
     pub fn catchers() -> Vec<Catcher> {
         catchers![not_found, service_unavailable, unknown_error, unauthorized]
+    }
+
+    fn urlencode(value: &str) -> String {
+        percent_encoding::percent_encode(value.as_bytes(), &percent_encoding::NON_ALPHANUMERIC)
+            .to_string()
     }
 }

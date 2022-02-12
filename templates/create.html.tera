@@ -13,7 +13,7 @@
   <header>
     <h1>New paste</h1>
   </header>
-  <form method="post" action="/p">
+  <form method="post">
     <div class="grid">
       <label>
         Title <small>(optional)</small>

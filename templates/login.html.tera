@@ -5,16 +5,16 @@
 
 {% block content%}
 
-{% set redir = redir | default(value="") | urlencode_strict %}
-
 <article class="slim">
   <header>
     <hgroup>
       <h1>Log in</h1>
-      <h2>Need an account? <a href="/register?redir={{ redir }}">Register</a></h2>
+      <h2>Need an account?
+        <a href="/register{% if redir %}?redir={{ redir | urlencode_strict }}{% endif %}">Register</a>
+      </h2>
     </hgroup>
   </header>
-  <form method="post" action="/login?redir={{ redir }}">
+  <form method="post">
     <label>
       Username
       <input type="text" name="username" autocomplete="username" required autofocus />

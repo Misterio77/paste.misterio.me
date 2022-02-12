@@ -1374,11 +1374,12 @@ dependencies = [
 
 [[package]]
 name = "paste-misterio-me"
-version = "1.2.0"
+version = "1.2.1"
 dependencies = [
  "chrono",
  "chrono-humanize",
  "grass",
+ "percent-encoding",
  "postgres-types",
  "rand",
  "rocket",

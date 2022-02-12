@@ -9,7 +9,9 @@
   <header>
     <hgroup>
       <h1>Register</h1>
-      <h2>Already have an account? <a href="/login">Login</a></h2>
+      <h2>Already have an account?
+        <a href="/login{% if redir %}?redir={{ redir | urlencode_strict }}{% endif %}">Login</a>
+      </h2>
     </hgroup>
   </header>
   <form method="post">
