@@ -28,7 +28,7 @@
     <fieldset>
       <label>
         <input name="unlisted" type="checkbox" role="switch" value="{{ unlisted }}"/>
-        Unlisted
+        Unlisted <br /><small>(Public pastes are shown in <a href="/u">your profile</a>)</small>
       </label>
     </fieldset>
 
