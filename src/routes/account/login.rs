@@ -28,7 +28,7 @@ pub fn get(
         return Err(ServerError::builder()
             .message("You're already logged in")
             .build()
-            .flash_redirect(redir.as_deref().unwrap_or_else(|| "/")));
+            .flash_redirect(redir.as_deref().unwrap_or("/")));
     }
 
     Ok(Template::render("login", context! {flash, session, redir}))
@@ -53,7 +53,7 @@ async fn post(
         return Err(ServerError::builder()
             .message("You're already logged in")
             .build()
-            .flash_redirect(redir.as_deref().unwrap_or_else(|| "/")));
+            .flash_redirect(redir.as_deref().unwrap_or("/")));
     }
 
     let LoginForm { username, password } = form.into_inner();

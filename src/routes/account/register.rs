@@ -25,7 +25,7 @@ fn get(
         return Err(ServerError::builder()
             .message("You're already logged in")
             .build()
-            .flash_redirect(redir.as_deref().unwrap_or_else(|| "/")));
+            .flash_redirect(redir.as_deref().unwrap_or("/")));
     }
 
     Ok(Template::render("register", context! {flash, redir, session}))
@@ -49,7 +49,7 @@ async fn post(
         return Err(ServerError::builder()
             .message("You're already logged in")
             .build()
-            .flash_redirect(redir.as_deref().unwrap_or_else(|| "/")));
+            .flash_redirect(redir.as_deref().unwrap_or("/")));
     }
 
     let RegisterForm {

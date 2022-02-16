@@ -93,7 +93,7 @@ pub mod errors {
     }
 
     fn urlencode(value: &str) -> String {
-        percent_encoding::percent_encode(value.as_bytes(), &percent_encoding::NON_ALPHANUMERIC)
+        percent_encoding::percent_encode(value.as_bytes(), percent_encoding::NON_ALPHANUMERIC)
             .to_string()
     }
 }

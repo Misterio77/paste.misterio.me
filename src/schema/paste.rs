@@ -130,7 +130,7 @@ impl Paste {
                 .build());
         }
 
-        Paste::fetch_partial(db, &partial_id).await.map_err(|e| {
+        Paste::fetch_partial(db, partial_id).await.map_err(|e| {
             ServerError::builder_from(e)
                 .code(Status::NotFound)
                 .message("Paste not found")
