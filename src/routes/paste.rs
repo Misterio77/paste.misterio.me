@@ -26,19 +26,16 @@ use uuid::Uuid;
 async fn create(
     db: Connection<Database>,
     flash: Option<FlashMessage<'_>>,
-    session: Session,
+    session: Option<Session>,
     existing: Option<Uuid>,
-) -> Result<Template, Flash<Redirect>> {
+) -> Template {
     let existing = if let Some(e) = existing {
         Paste::get(&db, e).await.ok()
     } else {
         None
     };
 
-    Ok(Template::render(
-        "create",
-        context! {flash, session, existing},
-    ))
+    Template::render("create", context! {flash, session, existing})
 }
 
 #[get("/<id>", rank = 1)]
@@ -96,14 +93,14 @@ struct CreateForm {
 #[post("/", data = "<form>", rank = 1)]
 async fn post(
     db: Connection<Database>,
-    session: Session,
+    session: Option<Session>,
     form: Form<CreateForm>,
 ) -> Result<Redirect, Flash<Redirect>> {
     let form = form.into_inner();
 
     let paste = Paste::create(
         &db,
-        &session.creator,
+        session.map(|s| s.creator),
         form.content,
         form.unlisted,
         form.title,
@@ -118,14 +115,14 @@ async fn post(
 #[post("/", data = "<body>", format = "json")]
 async fn api_post(
     db: Connection<Database>,
-    key: ApiKey,
+    key: Option<ApiKey>,
     body: Json<CreateForm>,
 ) -> Result<Created<Json<Paste>>, ServerError> {
     let body = body.into_inner();
 
     let paste = Paste::create(
         &db,
-        &key.creator,
+        key.map(|k| k.creator),
         body.content,
         body.unlisted,
         body.title,

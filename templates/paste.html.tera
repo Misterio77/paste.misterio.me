@@ -14,7 +14,12 @@
         {{ paste.description }}
         <br />
       {% endif %}
-      by <a href="/u/{{ paste.creator }}">u/{{ paste.creator }}</a>,
+      by
+      {% if paste.creator %}
+      <a href="/u/{{ paste.creator }}">u/{{ paste.creator }}</a>,
+      {% else %}
+      Anonymous
+      {% endif %}
       <span data-tooltip="{{ paste.creation | date(format="%Y-%m-%d %H:%M:%S") }}">
         {{ paste.creation | humanize }}
       </span>

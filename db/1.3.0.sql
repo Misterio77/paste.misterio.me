@@ -1,0 +1,4 @@
+BEGIN;
+ALTER TABLE pastes
+    ALTER COLUMN creator DROP NOT NULL;
+COMMIT;

@@ -25,12 +25,14 @@
       </label>
     </div>
 
+    {% if session %}
     <fieldset>
       <label>
         <input name="unlisted" type="checkbox" role="switch" value="{{ unlisted }}"/>
         Unlisted <br /><small>(Public pastes are shown in <a href="/u">your profile</a>)</small>
       </label>
     </fieldset>
+    {% endif %}
 
     <label>
       Content
@@ -40,6 +42,9 @@
     <button>
       Create
     </button>
+    {% if not session %}
+    <small>Note: Your paste can't be deleted if you create it anonymously</small>
+    {% endif %}
   </form>
 </article>
 

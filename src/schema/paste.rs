@@ -12,7 +12,7 @@ use uuid::Uuid;
 #[derive(Debug, Serialize)]
 pub struct Paste {
     pub id: Uuid,
-    pub creator: String,
+    pub creator: Option<String>,
     pub creation: DateTime<Utc>,
     pub content: String,
     pub unlisted: bool,
@@ -61,11 +61,11 @@ impl Paste {
         .map(TryInto::try_into)
         .collect()
     }
-    async fn delete(db: &Client, creator: &str, id: Option<Uuid>) -> Result<(), ServerError> {
+    async fn delete(db: &Client, id: Option<Uuid>) -> Result<(), ServerError> {
         db.execute(
             "DELETE FROM pastes
-            WHERE creator = $1 AND ($2::uuid IS NULL OR id = $2)",
-            &[&creator, &id],
+            WHERE id = $1",
+            &[&id],
         )
         .await?;
         Ok(())
@@ -91,15 +91,18 @@ impl Paste {
 
     pub async fn create(
         db: &Client,
-        creator: &str,
+        creator: Option<String>,
         content: String,
         unlisted: bool,
         title: Option<String>,
         description: Option<String>,
     ) -> Result<Paste, ServerError> {
+        // Unauthenticated pastes are always unlisted
+        let unlisted = unlisted || creator.is_none();
+
         let paste = Paste {
             id: Uuid::new_v4(),
-            creator: creator.into(),
+            creator,
             creation: Utc::now(),
             content,
             unlisted,
@@ -148,7 +151,7 @@ impl Paste {
         Ok(Paste::list(db, creator)
             .await?
             .into_iter()
-            .filter(|p| !p.unlisted || requester == Some(&p.creator))
+            .filter(|p| !p.unlisted || requester == p.creator.as_deref())
             .collect())
     }
     pub async fn remove(
@@ -157,8 +160,8 @@ impl Paste {
         id: Option<Uuid>,
         requester: &str,
     ) -> Result<(), ServerError> {
-        if self.creator == requester {
-            Paste::delete(db, &self.creator, id).await?;
+        if self.creator == Some(requester.to_string()) {
+            Paste::delete(db, id).await?;
             Ok(())
         } else {
             Err(ServerError::builder()

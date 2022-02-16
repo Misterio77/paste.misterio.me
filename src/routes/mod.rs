@@ -3,20 +3,11 @@ pub mod paste;
 pub mod user;
 
 pub mod home {
-    use crate::schema::Session;
-    use rocket::{get, request::FlashMessage, response::Redirect, routes, Route};
-    use rocket_dyn_templates::{context, Template};
+    use rocket::{get, response::Redirect, routes, Route};
 
     #[get("/", rank = 1)]
-    async fn home(
-        flash: Option<FlashMessage<'_>>,
-        session: Option<Session>,
-    ) -> Result<Redirect, Template> {
-        if session.is_some() {
-            Ok(Redirect::to("/p"))
-        } else {
-            Err(Template::render("home", context! {flash, session}))
-        }
+    async fn home() -> Redirect {
+        Redirect::to("/p")
     }
 
     #[get("/", format = "json")]
