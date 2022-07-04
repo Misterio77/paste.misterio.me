@@ -7,12 +7,7 @@ in rustPlatform.buildRustPackage rec {
 
   src = lib.cleanSource ./.;
 
-  cargoLock = {
-    lockFile = ./Cargo.lock;
-    outputHashes = {
-      "rocket-0.5.0-rc.1" = "sha256-wmC/nekpOx7Dwy4dRVoEWxrznnlw9r3Nmq8J9X+Kbmo=";
-    };
-  };
+  cargoLock.lockFile = ./Cargo.lock;
 
   postInstall = ''
     mkdir -p $out/etc

@@ -26,11 +26,11 @@ features = [ "json", "secrets", "uuid" ]
 version = "0.1.0-rc.1"
 features = [ "tera" ]
 [dependencies.rocket_db_pools]
-version = "0.1.0-rc"
+version = "0.1.0-rc.1"
 features = [ "deadpool_postgres" ]
 
 [dependencies.uuid]
-version = "0.8"
+version = "1.1"
 features = [ "serde", "v4"]
 
 [dependencies.serde]
@@ -43,7 +43,7 @@ features = [ "serde" ]
 
 [dependencies.postgres-types]
 version = "0.2"
-features = [ "with-chrono-0_4", "with-uuid-0_8" ]
+features = [ "with-chrono-0_4", "with-uuid-1" ]
 
 [dependencies.percent-encoding]
 version = "2.1"
@@ -54,9 +54,3 @@ syntect = "4.6"
 [build-dependencies.grass]
 version = "0.10"
 default-features = false
-
-
-[patch.crates-io]
-rocket = { git = "https://github.com/SergioBenitez/Rocket" }
-rocket_db_pools = { git = "https://github.com/SergioBenitez/Rocket" }
-rocket_dyn_templates = { git = "https://github.com/SergioBenitez/Rocket" }
