@@ -1,8 +1,5 @@
 # [paste.misterio.me](https://paste.misterio.me)
 
-[![builds.sr.ht status](https://builds.sr.ht/~misterio/paste.misterio.me.svg)](https://builds.sr.ht/~misterio/paste.misterio.me?)
-[![built with nix](https://img.shields.io/static/v1?logo=nixos&logoColor=white&label=&message=Built%20with%20Nix&color=41439a)](https://builtwithnix.org)
-
 ## About
 
 ### What
@@ -11,13 +8,13 @@ This is a simple pasting service, designed to be quick and easy to use. It's ful
 
 All the routes can also receive and return JSON. Just pass a JSON payload and/or put JSON into your `Accept` header. You can use `httpie`, for examploe.
 
-Lastly, we have a [nice CLI](https://git.sr.ht/~misterio/pmis) for interacting with the service.
+Lastly, we have a [nice CLI](https://github.com/misterio77/pmis) for interacting with the service.
 
 ### Where
 
-The source code (licensed under AGPLv3) for this app can be found both at [sourcehut](https://sr.ht/~misterio/paste.misterio.me) and [github](https://github.com/misterio77/paste.misterio.me). Feel free to contribute wherever you feel more confortable.
+The source code (licensed under AGPLv3) for this app can be at [github](https://github.com/misterio77/paste.misterio.me) and at my [personal git](https://m7.rs/git/paste-misterio-me). Feel free to contribute wherever you feel more confortable.
 
-The version live at [paste.misterio.me](https://paste.misterio.me) runs on my home Raspberry Pi 4 (running NixOS 22.05). Deployments are reproductible and based on [my configuration repository](https://sr.ht/~misterio/nix-config).
+The version live at [paste.misterio.me](https://paste.misterio.me) runs on my home Raspberry Pi 4 (running NixOS 22.05). Deployments are reproductible and based on [my configuration repository](https://github.com/misterio77/nix-config).
 
 ### Why
 

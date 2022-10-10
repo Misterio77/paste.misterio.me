@@ -43,7 +43,7 @@
 
     <footer class="container">
       <p>
-        <a href="//sr.ht/~misterio/paste.misterio.me/">Available under AGPLv3</a>
+        <a href="//github.com/misterio77/paste.misterio.me/">Available under AGPLv3</a>
       </p>
       <p>Served from: <em>{{ exec_path() }}</em></p>
     </footer>
