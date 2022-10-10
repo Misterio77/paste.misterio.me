@@ -3,50 +3,26 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-22.05";
-    utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, utils }:
+  outputs = { self, nixpkgs }:
     let
-      name = "paste-misterio-me";
-      overlay = final: prev: {
-        ${name} = final.callPackage ./default.nix { };
-      };
-      overlays = [ overlay ];
+      supportedSystems = [ "x86_64-linux" "aarch64-linux" ];
+      forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
+      pkgsFor = nixpkgs.legacyPackages;
     in
     rec {
-      inherit overlay overlays;
-
-      nixosModules."${name}" = import ./module.nix;
-      nixosModule = nixosModules."${name}";
-    } //
-    (utils.lib.eachDefaultSystem (system:
-      let
-        pkgs = import nixpkgs { inherit system overlays; };
-      in
-      rec {
-        # nix build
-        packages.${name} = pkgs.${name};
-        defaultPackage = packages.${name};
-
-        # nix run
-        apps.${name} = utils.lib.mkApp { drv = packages.${name}; };
-        defaultApp = apps.${name};
-
-        # nix develop
-        devShell = pkgs.mkShell {
-          inputsFrom = [ defaultPackage ];
-          buildInputs = with pkgs; [
-            # Rust tooling
-            rustc rust-analyzer rustfmt clippy
-            # Postgres tooling
-            postgresql pgformatter sqls
-            # Sass tooling
-            nodePackages.sass
-            # Httpie for testing
-            httpie
-          ];
-        };
-      }));
+      nixosModules.default = import ./module.nix;
+      overlays = {
+        default = final: _prev: { paste-misterio-me = final.callPackage ./default.nix { }; };
+      };
+      packages = forAllSystems (system: {
+        default = pkgsFor.${system}.callPackage ./default.nix { };
+      });
+      devShells = forAllSystems (system: {
+        default = pkgsFor.${system}.callPackage ./shell.nix { };
+      });
+      hydraJobs = packages;
+    };
 }
 
