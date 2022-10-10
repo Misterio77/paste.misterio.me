@@ -14,7 +14,7 @@
     rec {
       nixosModules.default = import ./module.nix;
       overlays = {
-        default = final: _prev: { paste-misterio-me = final.callPackage ./default.nix { }; };
+        default = final: prev: { paste-misterio-me = final.callPackage ./default.nix { }; };
       };
       packages = forAllSystems (system: {
         default = pkgsFor.${system}.callPackage ./default.nix { };
