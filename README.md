@@ -62,7 +62,7 @@ If you're planning on deploying, you need a stable secret (for signing auth cook
 
 ### Running
 
-Just run `cargo run -p server` to run debug mode. Add in `--release` for a optimised (but slower compilling) version. If you just want the executable, use `cargo build -p server` instead.
+Just run `cargo run -p paste-misterio-me` to run debug mode. Add in `--release` for a optimised (but slower compilling) version. If you just want the executable, use `cargo build -p paste-misterio-me` instead.
 
 If you run NixOS, there's a NixOS module available.
 
@@ -74,13 +74,13 @@ If you run NixOS, there's a NixOS module available.
 
 #### Cargo
 
-Use `cargo install pmis`, or clone this repo and run `cargo install -p cli`.
+Use `cargo install pmis`, or clone this repo and run `cargo build --release -p pmis`.
 
 You can generate completions using `pmis completions <SHELL>` (check your distro docs on where to install them).
 
 #### Nix/NixOS/home-manager
 
-You can get a shell with `pmis` using `nix shell github:misterio77/pmis`.
+You can get a shell with `pmis` using `nix shell github:misterio77/paste-misterio-me#cli`.
 
 For a more permanent solution, you should add `pmis` to your flake inputs, add the overlay, and put it wherever you usually put packages (i recommend using `home-manager`, we even have a module you can import).
 
