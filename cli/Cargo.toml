@@ -1,0 +1,54 @@
+[package]
+name = "pmis"
+description = "Companion CLI tool for paste.misterio.me"
+version = "1.0.1"
+authors = [ "Gabriel Fontes <eu@misterio.me>" ]
+readme = "../README.md"
+repository = "https://github.com/misterio77/paste.misterio.me"
+homepage = "https://paste.misterio.me"
+edition = "2018"
+license = "GPL-3.0-or-later"
+
+[dependencies.tokio]
+version = "1.15"
+features = ["full"]
+
+[dependencies.clap]
+version = "3.0"
+features = ["derive"]
+
+[dependencies.reqwest]
+version = "0.11"
+features = [ "json" ]
+
+[dependencies.uuid]
+version = "0.8"
+features = [ "serde" ]
+
+[dependencies.directories]
+version = "4.0"
+
+[dependencies.anyhow]
+version = "1.0"
+
+[dependencies.serde]
+version = "1.0"
+features = [ "derive" ]
+
+[dependencies.chrono]
+version = "0.4"
+features = [ "serde" ]
+
+[dependencies.chrono-humanize]
+version = "0.2"
+
+[dependencies.atty]
+version = "0.2"
+
+[dependencies.bat]
+version = "0.19"
+default-features = false
+features = ["regex-onig", "paging"]
+
+[dependencies.clap_complete]
+version = "3.0"

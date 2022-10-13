@@ -1,17 +1,20 @@
 { lib, rustPlatform }:
 
 let manifest = (lib.importTOML ./Cargo.toml).package;
-in rustPlatform.buildRustPackage rec {
+in
+rustPlatform.buildRustPackage rec {
   pname = manifest.name;
   version = manifest.version;
 
-  src = lib.cleanSource ./.;
+  src = lib.cleanSource ../.;
 
-  cargoLock.lockFile = ./Cargo.lock;
+  cargoLock.lockFile = ../Cargo.lock;
+
+  buildAndTestSubdir = "server";
 
   postInstall = ''
     mkdir -p $out/etc
-    cp -r templates db $out/etc
+    cp -r server/templates server/db $out/etc
   '';
 
   meta = with lib; {

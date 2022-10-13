@@ -1,6 +1,9 @@
 { pkgs, ... }:
 pkgs.mkShell {
-  inputsFrom = [ (pkgs.callPackage ./default.nix { }) ];
+  inputsFrom = [
+    (pkgs.callPackage ./server { })
+    (pkgs.callPackage ./cli { })
+  ];
   buildInputs = with pkgs; [
     # Rust tooling
     rustc

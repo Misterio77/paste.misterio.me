@@ -8,7 +8,7 @@ This is a simple pasting service, designed to be quick and easy to use. It's ful
 
 All the routes can also receive and return JSON. Just pass a JSON payload and/or put JSON into your `Accept` header. You can use `httpie`, for examploe.
 
-Lastly, we have a [nice CLI](https://github.com/misterio77/pmis) for interacting with the service.
+This workspace includes both the `server` and a companion `cli`, on their respective subdirectories.
 
 ### Where
 
@@ -36,9 +36,13 @@ Also to avoid client-side javascript code, syntax highlighting (a core feature o
 
 Passwords are hashed using [rust-argon](https://github.com/sru-systems/rust-argon2), and [chrono](https://github.com/chronotope/chrono) is used for datetime stuff.
 
-## Hacking
+The CLI is handled by [clap](https://github.com/clap-rs/clap), the API requests are made through [reqwest](https://github.com/seanmonstar/reqwest), and the output is formatted using [bat](https://github.com/sharkdp/bat).
+
+# Setup
 
 It should be really easy to build and run.
+
+## Server
 
 ### Dependencies
 
@@ -58,8 +62,62 @@ If you're planning on deploying, you need a stable secret (for signing auth cook
 
 ### Running
 
-Just run `cargo run` to run debug mode. Add in `--release` for a optimised (but slower compilling) version. If you just want the executable, use `cargo build` instead.
+Just run `cargo run -p server` to run debug mode. Add in `--release` for a optimised (but slower compilling) version. If you just want the executable, use `cargo build -p server` instead.
 
-### Contributing
+If you run NixOS, there's a NixOS module available.
 
-Open up a PR on github or send in a patch through sourcehut. I should have some automatic CI set soon(tm).
+## CLI
+
+### Installation
+
+`pmis` is available on crates.io, on the AUR, and there's also a nix flake in the repo for usage with nix.
+
+#### Cargo
+
+Use `cargo install pmis`, or clone this repo and run `cargo install -p cli`.
+
+You can generate completions using `pmis completions <SHELL>` (check your distro docs on where to install them).
+
+#### Nix/NixOS/home-manager
+
+You can get a shell with `pmis` using `nix shell github:misterio77/pmis`.
+
+For a more permanent solution, you should add `pmis` to your flake inputs, add the overlay, and put it wherever you usually put packages (i recommend using `home-manager`, we even have a module you can import).
+
+If you want to avoid compiling, `pmis` is cached on [cachix](https://app.cachix.org/cache/misterio): `cachix use misterio`.
+
+Completions are provided through the derivation.
+
+#### Arch Linux
+
+Use your favorite AUR helper: `paru -S pmis`.
+
+Completions are provided through the package.
+
+### Usage
+
+The default API URL is `https://paste.misterio.me`, you can switch to another (if you're self hosting an instance, for example) using `--api`.
+
+All commands and options are fully documented through `--help`
+
+#### Downloading pastes
+
+Use `pmis download <ID>`. The output is pretty printed using `bat` (unless it is piped, or if you use `--raw`).
+
+Do keep in mind pastes can easily be downloaded using many utilities, such as `curl`: `curl https://paste.misterio.me/p/ID/raw`. This makes it easy to get them on any barebones system or to share with friends that don't use `pmis`.
+
+#### Listing pastes
+
+You can list a users public pastes (or all of them, if you're authenticated and the user is you) using `pmis list [OWNER]`. You can ommit `OWNER` if you're authentiucated. If you just want the IDs, add `--ids-only`.
+
+#### Authenticating
+
+You should [generate a key](https://paste.misterio.me/keys), and then use `pmis auth`.
+
+#### Uploading pastes
+
+Use `pmis upload [FILE]`. The title of the paste is the filename, by default. You can ommit `FILE` to read from stdin. Use `--description` to add a description, and `--unlisted` if you don't want it to appear on your profile. When the upload is complete the link and ID will be output, you can get just the link by piping or using `--link-only`.
+
+#### Deleting pastes
+
+You can delete your pastes by using `pmis delete <ID>`.

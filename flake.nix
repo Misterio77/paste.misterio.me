@@ -1,5 +1,5 @@
 {
-  description = "Paste service";
+  description = "Paste service and companion CLI tool";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-22.05";
@@ -12,13 +12,15 @@
       pkgsFor = nixpkgs.legacyPackages;
     in
     rec {
-      nixosModules.default = import ./module.nix;
-      overlays = {
-        default = final: prev: { paste-misterio-me = final.callPackage ./default.nix { }; };
-      };
-      packages = forAllSystems (system: {
-        default = pkgsFor.${system}.callPackage ./default.nix { };
+      nixosModules.server = import ./server/module.nix;
+      homeManagerModules.cli = import ./cli/module.nix;
+
+      packages = forAllSystems (system: rec {
+        default = server;
+        server = pkgsFor.${system}.callPackage ./server { };
+        cli = pkgsFor.${system}.callPackage ./cli { };
       });
+
       devShells = forAllSystems (system: {
         default = pkgsFor.${system}.callPackage ./shell.nix { };
       });
