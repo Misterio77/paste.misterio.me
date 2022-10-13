@@ -1,4 +1,5 @@
 # [paste.misterio.me](https://paste.misterio.me)
+[![build status](https://img.shields.io/endpoint?url=https://hydra.m7.rs/job/paste-misterio-me/main/x86_64-linux.server/shield)](https://hydra.m7.rs/jobset/paste-misterio-me/main)
 
 ## About
 

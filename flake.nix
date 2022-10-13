@@ -16,7 +16,6 @@
       homeManagerModules.cli = import ./cli/module.nix;
 
       packages = forAllSystems (system: rec {
-        default = server;
         server = pkgsFor.${system}.callPackage ./server { };
         cli = pkgsFor.${system}.callPackage ./cli { };
       });
