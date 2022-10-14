@@ -8,8 +8,7 @@ in
     enable = mkEnableOption "paste.misterio.me";
     package = mkOption {
       type = types.package;
-      default = pkgs.paste-misterio-me or (pkgs.callPackage ./default.nix { });
-      defaultText = "pkgs.paste-misterio-me";
+      default = pkgs.callPackage ./default.nix { };
       description = ''
         The package implementing paste.misterio.me
       '';

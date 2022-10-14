@@ -11,8 +11,7 @@ in {
 
     package = mkOption {
       type = types.package;
-      default = pkgs.pmis;
-      defaultText = literalExpression "pkgs.pmis";
+      default = pkgs.callPackage ./default.nix { };
       description = "Package providing <command>pmis</command>.";
     };
   };
