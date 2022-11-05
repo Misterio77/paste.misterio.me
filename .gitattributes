@@ -1,2 +1,2 @@
-scss/pico/** linguist-vendored
-syntaxes/** linguist-vendored
+sever/scss/pico/** linguist-vendored
+server/syntaxes/** linguist-vendored
