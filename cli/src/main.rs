@@ -61,7 +61,10 @@ enum Commands {
     #[clap(alias = "del")]
     Delete { id: Uuid },
     /// Authenticates using an API key
-    Auth,
+    Auth {
+        /// File containing the key. If ommited, reads from stdin
+        file: Option<PathBuf>,
+    },
     /// Generate shell completions
     #[clap(setting(Hidden))]
     Completions { shell: Shell },
@@ -88,7 +91,7 @@ async fn main() -> Result<()> {
             link_only,
         } => operations::upload(api, file, title, description, unlisted, link_only).await?,
         Commands::Delete { id } => operations::delete(api, id).await?,
-        Commands::Auth => operations::auth(api).await?,
+        Commands::Auth { file } => operations::auth(api, file).await?,
         Commands::Completions { shell } => print_completions(shell, &mut app),
     }
 
