@@ -20,7 +20,7 @@ pub async fn download(api: Url, id: Uuid, raw: bool) -> Result<()> {
 
     if !raw && atty::is(Stream::Stdout) {
         let title = paste.title.as_deref().unwrap_or("Untitled");
-        let creator = paste.creator;
+        let creator = paste.creator.map(|c| format!("/u/{c}"));
         let time = HumanTime::from(paste.creation);
         let visibility = if paste.unlisted { "Unlisted" } else { "Public" };
 
@@ -29,8 +29,11 @@ pub async fn download(api: Url, id: Uuid, raw: bool) -> Result<()> {
                 Input::from_bytes(paste.content.as_bytes())
                     .name(title)
                     .title(format!(
-                        "{} // by u/{}, {} - {}",
-                        title, creator, time, visibility
+                        "{} // by {}, {} - {}",
+                        title,
+                        creator.unwrap_or("anon".into()),
+                        time,
+                        visibility
                     )),
             )
             .line_numbers(true)

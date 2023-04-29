@@ -24,7 +24,7 @@ pub async fn upload(
     unlisted: bool,
     link_only: bool,
 ) -> Result<()> {
-    let session = Session::load()?;
+    let session = Session::load().ok();
     let client = Client::new();
 
     let url = api.join("/p")?;
@@ -55,12 +55,15 @@ pub async fn upload(
         unlisted,
     };
 
-    let res = client
-        .post(url.clone())
-        .json(&payload)
-        .bearer_auth(session.key())
-        .send()
-        .await?;
+    let req = client.post(url.clone()).json(&payload);
+
+    let res = if let Some(s) = session {
+        req.bearer_auth(s.key())
+    } else {
+        req
+    }
+    .send()
+    .await?;
 
     if res.status() == StatusCode::UNAUTHORIZED {
         return Err(anyhow!(

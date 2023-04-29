@@ -4,7 +4,7 @@ use serde::Deserialize;
 #[derive(Deserialize)]
 pub struct Paste {
     pub id: Uuid,
-    pub creator: String,
+    pub creator: Option<String>,
     pub creation: DateTime<Utc>,
     pub content: String,
     pub unlisted: bool,

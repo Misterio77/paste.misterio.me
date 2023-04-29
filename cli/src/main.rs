@@ -38,7 +38,7 @@ enum Commands {
         #[clap(short, long)]
         raw: bool,
     },
-    /// Uploads a file and creates a new paste. Requires authentication
+    /// Uploads a file and creates a new paste.
     #[clap(alias = "u", alias = "up", alias = "create", alias = "post")]
     Upload {
         /// File to upload. If ommited, reads from stdin
@@ -50,7 +50,7 @@ enum Commands {
         #[clap(short, long)]
         description: Option<String>,
         /// If specified, the paste will not be listed on your profile and will only be reachable
-        /// by its link.
+        /// by its link. Anonymous uploads are always unlisted and are unnaffected by this flag.
         #[clap(short, long)]
         unlisted: bool,
         /// Output only new paste link, even on interactive terminals
