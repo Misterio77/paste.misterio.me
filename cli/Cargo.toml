@@ -8,6 +8,7 @@ repository = "https://github.com/misterio77/paste.misterio.me"
 homepage = "https://paste.misterio.me"
 edition = "2018"
 license = "GPL-3.0-or-later"
+rust-version = "1.64.0"
 
 [dependencies.tokio]
 version = "1.28"

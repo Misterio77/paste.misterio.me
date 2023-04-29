@@ -10,6 +10,7 @@ pkgs.mkShell {
     rust-analyzer
     rustfmt
     clippy
+    cargo-msrv
     # Postgres tooling
     postgresql
     pgformatter
