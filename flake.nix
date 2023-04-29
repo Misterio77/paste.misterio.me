@@ -2,7 +2,7 @@
   description = "Paste service and companion CLI tool";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-22.05";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-22.11";
   };
 
   outputs = { self, nixpkgs }:
@@ -15,7 +15,7 @@
       nixosModules.server = import ./server/module.nix;
       homeManagerModules.cli = import ./cli/module.nix;
 
-      packages = forAllSystems (system: rec {
+      packages = forAllSystems (system: {
         server = pkgsFor.${system}.callPackage ./server { };
         cli = pkgsFor.${system}.callPackage ./cli { };
       });

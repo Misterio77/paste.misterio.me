@@ -1,7 +1,7 @@
 [package]
 name = "paste-misterio-me"
 description = "Paste service"
-version = "1.4.0"
+version = "1.5.0"
 authors = [ "Gabriel Fontes <hi@m7.rs>" ]
 readme = "README.md"
 repository = "https://github.com/misterio77/paste.misterio.me"
@@ -17,20 +17,20 @@ rocket-post-as-delete = "0.1"
 rand = "0.8"
 rust-argon2 = "1.0"
 chrono-humanize = "0.2"
-syntect = "4.6"
+syntect = "5.0"
 
 [dependencies.rocket]
-version = "0.5.0-rc.1"
+version = "0.5.0-rc.3"
 features = [ "json", "secrets", "uuid" ]
 [dependencies.rocket_dyn_templates]
-version = "0.1.0-rc.1"
+version = "0.1.0-rc.3"
 features = [ "tera" ]
 [dependencies.rocket_db_pools]
-version = "0.1.0-rc.1"
+version = "0.1.0-rc.3"
 features = [ "deadpool_postgres" ]
 
 [dependencies.uuid]
-version = "1.1"
+version = "1.3"
 features = [ "serde", "v4"]
 
 [dependencies.serde]
@@ -46,11 +46,11 @@ version = "0.2"
 features = [ "with-chrono-0_4", "with-uuid-1" ]
 
 [dependencies.percent-encoding]
-version = "2.1"
+version = "2.2"
 
 [build-dependencies]
-syntect = "4.6"
+syntect = "5.0"
 
 [build-dependencies.grass]
-version = "0.10"
+version = "0.12"
 default-features = false

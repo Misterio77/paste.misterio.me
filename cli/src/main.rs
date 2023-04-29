@@ -1,8 +1,4 @@
-use clap::{
-    App,
-    AppSettings::{DisableHelpSubcommand, Hidden},
-    IntoApp, Parser, Subcommand,
-};
+use clap::{Command, CommandFactory, Parser, Subcommand};
 use clap_complete::{generate, Generator, Shell};
 use std::io;
 
@@ -10,7 +6,7 @@ use pmis::{operations, PathBuf, Result, Url, Uuid};
 
 #[derive(Parser)]
 #[clap(author, version, about)]
-#[clap(global_setting(DisableHelpSubcommand))]
+#[clap(disable_help_subcommand = true)]
 struct Cli {
     /// API URL to use
     #[clap(long, default_value = "https://paste.misterio.me")]
@@ -66,11 +62,11 @@ enum Commands {
         file: Option<PathBuf>,
     },
     /// Generate shell completions
-    #[clap(setting(Hidden))]
+    #[clap(hide = true)]
     Completions { shell: Shell },
 }
 
-fn print_completions<G: Generator>(gen: G, app: &mut App) {
+fn print_completions<G: Generator>(gen: G, app: &mut Command) {
     generate(gen, app, app.get_name().to_string(), &mut io::stdout());
 }
 
@@ -78,7 +74,7 @@ fn print_completions<G: Generator>(gen: G, app: &mut App) {
 async fn main() -> Result<()> {
     let cli = Cli::parse();
     let api = cli.api;
-    let mut app = Cli::into_app();
+    let mut app = Cli::command();
 
     match cli.command {
         Commands::List { owner, ids_only } => operations::list(api, owner, ids_only).await?,
