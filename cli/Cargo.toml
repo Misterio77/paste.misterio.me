@@ -16,7 +16,7 @@ features = ["full"]
 
 [dependencies.clap]
 version = "4.2"
-features = ["derive", "wrap_help"]
+features = ["derive", "wrap_help", "env"]
 
 [dependencies.reqwest]
 version = "0.11"

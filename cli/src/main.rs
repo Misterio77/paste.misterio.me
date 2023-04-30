@@ -9,7 +9,7 @@ use pmis::{operations, PathBuf, Result, Url, Uuid};
 #[clap(disable_help_subcommand = true)]
 struct Cli {
     /// API URL to use
-    #[clap(long, default_value = "https://paste.misterio.me")]
+    #[clap(long, default_value = "https://paste.misterio.me", env = "PMIS_API")]
     api: Url,
 
     #[clap(subcommand)]

@@ -19,7 +19,10 @@ in runTest {
         ROCKET_SECRET_KEY=Cb0uFIrmXCr4M+k4lKnohQc7vTMM0RmpxjsdnnKui1k=
       '';
     };
-    environment.systemPackages = [ cli ];
+    environment = {
+      systemPackages = [ cli ];
+      sessionVariables.PMIS_API = "http://localhost:8080";
+    };
   };
 
   testScript = ''
@@ -27,7 +30,7 @@ in runTest {
     # Run migrations
     machine.succeed("cat ${server}/etc/db/*.sql | sudo -u paste psql")
     # Try uploading and downloading a paste
-    id = machine.succeed('echo "foo-bar" | pmis --api http://localhost:8080 u | cut -d "/" -f5')
+    id = machine.succeed('echo foo-bar | pmis u | cut -d "/" -f5 ').strip()
     machine.succeed(f'pmis d {id} | grep foo-bar')
   '';
 }

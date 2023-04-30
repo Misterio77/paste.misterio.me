@@ -14,9 +14,20 @@ in {
       default = pkgs.callPackage ./cli.nix { };
       description = "Package providing <command>pmis</command>.";
     };
+
+    apiUrl = mkOption {
+      default = null;
+      type = types.nullOr types.str;
+      description = ''
+        Default pmis API URL to use.
+      '';
+    };
   };
 
   config = mkIf cfg.enable {
     home.packages = [ cfg.package ];
+    sessionVariables = {
+      PMIS_API = lib.optionalString (cfg.apiUrl != null) cfg.apiUrl;
+    };
   };
 }
