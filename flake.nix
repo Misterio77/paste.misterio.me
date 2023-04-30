@@ -12,17 +12,19 @@
       pkgsFor = nixpkgs.legacyPackages;
     in
     rec {
-      nixosModules.server = import ./server/module.nix;
-      homeManagerModules.cli = import ./cli/module.nix;
+      nixosModules.server = import ./nix/server-module.nix;
+      homeManagerModules.cli = import ./nix/cli-module.nix;
 
       packages = forAllSystems (system: {
-        server = pkgsFor.${system}.callPackage ./server { };
-        cli = pkgsFor.${system}.callPackage ./cli { };
+        server = pkgsFor.${system}.callPackage ./nix/server.nix { };
+        cli = pkgsFor.${system}.callPackage ./nix/cli.nix { };
+        tests = pkgsFor.${system}.callPackage ./nix/tests.nix { };
       });
 
       devShells = forAllSystems (system: {
-        default = pkgsFor.${system}.callPackage ./shell.nix { };
+        default = pkgsFor.${system}.callPackage ./nix/shell.nix { };
       });
+
       hydraJobs = packages;
     };
 }

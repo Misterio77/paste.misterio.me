@@ -1,12 +1,12 @@
 { lib, rustPlatform, openssl, pkg-config, installShellFiles }:
 
-let manifest = (lib.importTOML ./Cargo.toml).package;
+let manifest = (lib.importTOML ../cli/Cargo.toml).package;
 in
-rustPlatform.buildRustPackage rec {
+rustPlatform.buildRustPackage {
   pname = manifest.name;
   version = manifest.version;
 
-  src = lib.cleanSource ../.;
+  src = lib.sourceByRegex ../. [ "Cargo.toml" "Cargo.lock" "cli.*" "server.*" ];
 
   cargoLock.lockFile = ../Cargo.lock;
 
