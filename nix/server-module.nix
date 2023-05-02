@@ -131,6 +131,7 @@ in
     in {
       description = "paste.misterio.me";
       wantedBy = [ "multi-user.target" ];
+      requires = [ "network.target" ] ++ optional cfg.database.createLocally "postgresql.service";
       after = [ "network.target" ] ++ optional cfg.database.createLocally "postgresql.service";
       preStart = ''
         cat > "${envFile}" <<EOF
