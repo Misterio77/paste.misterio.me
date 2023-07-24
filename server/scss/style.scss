@@ -11,6 +11,14 @@
   color: unset;
 }
 
+html[aria-busy="true"]::before {
+  display: none !important;
+}
+
+.turbo-progress-bar {
+  background-color: var(--primary);
+}
+
 // Set selection color
 ::selection {
   background: var(--primary-hover);

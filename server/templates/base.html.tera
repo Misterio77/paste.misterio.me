@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}Home{% endblock %} | paste.misterio.me</title>
     <meta name="description" content="{% block description %}Simple FLOSS paste hosting service{% endblock description %}"/>
+    <script src="https://unpkg.com/@hotwired/turbo@7.3.0/dist/turbo.es2017-umd.js"></script>
     <link rel="icon" href="data:,"> <!-- Disable favicon -->
     <link rel="stylesheet" href="/assets/{{ version() }}/style.css" />
   </head>
@@ -29,7 +30,7 @@
     <main class="container">
       {% block flash %}
       {% if flash %}
-        <div id="flash" class="{{ flash.kind }}">
+        <div id="flash" class="{{ flash.kind }}" data-turbo-temporary>
           <sup onclick="document.getElementById('flash').remove()">
             {{ flash.message }}
           </sub>

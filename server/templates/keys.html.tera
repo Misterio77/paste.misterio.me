@@ -18,11 +18,14 @@
   </ul>
 </nav>
 
+{% if new_key %}
+  <article data-turbo-temporary>
+    <p>This is your new key, make sure to copy it now (you won't see it again):</p>
+    <code>{{ new_key }}</code>
+  </article>
+{% endif %}
+
 <article>
-  {% if new_key %}
-  <p>This is your new key, make sure to copy it now (you won't see it again):</p>
-  <code>{{ new_key }}</code>
-  {% else %}
   <form method="post">
     <label>
       Key name <small>(optional)</small>
@@ -30,7 +33,6 @@
     </label>
     <button>Generate new key</button>
   </form>
-  {% endif %}
 </article>
 
 <hr />
