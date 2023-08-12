@@ -1,2 +1,3 @@
 server/scss/pico/** linguist-vendored
 server/syntaxes/** linguist-vendored
+server/templates/*.tera linguist-language=jinja
