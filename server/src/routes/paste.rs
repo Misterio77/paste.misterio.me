@@ -50,7 +50,7 @@ async fn get(
         .await
         .map_err(|e| e.flash_redirect("/"))?;
 
-    let highlighted = paste.highlight(ss);
+    let highlighted = paste.highlight(ss).map_err(|e| e.flash_redirect("/"))?;
 
     Ok(Template::render(
         "paste",

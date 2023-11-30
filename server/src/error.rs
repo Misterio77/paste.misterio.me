@@ -129,6 +129,15 @@ impl From<argon2::Error> for ServerError {
             .build()
     }
 }
+impl From<syntect::Error> for ServerError {
+    fn from(e: syntect::Error) -> Self {
+        ServerError::builder()
+            .code(Status::InternalServerError)
+            .source(Box::new(e))
+            .message("Highlighting error")
+            .build()
+    }
+}
 impl From<rocket_db_pools::deadpool_postgres::tokio_postgres::Error> for ServerError {
     fn from(e: rocket_db_pools::deadpool_postgres::tokio_postgres::Error) -> Self {
         let (message, code) = match e.as_db_error() {

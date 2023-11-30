@@ -39,9 +39,7 @@
       <textarea name="content" class="code" spellcheck="false" autocomplete="off" autocapitalize="none" autocorrect="off" rows="10" required autofocus>{{ content }}</textarea>
     </label>
 
-    <button>
-      Create
-    </button>
+    <input type="submit" value="Create" />
     {% if not session %}
     <small>Note: Your paste can't be deleted if you create it anonymously</small>
     {% endif %}

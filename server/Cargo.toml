@@ -51,5 +51,5 @@ version = "2.2"
 syntect = "5.0"
 
 [build-dependencies.grass]
-version = "0.12"
+version = "0.13"
 default-features = false

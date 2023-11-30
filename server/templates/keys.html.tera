@@ -31,7 +31,7 @@
       Key name <small>(optional)</small>
       <input name="name" type="text" placeholder="To automate world domination"/>
     </label>
-    <button>Generate new key</button>
+    <input type="submit" value="Generate new key"/>
   </form>
 </article>
 
@@ -51,7 +51,7 @@
       </hgroup>
     </header>
     <form method="post" action="/keys/{{ key.id }}/delete">
-      <button>Revoke</button>
+      <input type="submit" value="Revoke"/>
     </form>
   </article>
   {% if (loop.index % 3) == 0 %}

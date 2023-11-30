@@ -1,3 +1,4 @@
+use crate::error::ServerError;
 use syntect::parsing::SyntaxSet as SyntectSyntaxSet;
 use syntect::{
     html::{ClassStyle, ClassedHTMLGenerator},
@@ -15,7 +16,7 @@ impl SyntaxSet {
         Self(inner)
     }
 
-    pub fn highlight(&self, extension: Option<&str>, content: &str) -> String {
+    pub fn highlight(&self, extension: Option<&str>, content: &str) -> Result<String, ServerError> {
         let ext = extension.unwrap_or("txt");
         let syntax = self
             .0
@@ -26,8 +27,8 @@ impl SyntaxSet {
             ClassedHTMLGenerator::new_with_class_style(syntax, &self.0, ClassStyle::Spaced);
 
         for line in LinesWithEndings::from(content) {
-            generator.parse_html_for_line_which_includes_newline(line);
+            generator.parse_html_for_line_which_includes_newline(line)?;
         }
-        generator.finalize()
+        Ok(generator.finalize())
     }
 }

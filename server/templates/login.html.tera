@@ -23,9 +23,7 @@
       Password
       <input type="password" name="password" autocomplete="current-password" required />
     </label>
-    <button>
-      Log in
-    </button>
+    <input type="submit" value="Log in"/>
   </form>
 </article>
 

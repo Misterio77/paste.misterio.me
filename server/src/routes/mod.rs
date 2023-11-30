@@ -19,8 +19,8 @@ pub mod home {
 }
 
 pub mod assets {
-    use crate::style::StyleSheet;
-    use rocket::{get, response::Redirect, routes, Route, State};
+    use crate::{asset::Asset, STYLE, TURBO};
+    use rocket::{get, response::Redirect, routes, Route};
 
     #[get("/style.css")]
     fn style() -> Redirect {
@@ -28,12 +28,22 @@ pub mod assets {
     }
 
     #[get("/<_version>/style.css")]
-    fn style_versioned<'a>(css: &'a State<StyleSheet>, _version: String) -> &'a StyleSheet<'a> {
-        css
+    fn style_versioned(_version: String) -> Asset<'static> {
+        Asset::new(STYLE, 86400)
+    }
+
+    #[get("/turbo.js")]
+    fn turbo() -> Redirect {
+        Redirect::to(format!("/assets/{}/turbo.js", crate::VERSION))
+    }
+
+    #[get("/<_version>/turbo.js")]
+    fn turbo_versioned(_version: String) -> Asset<'static> {
+        Asset::new(TURBO, 86400)
     }
 
     pub fn routes() -> Vec<Route> {
-        routes![style, style_versioned]
+        routes![style, style_versioned, turbo, turbo_versioned]
     }
 }
 

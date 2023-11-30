@@ -1,0 +1,102 @@
+/* Pink color for light color scheme (Default) */
+/* Can be forced with data-theme="light" */
+[data-theme=light],
+:root:not([data-theme=dark]) {
+  --pico-text-selection-color: rgba(246, 84, 126, 0.25);
+  --pico-primary: #c72259;
+  --pico-primary-background: #d92662;
+  --pico-primary-underline: rgba(199, 34, 89, 0.5);
+  --pico-primary-hover: #9d1945;
+  --pico-primary-hover-background: #c72259;
+  --pico-primary-focus: rgba(246, 84, 126, 0.25);
+  --pico-primary-inverse: #fff;
+  --pico-success-color: #2e7d32;
+  --pico-error-color: #b71c1c;
+  --pico-warn-color: #ff8f00;
+  --code-pink-color: #b34d80;
+  --code-cyan-color: #3d888f;
+  --code-blue-color: #4091bf;
+  --code-purple-color: #583399;
+  --code-red-color: #b71c1c;
+  --code-green-color: #2e7d32;
+  --code-amber-color: #ff6f00;
+  --code-brown-color: #986;
+  --code-grey-color: #8a99a3;
+  --code-background-color: #edf0f3;
+  --code-color: var(--pico-color);
+  --code-kbd-background-color: var(--pico-contrast);
+  --code-kbd-color: var(--pico-contrast-inverse);
+  --code-tag-color: var(--code-pink-color);
+  --code-property-color: var(--code-cyan-color);
+  --code-value-color: var(--code-brown-color);
+  --code-comment-color: var(--muted-color);
+}
+
+/* Pink color for dark color scheme (Auto) */
+/* Automatically enabled if user has Dark mode enabled */
+@media only screen and (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --pico-text-selection-color: rgba(247, 112, 142, 0.1875);
+    --pico-primary: #f7708e;
+    --pico-primary-background: #d92662;
+    --pico-primary-underline: rgba(247, 112, 142, 0.5);
+    --pico-primary-hover: #f99eae;
+    --pico-primary-hover-background: #f42c6f;
+    --pico-primary-focus: rgba(247, 112, 142, 0.25);
+    --pico-primary-inverse: #fff;
+    --pico-success-color: #27712a;
+    --pico-error-color: #e53935;
+    --pico-warn-color: #ffa000;
+    --pico-code-background-color: #161a1f;
+    --code-pink-color: #a65980;
+    --code-cyan-color: #599fa6;
+    --code-blue-color: #66a7cc;
+    --code-purple-color: #a88cd9;
+    --code-red-color: #e53935;
+    --code-green-color: #66bb6a;
+    --code-amber-color: #ffa000;
+    --code-brown-color: #8c8473;
+    --code-grey-color: #596b78;
+    --code-background-color: #141e26;
+    --code-color: var(--pico-color);
+    --code-kbd-background-color: var(--pico-contrast);
+    --code-kbd-color: var(--pico-contrast-inverse);
+    --code-tag-color: var(--code-pink-color);
+    --code-property-color: var(--code-cyan-color);
+    --code-value-color: var(--code-brown-color);
+    --code-comment-color: var(--muted-color);
+  }
+}
+
+/* Pink color for dark color scheme (Forced) */
+/* Enabled if forced with data-theme="dark" */
+[data-theme=dark] {
+  --pico-text-selection-color: rgba(247, 112, 142, 0.1875);
+  --pico-primary: #f7708e;
+  --pico-primary-background: #d92662;
+  --pico-primary-underline: rgba(247, 112, 142, 0.5);
+  --pico-primary-hover: #f99eae;
+  --pico-primary-hover-background: #f42c6f;
+  --pico-primary-focus: rgba(247, 112, 142, 0.25);
+  --pico-primary-inverse: #fff;
+  --pico-success-color: #27712a;
+  --pico-error-color: #e53935;
+  --pico-warn-color: #ffa000;
+  --code-pink-color: #a65980;
+  --code-cyan-color: #599fa6;
+  --code-blue-color: #66a7cc;
+  --code-purple-color: #a88cd9;
+  --code-red-color: #e53935;
+  --code-green-color: #66bb6a;
+  --code-amber-color: #ffa000;
+  --code-brown-color: #8c8473;
+  --code-grey-color: #596b78;
+  --code-background-color: #141e26;
+  --code-color: var(--pico-color);
+  --code-kbd-background-color: var(--pico-contrast);
+  --code-kbd-color: var(--pico-contrast-inverse);
+  --code-tag-color: var(--code-pink-color);
+  --code-property-color: var(--code-cyan-color);
+  --code-value-color: var(--code-brown-color);
+  --code-comment-color: var(--muted-color);
+}

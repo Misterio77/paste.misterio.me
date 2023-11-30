@@ -16,9 +16,7 @@
         Log out from all sessions
       </label>
     </fieldset>
-    <button>
-      Log out
-    </button>
+    <input type="submit" value="Log out"/>
   </form>
   <footer>
     <a href="/sessions">

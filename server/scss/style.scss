@@ -1,7 +1,10 @@
 // Import full Pico source code
-@import "pico/pico";
+@use "pico/pico";
+// Customize it
+@use "colors";
+
 // Import code highlighting
-@import "highlight";
+@use "highlight";
 
 // Disable link on current page
 [aria-current=page] {
@@ -11,55 +14,36 @@
   color: unset;
 }
 
+// Hide hotwire's aria-busy
 html[aria-busy="true"]::before {
   display: none !important;
 }
 
+// Recolor hotwire's progress bar
 .turbo-progress-bar {
-  background-color: var(--primary);
-}
-
-// Set selection color
-::selection {
-  background: var(--primary-hover);
+  background-color: var(--pico-primary);
 }
 
 // Style navbar
-body>nav { box-shadow: var(--card-box-shadow);
-  background-color: var(--card-sectionning-background-color);
+body>nav {
+  box-shadow: var(--pico-card-box-shadow);
+  background-color: var(--pico-card-sectioning-background-color);
 }
 
 // Style footer
 body>footer {
-  border-top: 1px solid var(--primary);
+  border-top: 1px solid var(--pico-primary);
   padding-top: 2rem;
   p {
     font-size: 80%;
   }
 }
 
-// Cards
-article {
-  // Slimmer card
-  &.slim {
-  margin: auto;
-    @media (min-width: 30em) {
-      max-width: 30em;
-    }
-  }
-  margin-top: var(--typography-spacing-vertical);
-  margin-bottom: var(--typography-spacing-vertical);
-}
-
 button {
+  // Red-colored delete button
   &.delete {
-    background-color: var(--error-color);
-    border-color: var(--error-color);
-  }
-  &.small {
-    width: auto;
-    display: inline;
-    margin-bottom: auto;
+    background-color: var(--pico-error-color);
+    border-color: var(--pico-error-color);
   }
 }
 
@@ -67,25 +51,25 @@ button {
   text-align: center;
   padding-bottom: 3rem;
   sup {
-    background-color: var(--primary);
-    color: var(--primary-inverse);
+    background-color: var(--pico-primary);
+    color: var(--pico-primary-inverse);
     font-weight: bold;
     border-radius: 0.2rem;
     margin: 0.2rem;
     padding: 0.4rem 0.5rem;
   }
   &.success sup {
-    background-color: var(--success-color);
+    background-color: var(--pico-success-color);
   }
   &.error sup {
-    background-color: var(--error-color);
+    background-color: var(--pico-error-color);
   }
   &.warning sup {
-    background-color: var(--warn-color);
+    background-color: var(--pico-warn-color);
   }
 }
 
 textarea.code {
   resize: vertical;
-  font-family: var(--mono-font-family);
+  font-family: var(--pico-mono-font-family);
 }

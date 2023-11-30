@@ -45,7 +45,7 @@
 
   {% if session and paste.creator == session.creator %}
   <form method="post" action="/p/{{ paste.id }}/delete">
-    <button class="small delete">Delete</button>
+    <button class="delete">Delete</button>
   </form>
   {% endif %}
 

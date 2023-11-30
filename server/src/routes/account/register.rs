@@ -28,7 +28,10 @@ fn get(
             .flash_redirect(redir.as_deref().unwrap_or("/")));
     }
 
-    Ok(Template::render("register", context! {flash, redir, session}))
+    Ok(Template::render(
+        "register",
+        context! {flash, redir, session},
+    ))
 }
 
 #[derive(FromForm, Deserialize)]

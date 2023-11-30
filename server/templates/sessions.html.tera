@@ -40,7 +40,7 @@
       {% endif %}
     </p>
     <form method="post" action="/sessions/{{ session.id }}/delete">
-      <button>Revoke</button>
+      <input type="submit" value="Revoke"/>
     </form>
   </article>
   {% if (loop.index % 3) == 0 %}

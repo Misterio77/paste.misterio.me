@@ -2,3 +2,4 @@
 result
 # cargo build
 target
+.database

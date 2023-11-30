@@ -140,7 +140,7 @@ impl Paste {
     pub fn extension(&self) -> Option<&str> {
         self.title.as_ref().and_then(|n| n.split('.').last())
     }
-    pub fn highlight(&self, ss: &SyntaxSet) -> String {
+    pub fn highlight(&self, ss: &SyntaxSet) -> Result<String, ServerError> {
         ss.highlight(self.extension(), &self.content)
     }
     pub async fn show_all(

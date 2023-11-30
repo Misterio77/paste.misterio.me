@@ -27,9 +27,7 @@
       Password
       <input type="password" name="password" autocomplete="new-password" required />
     </label>
-    <button>
-      Login
-    </button>
+    <input type="submit" value="Register"/>
   </form>
 </article>
 

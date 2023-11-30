@@ -2,7 +2,7 @@
   description = "Paste service and companion CLI tool";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-22.11";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.11";
   };
 
   outputs = { self, nixpkgs }:
@@ -12,17 +12,17 @@
       pkgsFor = nixpkgs.legacyPackages;
     in
     rec {
-      nixosModules.server = import ./nix/server-module.nix;
-      homeManagerModules.cli = import ./nix/cli-module.nix;
+      nixosModules.server = import ./server/nixos-module.nix;
+      homeManagerModules.cli = import ./cli/hm-module.nix;
 
       packages = forAllSystems (system: {
-        server = pkgsFor.${system}.callPackage ./nix/server.nix { };
-        cli = pkgsFor.${system}.callPackage ./nix/cli.nix { };
-        tests = pkgsFor.${system}.callPackage ./nix/tests.nix { };
+        server = pkgsFor.${system}.callPackage ./server { };
+        cli = pkgsFor.${system}.callPackage ./cli { };
+        tests = pkgsFor.${system}.callPackage ./tests { };
       });
 
       devShells = forAllSystems (system: {
-        default = pkgsFor.${system}.callPackage ./nix/shell.nix { };
+        default = pkgsFor.${system}.callPackage ./shell.nix { };
       });
 
       hydraJobs = packages;
