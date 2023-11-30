@@ -72,6 +72,7 @@ rustPlatform.buildRustPackage {
   '';
 
   meta = with lib; {
+    mainProgram = "paste-misterio-me";
     description = manifest.description;
     homepage = manifest.homepage;
     license = licenses.agpl3Plus;
