@@ -3,12 +3,12 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.11";
+    systems.url = "github:nix-systems/default";
   };
 
-  outputs = { self, nixpkgs }:
+  outputs = { self, nixpkgs, systems }:
     let
-      supportedSystems = [ "x86_64-linux" "aarch64-linux" ];
-      forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
+      forAllSystems = nixpkgs.lib.genAttrs (import systems);
       pkgsFor = nixpkgs.legacyPackages;
     in
     rec {
