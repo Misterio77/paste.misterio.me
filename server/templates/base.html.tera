@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}Home{% endblock %} | paste.misterio.me</title>
     <meta name="description" content="{% block description %}Simple FLOSS paste hosting service{% endblock description %}"/>
+    <meta name="view-transition" content="same-origin" />
     <script src="/assets/{{ version() }}/turbo.js"></script>
     <link rel="icon" href="data:,"> <!-- Disable favicon -->
     <link rel="stylesheet" href="/assets/{{ version() }}/style.css" />

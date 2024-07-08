@@ -1,15 +1,19 @@
-{ lib, rustPlatform, mkYarnPackage, fetchFromGitHub, stdenv }:
+{ lib, rustPlatform, mkYarnPackage, fetchFromGitHub, stdenv, fetchYarnDeps }:
 
 let
   manifest = (lib.importTOML ./Cargo.toml).package;
   turbo = mkYarnPackage rec {
     pname = "turbo";
-    version = "7.3.0";
+    version = "8.0.4";
     src = fetchFromGitHub {
       owner = "hotwired";
       repo = pname;
       rev = "v${version}";
-      hash = "sha256-+lkGiQg3hwK3Efo2JIN4i2oJNBF41DjzRhAvPzDemG8=";
+      hash = "sha256-XxocsGgdGlzs9JOByuM+ujaJTrE/Oycay2dxn+8Qo2I=";
+    };
+    offlineCache = fetchYarnDeps {
+      yarnLock = "${src}/yarn.lock";
+      hash = "sha256-BOyKVRKFS+XI0A9Lp9NODxuVFTmmwjWD5Znw8XP8bbs=";
     };
     buildPhase = "yarn --offline build";
     installPhase = "mv ./deps/@hotwired/turbo/dist $out";
