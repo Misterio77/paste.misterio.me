@@ -1,5 +1,2 @@
 [default]
 template_dir = "templates"
-
-[default.databases.database]
-url = "postgresql://misterio/postgres?user=misterio&host=/home/misterio/Documents/Dev/Personal/paste.misterio.me/server/.database&port=5430"

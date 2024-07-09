@@ -1,0 +1,3 @@
+[alias]
+watch-run = "watch -x run"
+wr = "watch-run"
