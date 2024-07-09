@@ -8,7 +8,7 @@ pub async fn list(api: Url, owner: Option<String>, ids_only: bool) -> Result<()>
     let session = Session::load().ok();
     let client = Client::new_with_redir();
 
-    let url = api.join(&format!("/u/{}/pastes", owner.unwrap_or_default()))?;
+    let url = api.join(&format!("/u/{}", owner.unwrap_or_default()))?;
     let res = if let Some(s) = session {
         client.get(url).bearer_auth(s.key())
     } else {

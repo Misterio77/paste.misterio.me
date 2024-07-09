@@ -25,22 +25,7 @@ async fn api_root(key: ApiKey) -> Redirect {
     Redirect::to(format!("/u/{}", key.creator))
 }
 
-#[get("/pastes", rank = 1)]
-async fn root_pastes(session: Session) -> Redirect {
-    Redirect::to(format!("/u/{}/pastes", session.creator))
-}
-
-#[get("/pastes", format = "json")]
-async fn api_root_pastes(key: ApiKey) -> Redirect {
-    Redirect::to(format!("/u/{}/pastes", key.creator))
-}
-
-#[get("/<username>")]
-async fn get(username: String) -> Redirect {
-    Redirect::to(format!("/u/{}/pastes", username))
-}
-
-#[get("/<username>/pastes", rank = 1)]
+#[get("/<username>", rank = 1)]
 async fn get_pastes(
     db: Connection<Database>,
     session: Option<Session>,
@@ -65,7 +50,7 @@ async fn get_pastes(
     ))
 }
 
-#[get("/<username>/pastes", format = "json")]
+#[get("/<username>", format = "json")]
 async fn api_get_pastes(
     db: Connection<Database>,
     key: Option<ApiKey>,
@@ -81,11 +66,8 @@ async fn api_get_pastes(
 pub fn routes() -> Vec<Route> {
     routes![
         root,
-        root_pastes,
-        get,
         get_pastes,
         api_root,
-        api_root_pastes,
         api_get_pastes
     ]
 }

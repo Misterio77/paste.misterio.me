@@ -13,7 +13,7 @@
 {% if session and session.creator == user.username %}
 <nav>
   <ul>
-    <li><a href="/u/{{ user.username }}/pastes" aria-current="page">Pastes</a></li>
+    <li><a href="/u/{{ user.username }}" aria-current="page">Pastes</a></li>
     <li><a href="/sessions">Sessions</a></li>
     <li><a href="/keys">API Keys</a></li>
   </ul>

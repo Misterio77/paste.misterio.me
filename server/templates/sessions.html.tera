@@ -13,7 +13,7 @@
 
 <nav>
   <ul>
-    <li><a href="/u/{{ session.creator }}/pastes">Pastes</a></li>
+    <li><a href="/u/{{ session.creator }}">Pastes</a></li>
     <li><a href="/sessions" aria-current="page">Sessions</a></li>
     <li><a href="/keys">API Keys</a></li>
   </ul>

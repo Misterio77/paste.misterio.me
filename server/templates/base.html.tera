@@ -13,7 +13,7 @@
   <body>
     <nav class="container-fluid">
       <ul>
-        <li><a href="/">paste.misterio.me</a></li>
+        <li><a href="/p">paste.misterio.me</a></li>
       </ul>
       <ul>
         {% block auth %}
