@@ -17,7 +17,7 @@
   <form method="post">
     <label>
       Username
-      <input type="text" name="username" autocomplete="username" required autofocus />
+      <input type="text" name="username" autocomplete="username" required />
     </label>
     <label>
       Password

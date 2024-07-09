@@ -36,7 +36,7 @@
 
     <label>
       Content
-      <textarea name="content" class="code" spellcheck="false" autocomplete="off" autocapitalize="none" autocorrect="off" rows="10" required autofocus>{{ content }}</textarea>
+      <textarea name="content" class="code" spellcheck="false" autocomplete="off" autocapitalize="none" autocorrect="off" rows="10" required>{{ content }}</textarea>
     </label>
 
     <input type="submit" value="Create" />

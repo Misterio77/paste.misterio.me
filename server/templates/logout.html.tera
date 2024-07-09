@@ -12,7 +12,7 @@
   <form method="post">
     <fieldset>
       <label>
-        <input role="switch" type="checkbox" name="all" autofocus />
+        <input role="switch" type="checkbox" name="all" />
         Log out from all sessions
       </label>
     </fieldset>
