@@ -4,16 +4,16 @@ let
   manifest = (lib.importTOML ./Cargo.toml).package;
   turbo = mkYarnPackage rec {
     pname = "turbo";
-    version = "8.0.4";
+    version = "14284e6";
     src = fetchFromGitHub {
       owner = "hotwired";
       repo = pname;
-      rev = "v${version}";
-      hash = "sha256-XxocsGgdGlzs9JOByuM+ujaJTrE/Oycay2dxn+8Qo2I=";
+      rev = version;
+      hash = "sha256-je9RrDUrA/ewMsu7557YRbaBSc21ByqoNpab4+MyDpw=";
     };
     offlineCache = fetchYarnDeps {
       yarnLock = "${src}/yarn.lock";
-      hash = "sha256-BOyKVRKFS+XI0A9Lp9NODxuVFTmmwjWD5Znw8XP8bbs=";
+      hash = "sha256-5wqfQzhi9+4H/jFjaqenrkfbYund4EDd1zn8KiNS+w0=";
     };
     buildPhase = "yarn --offline build";
     installPhase = "mv ./deps/@hotwired/turbo/dist $out";
