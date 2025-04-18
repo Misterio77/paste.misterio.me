@@ -72,6 +72,11 @@ in
         description = "Whether to create a local database automatically.";
       };
     };
+    maxBodySize = mkOption {
+      type = types.str;
+      default = "10MiB";
+      description = "Max body size for forms.";
+    };
     environmentFile = mkOption {
       type = types.nullOr types.path;
       description = "File path containing environment variables (secret key, for example) for the server";
@@ -148,6 +153,7 @@ in
         ROCKET_PORT = toString cfg.port;
         ROCKET_LOG_LEVEL = cfg.logLevel;
         ROCKET_TEMPLATE_DIR = "${cfg.package}/etc/templates";
+        ROCKET_LIMITS = ''{form="${cfg.maxBodySize}",data-form="${cfg.maxBodySize}",file="${cfg.maxBodySize}",json="${cfg.maxBodySize}",msgpack="${cfg.maxBodySize}"}'';
       };
     };
 
